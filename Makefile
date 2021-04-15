@@ -8,7 +8,7 @@ third_party/make-env/conda.mk:
 
 include third_party/make-env/conda.mk
 
-env:: | $(CONDA_ENV_PYTHON)
+build:
 	git submodule init
 	git submodule update --init --recursive
 	# Update RapidWright jars

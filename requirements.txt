@@ -1,0 +1,9 @@
+psutil
+ninja
+pyyaml
+fasm
+git+https://github.com/SymbiFlow/prjxray.git
+git+https://github.com/SymbiFlow/xc-fasm.git
+git+https://github.com/capnproto/pycapnp.git
+git+https://github.com/litghost/rapidyaml.git@fixup_python_packaging#egg=rapidyaml
+-e git+https://github.com/SymbiFlow/python-fpga-interchange.git#egg=python-fpga-interchange

@@ -1,0 +1,39 @@
+name: FPGA interchange CI tests
+
+on: [push, pull_request]
+
+jobs:
+  Run-Tests:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - uses: actions/setup-python@v2
+
+    - name: Install
+      run: |
+        sudo apt-get update
+        sudo apt-get install git make cmake
+
+    - name: Cache environment
+      id: cache-env
+      uses: actions/cache@v2
+      with:
+        path: env
+        key: env-${{ hashFiles('**/environment.yml', '**/requirements.txt') }}
+
+    - name: Create environment
+      if: steps.cache-env.outputs.cache-hit != 'true'
+      run: make env
+
+    - name: Build CMake
+      run: make build
+
+    - name: Run tests
+      run: |
+        source env.sh
+        cd build
+        make all-xc7-tests

@@ -37,3 +37,4 @@ jobs:
         source env.sh
         cd build
         make all-xc7-tests
+        make all-xc7-validation-tests

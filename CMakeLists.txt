@@ -30,6 +30,7 @@ include(boards/boards.cmake)
 include(tests/tests.cmake)
 
 add_custom_target(all-xc7-tests)
+add_custom_target(all-xc7-validation-tests)
 
 add_subdirectory(boards)
 add_subdirectory(tests)

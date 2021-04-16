@@ -14,3 +14,6 @@ build:
 	# Update RapidWright jars
 	pushd third_party/RapidWright && make update_jars && popd
 	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake ..
+
+clean-build:
+	rm -rf build

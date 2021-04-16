@@ -16,7 +16,7 @@ jobs:
     - name: Install
       run: |
         sudo apt-get update
-        sudo apt-get install git make cmake ninja-build
+        sudo apt-get install git make cmake
 
     - name: Cache environment
       id: cache-env
@@ -30,11 +30,11 @@ jobs:
       run: make env
 
     - name: Build CMake
-      run: CMAKE_FLAGS="-GNinja" make build
+      run: make build
 
     - name: Run tests
       run: |
         source env.sh
         cd build
-        ninja all-xc7-tests -j`nproc`
-        ninja all-xc7-validation-tests -j`nproc`
+        make all-xc7-tests -j`nproc`
+        make all-xc7-validation-tests -j`nproc`

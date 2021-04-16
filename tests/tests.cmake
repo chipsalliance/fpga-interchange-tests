@@ -58,6 +58,8 @@ function(add_xc7_test)
         set(top "top")
     endif()
 
+    set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
+
     foreach(board ${add_xc7_test_board_list})
         # Get board properties
         get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
@@ -76,7 +78,7 @@ function(add_xc7_test)
             COMMAND ${CMAKE_COMMAND} -E make_directory ${output_dir}
         )
 
-    add_custom_target(xc7-${test_name}-output-dir DEPENDS ${output_dir})
+        add_custom_target(xc7-${test_name}-output-dir DEPENDS ${output_dir})
 
         # Synthesis
         set(synth_json ${output_dir}/${name}.json)
@@ -86,6 +88,7 @@ function(add_xc7_test)
                 SOURCES="${sources}"
                 OUT_JSON=${synth_json}
                 TECHMAP=${techmap}
+                ${quiet_cmd}
                 yosys -c ${tcl}
             DEPENDS
                 ${sources}
@@ -101,6 +104,7 @@ function(add_xc7_test)
         add_custom_command(
             OUTPUT ${netlist}
             COMMAND ${CMAKE_COMMAND} -E env
+                ${quiet_cmd}
                 python3 -mfpga_interchange.yosys_json
                     --schema_dir ${INTERCHANGE_SCHEMA_PATH}
                     --device ${device_loc}
@@ -119,6 +123,7 @@ function(add_xc7_test)
         add_custom_command(
             OUTPUT ${phys}
             COMMAND
+                ${quiet_cmd}
                 nextpnr-fpga_interchange
                     --chipdb ${chipdb_loc}
                     --xdc ${xdc}
@@ -155,6 +160,7 @@ function(add_xc7_test)
         add_custom_command(
             OUTPUT ${fasm}
             COMMAND ${CMAKE_COMMAND} -E env
+                ${quiet_cmd}
                 python3 -mfpga_interchange.fasm_generator
                     --schema_dir ${INTERCHANGE_SCHEMA_PATH}
                     --family xc7
@@ -176,6 +182,7 @@ function(add_xc7_test)
         add_custom_command(
             OUTPUT ${bit}
             COMMAND ${CMAKE_COMMAND} -E env
+                ${quiet_cmd}
                 xcfasm
                     --db-root ${PRJXRAY_DB_DIR}/${device_family}
                     --part ${part}
@@ -230,6 +237,9 @@ function(add_xc7_validation_test)
 
     set(name ${add_xc7_validation_test_name})
     set(enable_vivado_test ${add_xc7_validation_test_enable_vivado_test})
+
+    set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
+
     foreach(board ${add_xc7_validation_test_board_list})
         get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
         get_property(device TARGET board-${board} PROPERTY DEVICE)
@@ -247,6 +257,7 @@ function(add_xc7_validation_test)
                 COMMAND
                     ${CMAKE_COMMAND} -E make_directory ${device_channels_dir}
                 COMMAND
+                    ${quiet_cmd}
                     python3 -mfasm2bels.database.create_channels
                         --db-root ${PRJXRAY_DB_DIR}/${device_family}
                         --part ${part}
@@ -270,6 +281,7 @@ function(add_xc7_validation_test)
         add_custom_command(
             OUTPUT ${netlist} ${phys} ${xdc} ${fasm}
             COMMAND
+                ${quiet_cmd}
                 python3 -mfasm2bels
                     --db_root ${PRJXRAY_DB_DIR}/${device_family}
                     --part ${part}
@@ -294,6 +306,7 @@ function(add_xc7_validation_test)
             OUTPUT ${dcp}
             COMMAND ${CMAKE_COMMAND} -E env
                 RAPIDWRIGHT_PATH=${RAPIDWRIGHT_PATH}
+                ${quiet_cmd}
                 ${INVOKE_RAPIDWRIGHT}
                 com.xilinx.rapidwright.interchange.PhysicalNetlistToDcp
                 ${netlist} ${phys} ${xdc} ${dcp}
@@ -304,37 +317,19 @@ function(add_xc7_validation_test)
 
         add_custom_target(xc7-${test_name}-fasm2bels-dcp DEPENDS ${dcp})
 
-        # Generate tcl script to run DCP to bitstream generation
-        set(tcl ${output_dir}/runme.tcl)
+        # Generate bitstream from Vivado
+        set(tcl ${CMAKE_SOURCE_DIR}/tests/common/runme.tcl)
         set(vivado_bit ${output_dir}/${name}.vivado.bit)
         add_custom_command(
-            OUTPUT ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "open_checkpoint ${dcp}"                                               >  ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "${XDC_EXTRA_ARGS}"                                                    >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "set_property CFGBVS VCCO [current_design]"                            >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "set_property CONFIG_VOLTAGE 3.3 [current_design]"                     >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "set_property BITSTREAM.GENERAL.PERFRAMECRC YES [current_design]"      >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "set_property IS_ENABLED 0 [get_drc_checks {LUTLP-1}]"                 >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "set_property IS_ENABLED 0 [get_drc_checks {NSTD-1}]"                  >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "report_utilization -file ${output_dir}/utilization.rpt"               >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "report_clock_utilization -file ${output_dir}/clock_utilization.rpt"   >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "report_timing_summary -datasheet -max_paths 10 -file ${output_dir}/timing_summary.rpt" >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "report_power -file ${output_dir}/power.rpt"                           >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "report_route_status -file ${output_dir}/route_status.rpt"             >> ${tcl}
-            COMMAND ${CMAKE_COMMAND} -E echo "write_bitstream -force ${vivado_bit}"                                 >> ${tcl}
-            DEPENDS
-                xc7-${test_name}-fasm2bels-dcp
-        )
-
-        add_custom_target(xc7-${test_name}-tcl DEPENDS ${tcl})
-
-        # Generate bitstream from Vivado
-        add_custom_command(
             OUTPUT ${vivado_bit}
-            COMMAND
+            COMMAND ${CMAKE_COMMAND} -E env
+                OUTPUT_DIR=${output_dir}
+                DCP_FILE=${dcp}
+                BIT_FILE=${vivado_bit}
+                ${quiet_cmd}
                 vivado -mode batch -source ${tcl}
             DEPENDS
-                xc7-${test_name}-tcl
+                xc7-${test_name}-fasm2bels-dcp
         )
 
         add_custom_target(xc7-${test_name}-vivado-bit DEPENDS ${vivado_bit})

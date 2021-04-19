@@ -1,3 +1,22 @@
+function(get_yosys_cells_sim arch cells_sim)
+    # This simple function returns a specific cells library
+    # file from the yosys share dir, corresponding to the
+    # desired device family
+    #
+    # Arguments:
+    #   - arch      : device family. E.g. xilinx, ecp5, etc.
+    #   - cells_sim : variable name where to store the cells_sim library path
+    execute_process(
+        COMMAND
+            yosys-config --datdir
+        OUTPUT_VARIABLE
+            prefix
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    set(${cells_sim} "${prefix}/${arch}/cells_sim.v" PARENT_SCOPE)
+endfunction()
+
 function(add_xc7_test)
     # ~~~
     # add_xc7_test(
@@ -7,6 +26,7 @@ function(add_xc7_test)
     #    sources <sources list>
     #    [top <top name>]
     #    [techmap <techmap file>]
+    #    [testbench]
     # )
     #
     # Generates targets to run desired tests
@@ -32,7 +52,7 @@ function(add_xc7_test)
     #   - xc7-<name>-<board>-dcp      : DCP
 
     set(options)
-    set(oneValueArgs name tcl top techmap)
+    set(oneValueArgs name tcl top techmap testbench)
     set(multiValueArgs board_list sources)
 
     cmake_parse_arguments(
@@ -47,6 +67,7 @@ function(add_xc7_test)
     set(top ${add_xc7_test_top})
     set(tcl ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_tcl})
     set(techmap ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_techmap})
+    set(testbench ${add_xc7_test_testbench})
 
     set(sources)
     foreach(source ${add_xc7_test_sources})
@@ -79,6 +100,18 @@ function(add_xc7_test)
         )
 
         add_custom_target(xc7-${test_name}-output-dir DEPENDS ${output_dir})
+
+        if(DEFINED testbench)
+            get_yosys_cells_sim(xilinx cells_sim)
+            add_simulation_test(
+                name ${name}
+                board ${board}
+                sources ${sources}
+                deps xc7-${test_name}-output-dir
+                testbench ${testbench}
+                cells_sim ${cells_sim}
+            )
+        endif()
 
         # Synthesis
         set(synth_json ${output_dir}/${name}.json)
@@ -207,6 +240,7 @@ function(add_xc7_validation_test)
     #    name <name>
     #    board_list <board>
     #    [enable_vivado_test]
+    #    [testbench]
     # )
     #
     # Generates targets to run desired tests
@@ -224,8 +258,8 @@ function(add_xc7_validation_test)
     #   - xc7-<name>-<board>-vivado-bit     : vivado-generated bitstream
 
     set(options enable_vivado_test)
-    set(oneValueArgs name)
-    set(multiValueArgs board_list)
+    set(oneValueArgs name testbench)
+    set(multiValueArgs board_list sources)
 
     cmake_parse_arguments(
         add_xc7_validation_test
@@ -237,6 +271,7 @@ function(add_xc7_validation_test)
 
     set(name ${add_xc7_validation_test_name})
     set(enable_vivado_test ${add_xc7_validation_test_enable_vivado_test})
+    set(testbench ${add_xc7_validation_test_testbench})
 
     set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
 
@@ -267,19 +302,24 @@ function(add_xc7_validation_test)
             add_custom_target(${device}-channels-db DEPENDS ${device_channels})
         endif()
 
-        find_program(BITREAD bitread REQUIRED)
-
         set(output_dir ${CMAKE_CURRENT_BINARY_DIR}/${board})
         set(bit ${output_dir}/${name}.bit)
         set(bit_target xc7-${test_name}-bit)
 
+        get_target_property(BITREAD programs BITREAD)
+
         # Run fasm2bels to get logical and physical netlists
         set(netlist ${output_dir}/${name}.bit.netlist)
         set(phys ${output_dir}/${name}.bit.phys)
-        set(xdc ${output_dir}/${name}.bit.xdc)
+        set(interchange_xdc ${output_dir}/${name}.bit.inter.xdc)
         set(fasm ${output_dir}/${name}.bit.fasm)
+        set(verilog ${output_dir}/${name}.bit.v)
+        set(xdc ${output_dir}/${name}.bit.xdc)
         add_custom_command(
-            OUTPUT ${netlist} ${phys} ${xdc} ${fasm}
+            OUTPUT ${netlist} ${phys} ${xdc} ${fasm} ${interchange_xdc}
+            COMMAND
+                ${quiet_cmd}
+                yosys -p "read_json ${output_dir}/${name}.json\; write_blif ${output_dir}/${name}.eblif"
             COMMAND
                 ${quiet_cmd}
                 python3 -mfasm2bels
@@ -289,16 +329,29 @@ function(add_xc7_validation_test)
                     --bitread ${BITREAD}
                     --bit_file ${bit}
                     --fasm_file ${fasm}
+                    --eblif ${output_dir}/${name}.eblif
+                    --verilog_file ${verilog}
+                    --input_xdc ${CMAKE_CURRENT_SOURCE_DIR}/${board}.xdc
+                    --xdc_file ${xdc}
                     --logical_netlist ${netlist}
                     --physical_netlist ${phys}
-                    --interchange_xdc ${xdc}
+                    --interchange_xdc ${interchange_xdc}
                     --interchange_capnp_schema_dir ${INTERCHANGE_SCHEMA_PATH}
             DEPENDS
                 xc7-${test_name}-bit
                 ${device}-channels-db
         )
 
-        add_custom_target(xc7-${test_name}-fasm2bels DEPENDS ${netlist} ${phys} ${xdc} ${fasm})
+        add_custom_target(
+            xc7-${test_name}-fasm2bels
+            DEPENDS
+                ${netlist}
+                ${phys}
+                ${interchange_xdc}
+                ${fasm}
+                ${verilog}
+                ${xdc}
+        )
 
         # DCP generation target
         set(dcp ${output_dir}/${name}.bit.dcp)
@@ -339,6 +392,116 @@ function(add_xc7_validation_test)
         else()
             add_dependencies(all-xc7-validation-tests xc7-${test_name}-fasm2bels-dcp)
         endif()
-    endforeach()
 
+        if(DEFINED testbench)
+            get_yosys_cells_sim(xilinx cells_sim)
+            add_simulation_test(
+                name fasm2bels-${name}
+                board ${board}
+                sources ${verilog}
+                deps xc7-${test_name}-fasm2bels-dcp
+                testbench ${testbench}
+                cells_sim ${cells_sim}
+            )
+        endif()
+    endforeach()
+endfunction()
+
+function(add_simulation_test)
+    # ~~~
+    # add_simulation_test(
+    #    name <name>
+    #    board <board>
+    #    cells_sim <cells sim>
+    #    testbench <testbench>
+    #    deps
+    # )
+    #
+    # Generates targets to run desired simulation tests.
+    #
+    # This function should not be called directly, but within another test function.
+    #
+    # Arguments:
+    #   - name: test name. This must be unique and no other tests with the same
+    #           name should exist
+    #   - board: board name. This is used to get the output directory
+    #   - cells_sim: verilog simulation file to get the cell's libraries
+    #                This is required for post-synthesis and fasm2bels targets
+    #   - testbench: verilog testbench file that instantiates the DUT and performs
+    #                basic tests
+    #   - deps: dependencies to be met prior to running the simulation test
+    #
+    # Targets generated:
+    #   - sim-test-${test}-${board}-vpp : generates the VPP and VCD files
+    #   - sim-test-${test}-${board}     : runs VVP
+
+    set(options)
+    set(oneValueArgs board name cells_sim testbench deps)
+    set(multiValueArgs sources)
+
+    cmake_parse_arguments(
+        add_simulation_test
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    set(name ${add_simulation_test_name})
+    set(board ${add_simulation_test_board})
+    set(cells_sim ${add_simulation_test_cells_sim})
+    set(sources ${add_simulation_test_sources})
+    set(deps ${add_simulation_test_deps})
+    set(testbench ${CMAKE_CURRENT_SOURCE_DIR}/${add_simulation_test_testbench})
+
+    set(test_name "${name}-${board}")
+
+    get_target_property(VVP programs VVP)
+    get_target_property(IVERILOG programs IVERILOG)
+
+    set(output_dir ${CMAKE_CURRENT_BINARY_DIR}/${board})
+
+    set(utils_dir ${CMAKE_SOURCE_DIR}/utils)
+    set(quiet_cmd ${utils_dir}/quiet_cmd.sh)
+
+    set(vpp ${name}.vpp)
+    set(vpp_path ${output_dir}/${vpp})
+    add_custom_command(
+        OUTPUT ${vpp_path}
+        COMMAND
+            which ${IVERILOG}
+        COMMAND
+            ${quiet_cmd}
+            ${IVERILOG}
+                -v
+                -I ${utils_dir}
+                -DVCD=${output_dir}/${name}.vcd
+                -o ${vpp}
+                ${cells_sim}
+                ${sources}
+                ${testbench}
+        DEPENDS
+            ${IVERILOG}
+            ${deps}
+            ${testbench}
+        WORKING_DIRECTORY
+            ${output_dir}
+    )
+
+    add_custom_target(sim-test-${test_name}-vpp DEPENDS ${vpp_path})
+
+    add_custom_target(
+        sim-test-${test_name}
+        COMMAND
+            ${quiet_cmd}
+            ${VVP}
+                -v
+                -N
+                ${vpp_path}
+        DEPENDS
+            ${VVP}
+            sim-test-${test_name}-vpp
+    )
+
+    add_dependencies(all-simulation-tests sim-test-${test_name})
 endfunction()

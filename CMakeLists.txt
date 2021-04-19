@@ -26,11 +26,25 @@ if (${PRJXRAY_DB_DIR} STREQUAL "PRJXRAY_DB_DIR-NOTFOUND")
   message(FATAL_ERROR "Could not find the project xray database directory! Please provide it with the PRJXRAY_DB_DIR variable")
 endif ()
 
+find_program(iverilog iverilog REQUIRED)
+find_program(vvp vvp REQUIRED)
+find_program(bitread bitread REQUIRED)
+
+add_custom_target(programs)
+set_target_properties(
+  programs
+  PROPERTIES
+    IVERILOG ${iverilog}
+    VVP ${vvp}
+    BITREAD ${bitread}
+)
+
 include(boards/boards.cmake)
 include(tests/tests.cmake)
 
 add_custom_target(all-xc7-tests)
 add_custom_target(all-xc7-validation-tests)
+add_custom_target(all-simulation-tests)
 
 add_subdirectory(boards)
 add_subdirectory(tests)

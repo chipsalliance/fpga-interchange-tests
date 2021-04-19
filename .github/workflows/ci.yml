@@ -38,3 +38,4 @@ jobs:
         cd build
         make all-xc7-tests -j`nproc`
         make all-xc7-validation-tests -j`nproc`
+        make all-simulation-tests -j`nproc`

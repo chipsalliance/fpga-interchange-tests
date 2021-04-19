@@ -81,6 +81,11 @@ function(add_xc7_test)
 
     set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
 
+    get_target_property(YOSYS programs YOSYS)
+    get_target_property(NEXTPNR_INTERCHANGE programs NEXTPNR_INTERCHANGE)
+    get_target_property(XCFASM programs XCFASM)
+    get_target_property(PYTHON3 programs PYTHON3)
+
     foreach(board ${add_xc7_test_board_list})
         # Get board properties
         get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
@@ -122,7 +127,7 @@ function(add_xc7_test)
                 OUT_JSON=${synth_json}
                 TECHMAP=${techmap}
                 ${quiet_cmd}
-                yosys -c ${tcl}
+                ${YOSYS} -c ${tcl}
             DEPENDS
                 ${sources}
                 ${techmap}
@@ -157,7 +162,7 @@ function(add_xc7_test)
             OUTPUT ${phys}
             COMMAND
                 ${quiet_cmd}
-                nextpnr-fpga_interchange
+                ${NEXTPNR_INTERCHANGE}
                     --chipdb ${chipdb_loc}
                     --xdc ${xdc}
                     --netlist ${netlist}
@@ -194,7 +199,7 @@ function(add_xc7_test)
             OUTPUT ${fasm}
             COMMAND ${CMAKE_COMMAND} -E env
                 ${quiet_cmd}
-                python3 -mfpga_interchange.fasm_generator
+                ${PYTHON3} -mfpga_interchange.fasm_generator
                     --schema_dir ${INTERCHANGE_SCHEMA_PATH}
                     --family xc7
                     ${device_loc}
@@ -216,7 +221,7 @@ function(add_xc7_test)
             OUTPUT ${bit}
             COMMAND ${CMAKE_COMMAND} -E env
                 ${quiet_cmd}
-                xcfasm
+                ${XCFASM}
                     --db-root ${PRJXRAY_DB_DIR}/${device_family}
                     --part ${part}
                     --part_file ${PRJXRAY_DB_DIR}/${device_family}/${part}/part.yaml
@@ -275,6 +280,10 @@ function(add_xc7_validation_test)
 
     set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
 
+    get_target_property(PYTHON3 programs PYTHON3)
+    get_target_property(YOSYS programs YOSYS)
+    get_target_property(BITREAD programs BITREAD)
+
     foreach(board ${add_xc7_validation_test_board_list})
         get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
         get_property(device TARGET board-${board} PROPERTY DEVICE)
@@ -293,7 +302,7 @@ function(add_xc7_validation_test)
                     ${CMAKE_COMMAND} -E make_directory ${device_channels_dir}
                 COMMAND
                     ${quiet_cmd}
-                    python3 -mfasm2bels.database.create_channels
+                    ${PYTHON3} -mfasm2bels.database.create_channels
                         --db-root ${PRJXRAY_DB_DIR}/${device_family}
                         --part ${part}
                         --connection-database ${device_channels}
@@ -306,8 +315,6 @@ function(add_xc7_validation_test)
         set(bit ${output_dir}/${name}.bit)
         set(bit_target xc7-${test_name}-bit)
 
-        get_target_property(BITREAD programs BITREAD)
-
         # Run fasm2bels to get logical and physical netlists
         set(netlist ${output_dir}/${name}.bit.netlist)
         set(phys ${output_dir}/${name}.bit.phys)
@@ -316,13 +323,13 @@ function(add_xc7_validation_test)
         set(verilog ${output_dir}/${name}.bit.v)
         set(xdc ${output_dir}/${name}.bit.xdc)
         add_custom_command(
-            OUTPUT ${netlist} ${phys} ${xdc} ${fasm} ${interchange_xdc}
+            OUTPUT ${netlist} ${phys} ${xdc} ${fasm} ${interchange_xdc} ${verilog}
             COMMAND
                 ${quiet_cmd}
-                yosys -p "read_json ${output_dir}/${name}.json\; write_blif ${output_dir}/${name}.eblif"
+                ${YOSYS} -p "read_json ${output_dir}/${name}.json\; write_blif ${output_dir}/${name}.eblif"
             COMMAND
                 ${quiet_cmd}
-                python3 -mfasm2bels
+                ${PYTHON3} -mfasm2bels
                     --db_root ${PRJXRAY_DB_DIR}/${device_family}
                     --part ${part}
                     --connection_database ${device_channels}
@@ -338,7 +345,7 @@ function(add_xc7_validation_test)
                     --interchange_xdc ${interchange_xdc}
                     --interchange_capnp_schema_dir ${INTERCHANGE_SCHEMA_PATH}
             DEPENDS
-                xc7-${test_name}-bit
+                ${bit_target}
                 ${device}-channels-db
         )
 

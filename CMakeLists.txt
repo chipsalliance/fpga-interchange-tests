@@ -26,10 +26,33 @@ if (${PRJXRAY_DB_DIR} STREQUAL "PRJXRAY_DB_DIR-NOTFOUND")
   message(FATAL_ERROR "Could not find the project xray database directory! Please provide it with the PRJXRAY_DB_DIR variable")
 endif ()
 
+find_program(python3 python3 REQUIRED)
+find_program(yosys yosys REQUIRED)
+find_program(nextpnr-interchange nextpnr-fpga_interchange REQUIRED)
+find_program(xcfasm xcfasm REQUIRED)
+find_program(bitread bitread REQUIRED)
+find_program(iverilog iverilog REQUIRED)
+find_program(vvp vvp REQUIRED)
+
+add_custom_target(programs)
+set_target_properties(
+  programs
+  PROPERTIES
+    PYTHON3 ${python3}
+    YOSYS ${yosys}
+    NEXTPNR_INTERCHANGE ${nextpnr-interchange}
+    XCFASM ${xcfasm}
+    BITREAD ${bitread}
+    IVERILOG ${iverilog}
+    VVP ${vvp}
+)
+
 include(boards/boards.cmake)
 include(tests/tests.cmake)
 
 add_custom_target(all-xc7-tests)
+add_custom_target(all-xc7-validation-tests)
+add_custom_target(all-simulation-tests)
 
 add_subdirectory(boards)
 add_subdirectory(tests)

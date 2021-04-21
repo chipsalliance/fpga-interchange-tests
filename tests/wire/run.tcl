@@ -12,3 +12,4 @@ opt_clean
 setundef -zero -params
 
 write_json $::env(OUT_JSON)
+write_verilog $::env(OUT_VERILOG)

@@ -5,6 +5,7 @@ set(RAPIDWRIGHT_PATH ${PROJECT_SOURCE_DIR}/third_party/RapidWright CACHE PATH "P
 set(INVOKE_RAPIDWRIGHT "${RAPIDWRIGHT_PATH}/scripts/invoke_rapidwright.sh" CACHE PATH "Path to RapidWright invocation script")
 set(INTERCHANGE_SCHEMA_PATH ${PROJECT_SOURCE_DIR}/third_party/fpga-interchange-schema/interchange CACHE PATH "Path to the FPGA interchange schema dir")
 set(NEXTPNR_SHARE_DIR $ENV{CONDA_PREFIX}/share/nextpnr-fpga_interchange CACHE PATH "Path to the nextpnr-fpga_interchange share directory")
+set(XILINX_UNISIM_DIR ${PROJECT_SOURCE_DIR}/third_party/xilinx-unisims/verilog/src/unisims CACHE PATH "Path to the Xilinx Unisims libraries")
 
 # FASM database directory
 find_program(PRJXRAY_CONFIG prjxray-config)

@@ -106,25 +106,15 @@ function(add_xc7_test)
 
         add_custom_target(xc7-${test_name}-output-dir DEPENDS ${output_dir})
 
-        if(DEFINED testbench)
-            get_yosys_cells_sim(xilinx cells_sim)
-            add_simulation_test(
-                name ${name}
-                board ${board}
-                sources ${sources}
-                deps xc7-${test_name}-output-dir
-                testbench ${testbench}
-                cells_sim ${cells_sim}
-            )
-        endif()
-
         # Synthesis
         set(synth_json ${output_dir}/${name}.json)
+        set(synth_verilog ${output_dir}/${name}.synth.v)
         add_custom_command(
             OUTPUT ${synth_json}
             COMMAND ${CMAKE_COMMAND} -E env
                 SOURCES="${sources}"
                 OUT_JSON=${synth_json}
+                OUT_VERILOG=${synth_verilog}
                 TECHMAP=${techmap}
                 ${quiet_cmd}
                 ${YOSYS} -c ${tcl}
@@ -136,6 +126,28 @@ function(add_xc7_test)
         )
 
         add_custom_target(xc7-${test_name}-json DEPENDS ${synth_json})
+
+        if(DEFINED testbench)
+            add_simulation_test(
+                name ${name}
+                board ${board}
+                sources ${sources}
+                deps xc7-${test_name}-output-dir
+                testbench ${testbench}
+                simlib_dir ${XILINX_UNISIM_DIR}
+                extra_libs ${XILINX_UNISIM_DIR}/../glbl.v
+            )
+
+            add_simulation_test(
+                name post-synth-${name}
+                board ${board}
+                sources ${synth_verilog}
+                deps xc7-${test_name}-json
+                testbench ${testbench}
+                simlib_dir ${XILINX_UNISIM_DIR}
+                extra_libs ${XILINX_UNISIM_DIR}/../glbl.v
+            )
+        endif()
 
         # Logical netlist
         set(netlist ${output_dir}/${name}.netlist)
@@ -404,14 +416,14 @@ function(add_xc7_validation_test)
         endif()
 
         if(DEFINED testbench)
-            get_yosys_cells_sim(xilinx cells_sim)
             add_simulation_test(
                 name fasm2bels-${name}
                 board ${board}
                 sources ${verilog}
                 deps xc7-${test_name}-fasm2bels-dcp
                 testbench ${testbench}
-                cells_sim ${cells_sim}
+                simlib_dir ${XILINX_UNISIM_DIR}
+                extra_libs ${XILINX_UNISIM_DIR}/../glbl.v
             )
         endif()
     endforeach()
@@ -422,9 +434,10 @@ function(add_simulation_test)
     # add_simulation_test(
     #    name <name>
     #    board <board>
-    #    cells_sim <cells sim>
     #    testbench <testbench>
     #    deps
+    #    [extra_libs <extra libraries>]
+    #    [simlib_dir <simulation lib directory>]
     # )
     #
     # Generates targets to run desired simulation tests.
@@ -435,19 +448,19 @@ function(add_simulation_test)
     #   - name: test name. This must be unique and no other tests with the same
     #           name should exist
     #   - board: board name. This is used to get the output directory
-    #   - cells_sim: verilog simulation file to get the cell's libraries
-    #                This is required for post-synthesis and fasm2bels targets
     #   - testbench: verilog testbench file that instantiates the DUT and performs
     #                basic tests
     #   - deps: dependencies to be met prior to running the simulation test
+    #   - extra_libs (optional): verilog libraires for vendor-specific cells
+    #   - simlib_dir (optional): simulation library directory
     #
     # Targets generated:
     #   - sim-test-${test}-${board}-vvp : generates the VVP and VCD files
     #   - sim-test-${test}-${board}     : runs VVP
 
     set(options)
-    set(oneValueArgs board name cells_sim testbench deps)
-    set(multiValueArgs sources)
+    set(oneValueArgs board name testbench deps simlib_dir)
+    set(multiValueArgs sources extra_libs)
 
     cmake_parse_arguments(
         add_simulation_test
@@ -459,9 +472,10 @@ function(add_simulation_test)
 
     set(name ${add_simulation_test_name})
     set(board ${add_simulation_test_board})
-    set(cells_sim ${add_simulation_test_cells_sim})
     set(sources ${add_simulation_test_sources})
     set(deps ${add_simulation_test_deps})
+    set(extra_libs ${add_simulation_test_extra_libs})
+    set(simlib_dir ${add_simulation_test_simlib_dir})
     set(testbench ${CMAKE_CURRENT_SOURCE_DIR}/${add_simulation_test_testbench})
 
     set(test_name "${name}-${board}")
@@ -474,6 +488,11 @@ function(add_simulation_test)
     set(utils_dir ${CMAKE_SOURCE_DIR}/utils)
     set(quiet_cmd ${utils_dir}/quiet_cmd.sh)
 
+    set(simlib_dir_opt "")
+    if(DEFINED simlib_dir)
+        set(simlib_dir_opt "-y${simlib_dir}")
+    endif()
+
     set(vvp ${name}.vvp)
     set(vvp_path ${output_dir}/${vvp})
     add_custom_command(
@@ -485,7 +504,8 @@ function(add_simulation_test)
                 -I ${utils_dir}
                 -DVCD=${output_dir}/${name}.vcd
                 -o ${vvp}
-                ${cells_sim}
+                ${simlib_dir_opt}
+                ${extra_libs}
                 ${sources}
                 ${testbench}
         DEPENDS

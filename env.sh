@@ -7,4 +7,4 @@
 #
 # SPDX-License-Identifier: ISC
 
-. `pwd`/env/conda/bin/activate fpga-interchange
+. $(pwd)/env/conda/bin/activate fpga-interchange

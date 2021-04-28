@@ -74,9 +74,15 @@ always @(posedge clk) begin
 
     if (sw == 16'd9 || rst) begin
         sw <= 0;
-        check_counter <= 4'd13;
     end else begin
         sw <= sw + 1;
+    end
+
+    if (rst) begin
+        check_counter <= 4'd13;
+    end else if (check_counter == 4'd9) begin
+        check_counter <= 4'd0;
+    end else begin
         check_counter <= check_counter + 1;
     end
 

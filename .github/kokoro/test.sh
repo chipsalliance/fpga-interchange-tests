@@ -26,8 +26,10 @@ echo "Running FPGA interchange tests"
 echo "-------------------------------------------"
 (
     source env.sh
+    pushd build
     make all-xc7-tests -j$NUM_CORES
     make all-xc7-validation-tests -j$NUM_CORES
     make all-simulation-tests -j$NUM_CORES
+    popd
 )
 echo "-------------------------------------------"

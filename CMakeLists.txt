@@ -7,6 +7,9 @@ set(INTERCHANGE_SCHEMA_PATH ${PROJECT_SOURCE_DIR}/third_party/fpga-interchange-s
 set(NEXTPNR_SHARE_DIR $ENV{CONDA_PREFIX}/share/nextpnr-fpga_interchange CACHE PATH "Path to the nextpnr-fpga_interchange share directory")
 set(XILINX_UNISIM_DIR ${PROJECT_SOURCE_DIR}/third_party/xilinx-unisims/verilog/src/unisims CACHE PATH "Path to the Xilinx Unisims libraries")
 
+set(VIVADO_VERSION 2017.2 CACHE STRING "Vivado version")
+set(VIVADO_SETTINGS /opt/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh CACHE PATH "Path to the Vivado settings script")
+
 # FASM database directory
 find_program(PRJXRAY_CONFIG prjxray-config)
 if (NOT ${PRJXRAY_CONFIG} STREQUAL "PRJXRAY_CONFIG-NOTFOUND")
@@ -53,6 +56,7 @@ include(tests/tests.cmake)
 
 add_custom_target(all-xc7-tests)
 add_custom_target(all-xc7-validation-tests)
+add_custom_target(all-xc7-vivado-bit-tests)
 add_custom_target(all-simulation-tests)
 
 add_subdirectory(boards)

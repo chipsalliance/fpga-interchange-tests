@@ -6,4 +6,9 @@ add_xc7_test(
     testbench ram_tb.v
 )
 
-# TODO: add validation test once RAMB FASM Generation is supported
+add_xc7_validation_test(
+    name ram
+    board_list basys3
+    testbench ram_tb.v
+    disable_vivado_test
+)

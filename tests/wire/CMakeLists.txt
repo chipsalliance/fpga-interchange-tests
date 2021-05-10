@@ -1,6 +1,7 @@
 add_xc7_test(
     name wire
-    board_list basys3 arty35t zybo arty100t nexys_video
+    #TODO: add nexys_video once https://github.com/hdl/conda-eda/issues/108 is solved
+    board_list basys3 arty35t zybo arty100t
     tcl run.tcl
     sources wire.v
     testbench wire_tb.v

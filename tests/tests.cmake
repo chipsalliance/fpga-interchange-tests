@@ -67,8 +67,6 @@ function(add_xc7_test)
 
     set(name ${add_xc7_test_name})
     set(top ${add_xc7_test_top})
-    set(tcl ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_tcl})
-    set(techmap ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_techmap})
     set(testbench ${add_xc7_test_testbench})
     set(disable_vivado_test ${add_xc7_test_disable_vivado_test})
 
@@ -77,9 +75,19 @@ function(add_xc7_test)
         list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/${source})
     endforeach()
 
+    set(techmap "")
+    if (DEFINED ${add_xc7_test_techmap})
+        set(techmap ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_techmap})
+    endif()
+
     if (NOT DEFINED top)
         # Setting default top value
         set(top "top")
+    endif()
+
+    set(synth_tcl "${CMAKE_SOURCE_DIR}/tests/common/synth.tcl")
+    if (DEFINED ${add_xc7_test_tcl})
+        set(synth_tcl ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_tcl})
     endif()
 
     set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
@@ -97,6 +105,7 @@ function(add_xc7_test)
         get_property(part TARGET board-${board} PROPERTY PART)
 
         set(test_name "${name}-${board}")
+        add_custom_target(xc7-${test_name}-common-synth-tcl DEPENDS ${synth_tcl})
         set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${board}.xdc)
         set(device_loc ${NEXTPNR_SHARE_DIR}/devices/${device}.device)
         set(chipdb_loc ${NEXTPNR_SHARE_DIR}/chipdb/${device}.bin)
@@ -120,11 +129,11 @@ function(add_xc7_test)
                 OUT_VERILOG=${synth_verilog}
                 TECHMAP=${techmap}
                 ${quiet_cmd}
-                ${YOSYS} -c ${tcl}
+                ${YOSYS} -c ${synth_tcl}
             DEPENDS
                 ${sources}
                 ${techmap}
-                ${tcl}
+                ${synth_tcl}
                 xc7-${test_name}-output-dir
         )
 
@@ -209,7 +218,7 @@ function(add_xc7_test)
         add_custom_target(xc7-${test_name}-dcp DEPENDS ${dcp})
 
         # Bitstream generation target from DCP
-        set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/runme.tcl)
+        set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
         set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
         set(dcp_bit ${output_dir}/${name}.dcp.bit)
         add_custom_command(
@@ -421,7 +430,7 @@ function(add_xc7_validation_test)
         add_custom_target(xc7-${test_name}-fasm2bels-dcp DEPENDS ${dcp})
 
         # Generate bitstream from Vivado
-        set(tcl ${CMAKE_SOURCE_DIR}/tests/common/runme.tcl)
+        set(tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
         set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
         set(vivado_bit ${output_dir}/${name}.fasm2bels.bit)
         add_custom_command(

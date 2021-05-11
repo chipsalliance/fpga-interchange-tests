@@ -1,7 +1,6 @@
 add_xc7_test(
     name ram
     board_list basys3
-    tcl run.tcl
     sources ram.v
     testbench ram_tb.v
 )

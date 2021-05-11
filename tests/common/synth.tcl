@@ -5,7 +5,10 @@ foreach src $::env(SOURCES) {
 }
 
 synth_xilinx -flatten -nolutram -nowidelut -nosrl -nocarry -nodsp
-techmap -map $::env(TECHMAP)
+
+if { [info exists $::env(TECHMAP) ] && $::env(TECHMAP) != "" } {
+    techmap -map $::env(TECHMAP)
+}
 
 # opt_expr -undriven makes sure all nets are driven, if only by the $undef
 # net.

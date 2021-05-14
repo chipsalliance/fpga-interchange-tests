@@ -22,8 +22,8 @@ function(add_xc7_test)
     # add_xc7_test(
     #    name <name>
     #    board_list <board_list>
-    #    tcl <tcl>
     #    sources <sources list>
+    #    [tcl <tcl>]
     #    [top <top name>]
     #    [techmap <techmap file>]
     #    [testbench]
@@ -68,6 +68,8 @@ function(add_xc7_test)
     set(name ${add_xc7_test_name})
     set(top ${add_xc7_test_top})
     set(testbench ${add_xc7_test_testbench})
+    set(techmap ${add_xc7_test_techmap})
+    set(tcl ${add_xc7_test_tcl})
     set(disable_vivado_test ${add_xc7_test_disable_vivado_test})
 
     set(sources)
@@ -75,8 +77,7 @@ function(add_xc7_test)
         list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/${source})
     endforeach()
 
-    set(techmap "")
-    if (DEFINED ${add_xc7_test_techmap})
+    if (DEFINED techmap)
         set(techmap ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_techmap})
     endif()
 
@@ -86,7 +87,7 @@ function(add_xc7_test)
     endif()
 
     set(synth_tcl "${CMAKE_SOURCE_DIR}/tests/common/synth.tcl")
-    if (DEFINED ${add_xc7_test_tcl})
+    if (DEFINED tcl)
         set(synth_tcl ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_tcl})
     endif()
 
@@ -120,6 +121,7 @@ function(add_xc7_test)
 
         # Synthesis
         set(synth_json ${output_dir}/${name}.json)
+        set(synth_log ${output_dir}/${name}.synth.log)
         set(synth_verilog ${output_dir}/${name}.synth.v)
         add_custom_command(
             OUTPUT ${synth_json}
@@ -129,7 +131,7 @@ function(add_xc7_test)
                 OUT_VERILOG=${synth_verilog}
                 TECHMAP=${techmap}
                 ${quiet_cmd}
-                ${YOSYS} -c ${synth_tcl}
+                ${YOSYS} -c ${synth_tcl} -l ${synth_log}
             DEPENDS
                 ${sources}
                 ${techmap}
@@ -182,6 +184,7 @@ function(add_xc7_test)
 
         # Physical netlist
         set(phys ${output_dir}/${name}.phys)
+        set(phys_log ${output_dir}/${name}.phys.log)
         add_custom_command(
             OUTPUT ${phys}
             COMMAND
@@ -192,6 +195,7 @@ function(add_xc7_test)
                     --netlist ${netlist}
                     --phys ${phys}
                     --package ${package}
+                    --log ${phys_log}
             DEPENDS
                 xc7-${test_name}-netlist
                 ${xdc}

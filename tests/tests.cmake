@@ -178,6 +178,7 @@ function(add_xc7_test)
             DEPENDS
                 xc7-${test_name}-json
                 ${device_loc}
+                ${synth_json}
         )
 
         add_custom_target(xc7-${test_name}-netlist DEPENDS ${netlist})
@@ -200,6 +201,7 @@ function(add_xc7_test)
                 xc7-${test_name}-netlist
                 ${xdc}
                 ${chipdb_loc}
+                ${netlist}
         )
 
         add_custom_target(xc7-${test_name}-phys DEPENDS ${phys})
@@ -217,6 +219,8 @@ function(add_xc7_test)
                 ${INVOKE_RAPIDWRIGHT}
                 xc7-${test_name}-netlist
                 xc7-${test_name}-phys
+                ${netlist}
+                ${phys}
         )
 
         add_custom_target(xc7-${test_name}-dcp DEPENDS ${dcp})
@@ -238,6 +242,7 @@ function(add_xc7_test)
                 xc7-${test_name}-dcp
                 ${run_vivado}
                 ${vivado_tcl}
+                ${dcp}
         )
 
         add_custom_target(xc7-${test_name}-dcp-bit DEPENDS ${dcp_bit})
@@ -264,6 +269,8 @@ function(add_xc7_test)
                 xc7-${test_name}-netlist
                 xc7-${test_name}-phys
                 xc7-${test_name}-dcp
+                ${netlist}
+                ${phys}
         )
 
         add_custom_target(xc7-${test_name}-fasm DEPENDS ${fasm})
@@ -284,6 +291,7 @@ function(add_xc7_test)
                     --bit_out ${bit}
             DEPENDS
                 xc7-${test_name}-fasm
+                ${fasm}
             )
 
         add_custom_target(xc7-${test_name}-bit DEPENDS ${bit})
@@ -403,6 +411,7 @@ function(add_xc7_validation_test)
             DEPENDS
                 ${bit_target}
                 ${device}-channels-db
+                ${bit}
         )
 
         add_custom_target(
@@ -448,6 +457,7 @@ function(add_xc7_validation_test)
                 ${run_vivado} -mode batch -source ${tcl}
             DEPENDS
                 xc7-${test_name}-fasm2bels-dcp
+                ${dcp}
                 ${run_vivado}
                 ${tcl}
         )
@@ -556,6 +566,7 @@ function(add_simulation_test)
         DEPENDS
             ${IVERILOG}
             ${deps}
+            ${sources}
             ${testbench}
         WORKING_DIRECTORY
             ${output_dir}

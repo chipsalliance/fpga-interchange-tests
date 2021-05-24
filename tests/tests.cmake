@@ -23,6 +23,7 @@ function(add_xc7_test)
     #    name <name>
     #    board_list <board_list>
     #    sources <sources list>
+    #    [absolute_sources <sources list>]
     #    [tcl <tcl>]
     #    [top <top name>]
     #    [techmap <techmap file>]
@@ -38,6 +39,7 @@ function(add_xc7_test)
     #   - board_list: list of boards, one for each test
     #   - tcl: tcl script used for synthesis
     #   - sources: list of HDL sources
+    #   - absoulute_sources (optional): list of sources with an absoulute path.
     #   - top (optional): name of the top level module.
     #                     If not provided, "top" is assigned as top level module
     #   - techmap (optional): techmap file used during synthesis
@@ -55,7 +57,7 @@ function(add_xc7_test)
 
     set(options disable_vivado_test)
     set(oneValueArgs name tcl top techmap testbench)
-    set(multiValueArgs board_list sources)
+    set(multiValueArgs board_list sources absolute_sources)
 
     cmake_parse_arguments(
         add_xc7_test
@@ -75,6 +77,9 @@ function(add_xc7_test)
     set(sources)
     foreach(source ${add_xc7_test_sources})
         list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/${source})
+    endforeach()
+    foreach(source ${add_xc7_test_absolute_sources})
+        list(APPEND sources ${source})
     endforeach()
 
     if (DEFINED techmap)

@@ -1,3 +1,4 @@
+add_subdirectory(counter)
 add_subdirectory(lut)
 add_subdirectory(murax)
 add_subdirectory(ram)

@@ -11,6 +11,9 @@ REQUIREMENTS_FILE := requirements.txt
 ENVIRONMENT_FILE := environment.yml
 CMAKE_FLAGS ?= ""
 
+# Paths
+RAPIDWRIGHT_PATH ?= $(TOP_DIR)/third_party/RapidWright
+
 third_party/make-env/conda.mk:
 	git submodule init
 	git submodule update --init --recursive
@@ -21,7 +24,12 @@ build:
 	git submodule init
 	git submodule update --init --recursive
 	# Update RapidWright jars
-	pushd third_party/RapidWright && make update_jars && popd
+	pushd ${RAPIDWRIGHT_PATH} && \
+		make update_jars && \
+		wget https://github.com/Xilinx/RapidWright/releases/download/v2020.2.5-beta/rapidwright_api_lib-2020.2.5-patch1.zip && \
+		unzip -o rapidwright_api_lib-2020.2.5-patch1.zip && \
+		popd
+	# Build test suite
 	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake $(CMAKE_FLAGS) ..
 
 clean-build:

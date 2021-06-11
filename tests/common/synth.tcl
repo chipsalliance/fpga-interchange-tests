@@ -6,7 +6,7 @@ foreach src $::env(SOURCES) {
 
 synth_xilinx -flatten -nolutram -nowidelut -nosrl -nocarry -nodsp
 
-if { [info exists $::env(TECHMAP) ] && $::env(TECHMAP) != "" } {
+if { $::env(TECHMAP) != "" } {
     techmap -map $::env(TECHMAP)
 }
 

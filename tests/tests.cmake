@@ -22,8 +22,9 @@ function(add_xc7_test)
     # add_xc7_test(
     #    name <name>
     #    board_list <board_list>
-    #    tcl <tcl>
     #    sources <sources list>
+    #    [absolute_sources <sources list>]
+    #    [tcl <tcl>]
     #    [top <top name>]
     #    [techmap <techmap file>]
     #    [testbench]
@@ -38,6 +39,7 @@ function(add_xc7_test)
     #   - board_list: list of boards, one for each test
     #   - tcl: tcl script used for synthesis
     #   - sources: list of HDL sources
+    #   - absoulute_sources (optional): list of sources with an absoulute path.
     #   - top (optional): name of the top level module.
     #                     If not provided, "top" is assigned as top level module
     #   - techmap (optional): techmap file used during synthesis
@@ -55,7 +57,7 @@ function(add_xc7_test)
 
     set(options disable_vivado_test)
     set(oneValueArgs name tcl top techmap testbench)
-    set(multiValueArgs board_list sources)
+    set(multiValueArgs board_list sources absolute_sources)
 
     cmake_parse_arguments(
         add_xc7_test
@@ -68,15 +70,19 @@ function(add_xc7_test)
     set(name ${add_xc7_test_name})
     set(top ${add_xc7_test_top})
     set(testbench ${add_xc7_test_testbench})
+    set(techmap ${add_xc7_test_techmap})
+    set(tcl ${add_xc7_test_tcl})
     set(disable_vivado_test ${add_xc7_test_disable_vivado_test})
 
     set(sources)
     foreach(source ${add_xc7_test_sources})
         list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/${source})
     endforeach()
+    foreach(source ${add_xc7_test_absolute_sources})
+        list(APPEND sources ${source})
+    endforeach()
 
-    set(techmap "")
-    if (DEFINED ${add_xc7_test_techmap})
+    if (DEFINED techmap)
         set(techmap ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_techmap})
     endif()
 
@@ -86,7 +92,7 @@ function(add_xc7_test)
     endif()
 
     set(synth_tcl "${CMAKE_SOURCE_DIR}/tests/common/synth.tcl")
-    if (DEFINED ${add_xc7_test_tcl})
+    if (DEFINED tcl)
         set(synth_tcl ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_tcl})
     endif()
 
@@ -120,6 +126,7 @@ function(add_xc7_test)
 
         # Synthesis
         set(synth_json ${output_dir}/${name}.json)
+        set(synth_log ${output_dir}/${name}.synth.log)
         set(synth_verilog ${output_dir}/${name}.synth.v)
         add_custom_command(
             OUTPUT ${synth_json}
@@ -129,7 +136,7 @@ function(add_xc7_test)
                 OUT_VERILOG=${synth_verilog}
                 TECHMAP=${techmap}
                 ${quiet_cmd}
-                ${YOSYS} -c ${synth_tcl}
+                ${YOSYS} -c ${synth_tcl} -l ${synth_log}
             DEPENDS
                 ${sources}
                 ${techmap}
@@ -176,12 +183,14 @@ function(add_xc7_test)
             DEPENDS
                 xc7-${test_name}-json
                 ${device_loc}
+                ${synth_json}
         )
 
         add_custom_target(xc7-${test_name}-netlist DEPENDS ${netlist})
 
         # Physical netlist
         set(phys ${output_dir}/${name}.phys)
+        set(phys_log ${output_dir}/${name}.phys.log)
         add_custom_command(
             OUTPUT ${phys}
             COMMAND
@@ -192,10 +201,12 @@ function(add_xc7_test)
                     --netlist ${netlist}
                     --phys ${phys}
                     --package ${package}
+                    --log ${phys_log}
             DEPENDS
                 xc7-${test_name}-netlist
                 ${xdc}
                 ${chipdb_loc}
+                ${netlist}
         )
 
         add_custom_target(xc7-${test_name}-phys DEPENDS ${phys})
@@ -213,6 +224,8 @@ function(add_xc7_test)
                 ${INVOKE_RAPIDWRIGHT}
                 xc7-${test_name}-netlist
                 xc7-${test_name}-phys
+                ${netlist}
+                ${phys}
         )
 
         add_custom_target(xc7-${test_name}-dcp DEPENDS ${dcp})
@@ -234,6 +247,7 @@ function(add_xc7_test)
                 xc7-${test_name}-dcp
                 ${run_vivado}
                 ${vivado_tcl}
+                ${dcp}
         )
 
         add_custom_target(xc7-${test_name}-dcp-bit DEPENDS ${dcp_bit})
@@ -260,6 +274,8 @@ function(add_xc7_test)
                 xc7-${test_name}-netlist
                 xc7-${test_name}-phys
                 xc7-${test_name}-dcp
+                ${netlist}
+                ${phys}
         )
 
         add_custom_target(xc7-${test_name}-fasm DEPENDS ${fasm})
@@ -280,6 +296,7 @@ function(add_xc7_test)
                     --bit_out ${bit}
             DEPENDS
                 xc7-${test_name}-fasm
+                ${fasm}
             )
 
         add_custom_target(xc7-${test_name}-bit DEPENDS ${bit})
@@ -399,6 +416,7 @@ function(add_xc7_validation_test)
             DEPENDS
                 ${bit_target}
                 ${device}-channels-db
+                ${bit}
         )
 
         add_custom_target(
@@ -444,6 +462,7 @@ function(add_xc7_validation_test)
                 ${run_vivado} -mode batch -source ${tcl}
             DEPENDS
                 xc7-${test_name}-fasm2bels-dcp
+                ${dcp}
                 ${run_vivado}
                 ${tcl}
         )
@@ -552,6 +571,7 @@ function(add_simulation_test)
         DEPENDS
             ${IVERILOG}
             ${deps}
+            ${sources}
             ${testbench}
         WORKING_DIRECTORY
             ${output_dir}

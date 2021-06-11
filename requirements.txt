@@ -6,5 +6,5 @@ git+https://github.com/SymbiFlow/prjxray.git
 git+https://github.com/SymbiFlow/xc-fasm.git
 git+https://github.com/capnproto/pycapnp.git
 git+https://github.com/litghost/rapidyaml.git@fixup_python_packaging#egg=rapidyaml
-git+https://github.com/SymbiFlow/python-fpga-interchange.git@v0.0.12#egg=python-fpga-interchange
+git+https://github.com/SymbiFlow/python-fpga-interchange.git@v0.0.13#egg=python-fpga-interchange
 git+https://github.com/SymbiFlow/symbiflow-xc-fasm2bels.git

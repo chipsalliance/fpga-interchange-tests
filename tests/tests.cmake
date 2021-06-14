@@ -209,7 +209,25 @@ function(add_xc7_test)
                 ${netlist}
         )
 
+        # Physical Netlist YAML
+        set(phys_yaml ${output_dir}/${name}.phys.yaml)
+        add_custom_command(
+            OUTPUT ${phys_yaml}
+            COMMAND
+                ${PYTHON3} -mfpga_interchange.convert
+                    --schema_dir ${INTERCHANGE_SCHEMA_PATH}
+                    --schema physical
+                    --input_format capnp
+                    --output_format yaml
+                    ${phys}
+                    ${phys_yaml}
+            DEPENDS
+                xc7-${test_name}-phys
+                ${phys}
+        )
+
         add_custom_target(xc7-${test_name}-phys DEPENDS ${phys})
+        add_custom_target(xc7-${test_name}-phys-yaml DEPENDS ${phys_yaml})
 
         # DCP generation target
         set(dcp ${output_dir}/${name}.dcp)

@@ -1,5 +1,2 @@
-add_subdirectory(counter)
-add_subdirectory(lut)
-add_subdirectory(murax)
-add_subdirectory(ram)
-add_subdirectory(wire)
+add_subdirectory(designs)
+add_subdirectory(features)

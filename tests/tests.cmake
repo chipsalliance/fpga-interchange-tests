@@ -237,7 +237,7 @@ function(add_xc7_test)
             OUTPUT ${dcp}
             COMMAND ${CMAKE_COMMAND} -E env
                 RAPIDWRIGHT_PATH=${RAPIDWRIGHT_PATH}
-                ${INVOKE_RAPIDWRIGHT}
+                ${INVOKE_RAPIDWRIGHT} ${JAVA_HEAP_SPACE}
                 com.xilinx.rapidwright.interchange.PhysicalNetlistToDcp
                 ${netlist} ${phys} ${xdc} ${dcp}
             DEPENDS
@@ -457,7 +457,7 @@ function(add_xc7_validation_test)
             COMMAND ${CMAKE_COMMAND} -E env
                 RAPIDWRIGHT_PATH=${RAPIDWRIGHT_PATH}
                 ${quiet_cmd}
-                ${INVOKE_RAPIDWRIGHT}
+                ${INVOKE_RAPIDWRIGHT} ${JAVA_HEAP_SPACE}
                 com.xilinx.rapidwright.interchange.PhysicalNetlistToDcp
                 ${netlist} ${phys} ${xdc} ${dcp}
             DEPENDS

@@ -3,6 +3,8 @@ project(fpga-interchange)
 
 set(RAPIDWRIGHT_PATH ${PROJECT_SOURCE_DIR}/third_party/RapidWright CACHE PATH "Path to RapidWright")
 set(INVOKE_RAPIDWRIGHT "${RAPIDWRIGHT_PATH}/scripts/invoke_rapidwright.sh" CACHE PATH "Path to RapidWright invocation script")
+set(JAVA_HEAP_SPACE "-Xmx8g" CACHE STRING "Heap space reserved for Java")
+
 set(PYTHON_INTERCHANGE_PATH ${PROJECT_SOURCE_DIR}/third_party/python-fpga-interchange CACHE PATH "Path to the Python FPGA interchange library")
 set(INTERCHANGE_SCHEMA_PATH ${PROJECT_SOURCE_DIR}/third_party/fpga-interchange-schema/interchange CACHE PATH "Path to the FPGA interchange schema dir")
 set(NEXTPNR_SHARE_DIR $ENV{CONDA_PREFIX}/share/nextpnr-fpga_interchange CACHE PATH "Path to the nextpnr-fpga_interchange share directory")

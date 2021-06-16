@@ -91,7 +91,7 @@ function(add_xc7_test)
         set(top "top")
     endif()
 
-    set(synth_tcl "${CMAKE_SOURCE_DIR}/tests/common/synth.tcl")
+    set(synth_tcl "${CMAKE_SOURCE_DIR}/tests/common/synth_xc7.tcl")
     if (DEFINED tcl)
         set(synth_tcl ${CMAKE_CURRENT_SOURCE_DIR}/${add_xc7_test_tcl})
     endif()

@@ -113,8 +113,8 @@ function(add_xc7_test)
         set(test_name "${name}-${board}")
         add_custom_target(xc7-${test_name}-common-synth-tcl DEPENDS ${synth_tcl})
         set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${board}.xdc)
-        set(device_loc ${NEXTPNR_SHARE_DIR}/devices/${device}.device)
-        set(chipdb_loc ${NEXTPNR_SHARE_DIR}/chipdb/${device}.bin)
+        set(device_loc ${CMAKE_BINARY_DIR}/devices/${device}/${device}.device)
+        set(chipdb_loc ${CMAKE_BINARY_DIR}/devices/${device}/${device}.bin)
 
         set(output_dir ${CMAKE_CURRENT_BINARY_DIR}/${board})
         add_custom_command(
@@ -174,7 +174,7 @@ function(add_xc7_test)
             OUTPUT ${netlist}
             COMMAND ${CMAKE_COMMAND} -E env
                 ${quiet_cmd}
-                python3 -mfpga_interchange.yosys_json
+                ${PYTHON3} -mfpga_interchange.yosys_json
                     --schema_dir ${INTERCHANGE_SCHEMA_PATH}
                     --device ${device_loc}
                     --top ${top}
@@ -182,6 +182,7 @@ function(add_xc7_test)
                     ${netlist}
             DEPENDS
                 xc7-${test_name}-json
+                chipdb-${device}-bin
                 ${device_loc}
                 ${synth_json}
         )
@@ -205,6 +206,7 @@ function(add_xc7_test)
             DEPENDS
                 xc7-${test_name}-netlist
                 ${xdc}
+                chipdb-${device}-bin
                 ${chipdb_loc}
                 ${netlist}
         )
@@ -235,7 +237,7 @@ function(add_xc7_test)
             OUTPUT ${dcp}
             COMMAND ${CMAKE_COMMAND} -E env
                 RAPIDWRIGHT_PATH=${RAPIDWRIGHT_PATH}
-                ${INVOKE_RAPIDWRIGHT}
+                ${INVOKE_RAPIDWRIGHT} ${JAVA_HEAP_SPACE}
                 com.xilinx.rapidwright.interchange.PhysicalNetlistToDcp
                 ${netlist} ${phys} ${xdc} ${dcp}
             DEPENDS
@@ -455,7 +457,7 @@ function(add_xc7_validation_test)
             COMMAND ${CMAKE_COMMAND} -E env
                 RAPIDWRIGHT_PATH=${RAPIDWRIGHT_PATH}
                 ${quiet_cmd}
-                ${INVOKE_RAPIDWRIGHT}
+                ${INVOKE_RAPIDWRIGHT} ${JAVA_HEAP_SPACE}
                 com.xilinx.rapidwright.interchange.PhysicalNetlistToDcp
                 ${netlist} ${phys} ${xdc} ${dcp}
             DEPENDS

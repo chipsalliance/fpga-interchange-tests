@@ -24,6 +24,7 @@ build:
 	git submodule init
 	git submodule update --init --recursive
 	# Update RapidWright jars
+	# TODO: remove patch once https://github.com/Xilinx/RapidWright/issues/183 is solved
 	pushd ${RAPIDWRIGHT_PATH} && \
 		make update_jars && \
 		wget https://github.com/Xilinx/RapidWright/releases/download/v2020.2.5-beta/rapidwright_api_lib-2020.2.5-patch1.zip && \

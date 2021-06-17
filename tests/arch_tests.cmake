@@ -6,6 +6,7 @@ function(add_xc7_test)
     #    netlist <logical netlist>
     #    phys <physical netlist>
     #    fasm <fasm file>
+    #    top <top>
     # )
     #
     # Generates targets to run xc7-specific test steps such as bitstream generation
@@ -16,6 +17,7 @@ function(add_xc7_test)
     #   - netlist: path to the generated logical netlist
     #   - phys: path to the generated physical netlist
     #   - fasm: path to the generated fasm file
+    #   - top: top level module
     #
     # Targets generated:
     #   - <arch>-<name>-<board>-dcp     : dcp generation
@@ -23,7 +25,7 @@ function(add_xc7_test)
     #   - <arch>-<name>-<board>-bit     : bitstream generation
 
     set(options)
-    set(oneValueArgs name board netlist phys fasm)
+    set(oneValueArgs name board netlist phys fasm top)
     set(multiValueArgs sources)
 
     cmake_parse_arguments(
@@ -38,6 +40,7 @@ function(add_xc7_test)
     set(board ${add_xc7_test_board})
     set(netlist ${add_xc7_test_netlist})
     set(phys ${add_xc7_test_phys})
+    set(top ${add_xc7_test_top})
     set(sources ${add_xc7_test_sources})
 
     set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
@@ -52,6 +55,32 @@ function(add_xc7_test)
 
     set(test_name "${name}-${board}")
     set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${board}.xdc)
+    set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
+
+    # Bitstream generation target from DCP
+    set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
+    set(vivado_bit ${output_dir}/${name}.vivado.bit)
+    add_custom_command(
+        OUTPUT ${vivado_bit}
+        COMMAND ${CMAKE_COMMAND} -E env
+            VIVADO_SETTINGS=${VIVADO_SETTINGS}
+            OUTPUT_DIR=${output_dir}/${name}
+            NAME=${name}
+            PART=${part}
+            TOP=${top}
+            XDC=${xdc}
+            SOURCES="${sources}"
+            BIT_FILE=${vivado_bit}
+            ${quiet_cmd}
+            ${run_vivado} -mode batch -source ${vivado_tcl}
+        DEPENDS
+            ${run_vivado}
+            ${vivado_tcl}
+            ${sources}
+    )
+
+    add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
+    add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
 
     # DCP generation target
     set(dcp ${output_dir}/${name}.dcp)
@@ -74,8 +103,7 @@ function(add_xc7_test)
     add_custom_target(${arch}-${test_name}-dcp DEPENDS ${dcp})
 
     # Bitstream generation target from DCP
-    set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
-    set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
+    set(dcp_vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/dcp_vivado.tcl)
     set(dcp_bit ${output_dir}/${name}.dcp.bit)
     add_custom_command(
         OUTPUT ${dcp_bit}
@@ -85,11 +113,11 @@ function(add_xc7_test)
             DCP_FILE=${dcp}
             BIT_FILE=${dcp_bit}
             ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${vivado_tcl}
+            ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
         DEPENDS
             ${arch}-${test_name}-dcp
             ${run_vivado}
-            ${vivado_tcl}
+            ${dcp_vivado_tcl}
             ${dcp}
     )
 
@@ -143,7 +171,7 @@ function(add_xc7_validation_test)
     #   - xc7-<name>-<board>-fasm2bels      : target to run fasm2bels
     #   - xc7-<name>-<board>-fasm2bels-dcp  : dcp from the fasm2bels outputs
     #   - xc7-<name>-<board>-tcl            : tcl file to run Vivado
-    #   - xc7-<name>-<board>-vivado-bit     : vivado-generated bitstream
+    #   - xc7-<name>-<board>-fasm2bels-bit  : vivado-generated bitstream
 
     set(options disable_vivado_test)
     set(oneValueArgs name testbench)
@@ -262,7 +290,7 @@ function(add_xc7_validation_test)
         add_custom_target(xc7-${test_name}-fasm2bels-dcp DEPENDS ${dcp})
 
         # Generate bitstream from Vivado
-        set(tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
+        set(tcl ${CMAKE_SOURCE_DIR}/tests/common/dcp_vivado.tcl)
         set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
         set(vivado_bit ${output_dir}/${name}.fasm2bels.bit)
         add_custom_command(
@@ -281,10 +309,10 @@ function(add_xc7_validation_test)
                 ${tcl}
         )
 
-        add_custom_target(xc7-${test_name}-vivado-bit DEPENDS ${vivado_bit})
+        add_custom_target(xc7-${test_name}-fasm2bels-bit DEPENDS ${vivado_bit})
 
         if(NOT ${disable_vivado_test})
-            add_dependencies(all-vendor-bit-tests xc7-${test_name}-vivado-bit)
+            add_dependencies(all-vendor-bit-tests xc7-${test_name}-fasm2bels-bit)
         endif()
 
         add_dependencies(all-validation-tests xc7-${test_name}-fasm2bels-dcp)

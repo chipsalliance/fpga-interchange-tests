@@ -242,6 +242,7 @@ function(add_generic_test)
                 netlist ${netlist}
                 phys ${phys}
                 fasm ${fasm}
+                top ${top}
             )
         endif()
     endforeach()

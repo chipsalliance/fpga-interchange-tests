@@ -1,4 +1,4 @@
-add_xc7_test(
+add_generic_test(
     name pll
     board_list basys3
     sources pll_top.v plle2_test.v

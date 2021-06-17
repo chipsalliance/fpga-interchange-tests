@@ -47,7 +47,7 @@ jobs:
 
     - name: Run tests
       run: |
-        source env.sh
+        source env/conda/bin/activate fpga-interchange
         cd build
         make all-${{ matrix.device }}-tests -j`nproc`
         make all-${{ matrix.device }}-validation-tests -j`nproc`

@@ -25,7 +25,7 @@ echo "==========================================="
 echo "Running FPGA interchange tests"
 echo "-------------------------------------------"
 (
-    source env.sh
+    source env/conda/bin/activate fpga-interchange
     pushd build
     make all-simulation-tests -j$NUM_CORES
     make all-tests -j$NUM_CORES

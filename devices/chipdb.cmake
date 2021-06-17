@@ -193,5 +193,10 @@ function(generate_chipdb)
             CHIPDB_BIN_TARGET chipdb-${device}-bin
     )
 
+    add_custom_target(all-${device}-tests)
+    add_custom_target(all-${device}-validation-tests)
+    add_custom_target(all-${device}-vendor-bit-tests)
+    add_custom_target(all-${device}-simulation-tests)
+
 endfunction()
 

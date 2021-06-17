@@ -81,6 +81,7 @@ function(add_xc7_test)
 
     add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
     add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
 
     # DCP generation target
     set(dcp ${output_dir}/${name}.dcp)
@@ -123,6 +124,7 @@ function(add_xc7_test)
 
     add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
     add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
 
     # Bitstream generation target
     set(bit ${output_dir}/${name}.bit)
@@ -145,6 +147,7 @@ function(add_xc7_test)
 
     add_custom_target(${arch}-${test_name}-bit DEPENDS ${bit})
     add_dependencies(all-tests ${arch}-${test_name}-bit)
+    add_dependencies(all-${device}-tests ${arch}-${test_name}-bit)
 endfunction()
 
 function(add_xc7_validation_test)
@@ -313,9 +316,11 @@ function(add_xc7_validation_test)
 
         if(NOT ${disable_vivado_test})
             add_dependencies(all-vendor-bit-tests xc7-${test_name}-fasm2bels-bit)
+            add_dependencies(all-${device}-vendor-bit-tests xc7-${test_name}-fasm2bels-bit)
         endif()
 
         add_dependencies(all-validation-tests xc7-${test_name}-fasm2bels-dcp)
+        add_dependencies(all-${device}-validation-tests xc7-${test_name}-fasm2bels-dcp)
 
         if(DEFINED testbench)
             add_simulation_test(

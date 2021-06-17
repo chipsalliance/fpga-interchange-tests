@@ -233,6 +233,7 @@ function(add_generic_test)
 
         add_custom_target(${arch}-${test_name}-fasm DEPENDS ${fasm})
         add_dependencies(all-tests ${arch}-${test_name}-fasm)
+        add_dependencies(all-${device}-tests ${arch}-${test_name}-fasm)
 
         if(${arch} STREQUAL "xc7")
             add_xc7_test(
@@ -352,4 +353,5 @@ function(add_simulation_test)
     )
 
     add_dependencies(all-simulation-tests sim-test-${test_name})
+    add_dependencies(all-${device}-simulation-tests sim-test-${test_name})
 endfunction()

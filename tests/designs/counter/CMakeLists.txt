@@ -1,4 +1,4 @@
-add_xc7_test(
+add_generic_test(
     name counter
     board_list basys3 arty35t arty100t
     sources counter.v

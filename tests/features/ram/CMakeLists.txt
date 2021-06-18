@@ -1,4 +1,4 @@
-add_xc7_test(
+add_generic_test(
     name ram
     board_list basys3
     sources ram.v

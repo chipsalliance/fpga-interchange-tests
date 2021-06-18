@@ -27,10 +27,10 @@ echo "-------------------------------------------"
 (
     source env.sh
     pushd build
-    make all-xc7-tests -j$NUM_CORES
-    make all-xc7-validation-tests -j$NUM_CORES
-    make all-xc7-vivado-bit-tests -j$NUM_CORES
     make all-simulation-tests -j$NUM_CORES
+    make all-tests -j$NUM_CORES
+    make all-validation-tests -j$NUM_CORES
+    make all-vendor-bit-tests -j$NUM_CORES
     popd
 )
 echo "-------------------------------------------"

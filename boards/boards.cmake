@@ -1,9 +1,10 @@
-function(add_xc7_board)
+function(add_board)
     # ~~~
     # add_board(
     #    name <board name>
     #    device_family <device family>
     #    device <common device>
+    #    arch <arch>
     #    package <package>
     #    speedgrade <speedgrade>
     # )
@@ -18,6 +19,7 @@ function(add_xc7_board)
     #                    E.g. the xc7a35t device belongs to the artix7 family
     #   - device: common device name of a set of parts. E.g. xc7a35tcsg324-1 and xc7a35tcpg236-1
     #             share the same xc7a35t device prefix
+    #   - arch: architecture name: e.g. xc7, nexus, etc.
     #   - package: one of the packages available for a given device. E.g. cpg236
     #   - speedgrade: speedgrade of the chip. E.g -1, -2, -3
     #
@@ -25,22 +27,23 @@ function(add_xc7_board)
     #   - board-<name>
 
     set(options)
-    set(oneValueArgs name device_family device package speedgrade)
+    set(oneValueArgs name device_family device arch package speedgrade)
     set(multiValueArgs)
 
     cmake_parse_arguments(
-        add_xc7_board
+        add_board
         "${options}"
         "${oneValueArgs}"
         "${multiValueArgs}"
         ${ARGN}
     )
 
-    set(name ${add_xc7_board_name})
-    set(device_family ${add_xc7_board_device_family})
-    set(device ${add_xc7_board_device})
-    set(package ${add_xc7_board_package})
-    set(speedgrade ${add_xc7_board_speedgrade})
+    set(name ${add_board_name})
+    set(device_family ${add_board_device_family})
+    set(device ${add_board_device})
+    set(arch ${add_board_arch})
+    set(package ${add_board_package})
+    set(speedgrade ${add_board_speedgrade})
 
     add_custom_target(board-${name} DEPENDS device-${device})
     set_target_properties(
@@ -48,6 +51,7 @@ function(add_xc7_board)
         PROPERTIES
             DEVICE_FAMILY ${device_family}
             DEVICE ${device}
+            ARCH ${arch}
             PACKAGE ${package}
             SPEEDGRADE ${speedgrade}
             PART ${device}${package}${speedgrade}

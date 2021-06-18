@@ -1,4 +1,4 @@
-add_xc7_test(
+add_generic_test(
     name lut
     board_list arty35t
     sources lut.v

@@ -70,7 +70,7 @@ function(add_generic_test)
     set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
 
     get_target_property(YOSYS programs YOSYS)
-    get_target_property(NEXTPNR_INTERCHANGE programs NEXTPNR_INTERCHANGE)
+    get_target_property(NEXTPNR_FPGA_INTERCHANGE programs NEXTPNR_FPGA_INTERCHANGE)
     get_target_property(PYTHON3 programs PYTHON3)
 
     foreach(board ${add_generic_test_board_list})
@@ -175,7 +175,7 @@ function(add_generic_test)
             OUTPUT ${phys}
             COMMAND
                 ${quiet_cmd}
-                ${NEXTPNR_INTERCHANGE}
+                ${NEXTPNR_FPGA_INTERCHANGE}
                     --chipdb ${chipdb_loc}
                     --xdc ${xdc}
                     --netlist ${netlist}

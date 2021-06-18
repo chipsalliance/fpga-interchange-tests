@@ -10,16 +10,16 @@ To prepare the environment run:
 make env
 ```
 
+Enter the environment by running:
+
+```
+make enter
+```
+
 To build the CMake infrastructure and the required tools run:
 
 ```
 make build
-```
-
-Before running the tests, enter the environment by running:
-
-```
-make enter
 ```
 
 A set of targets are generated to run every step of the flow:

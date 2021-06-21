@@ -197,6 +197,7 @@ function(add_xc7_validation_test)
     get_target_property(PYTHON3 programs PYTHON3)
     get_target_property(YOSYS programs YOSYS)
     get_target_property(BITREAD programs BITREAD)
+    get_target_property(BIT2FASM programs BIT2FASM)
 
     foreach(board ${add_xc7_validation_test_board_list})
         get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
@@ -229,15 +230,33 @@ function(add_xc7_validation_test)
         set(bit ${output_dir}/${name}.bit)
         set(bit_target xc7-${test_name}-bit)
 
+        # Generate FASM file from bitstream
+        set(fasm ${output_dir}/${name}.fasm2bels.fasm)
+        add_custom_command(
+            OUTPUT ${fasm}
+            COMMAND
+                ${quiet_cmd}
+                ${BIT2FASM}
+                    --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                    --part ${part}
+                    --bitread ${BITREAD}
+                    --fasm_file ${fasm}
+                    ${bit}
+            DEPENDS
+                ${bit}
+                ${bit_target}
+        )
+
+        add_custom_target(xc7-${test_name}-fasm2bels-fasm DEPENDS ${fasm})
+
         # Run fasm2bels to get logical and physical netlists
         set(netlist ${output_dir}/${name}.fasm2bels.netlist)
         set(phys ${output_dir}/${name}.fasm2bels.phys)
         set(interchange_xdc ${output_dir}/${name}.fasm2bels.inter.xdc)
-        set(fasm ${output_dir}/${name}.fasm2bels.fasm)
         set(verilog ${output_dir}/${name}.fasm2bels.v)
         set(xdc ${output_dir}/${name}.fasm2bels.xdc)
         add_custom_command(
-            OUTPUT ${netlist} ${phys} ${xdc} ${fasm} ${interchange_xdc} ${verilog}
+            OUTPUT ${netlist} ${phys} ${xdc} ${interchange_xdc} ${verilog}
             COMMAND
                 ${quiet_cmd}
                 ${YOSYS} -p "read_json ${output_dir}/${name}.json\; write_blif ${output_dir}/${name}.eblif"
@@ -247,8 +266,6 @@ function(add_xc7_validation_test)
                     --db_root ${PRJXRAY_DB_DIR}/${device_family}
                     --part ${part}
                     --connection_database ${device_channels}
-                    --bitread ${BITREAD}
-                    --bit_file ${bit}
                     --fasm_file ${fasm}
                     --eblif ${output_dir}/${name}.eblif
                     --verilog_file ${verilog}
@@ -259,9 +276,9 @@ function(add_xc7_validation_test)
                     --interchange_xdc ${interchange_xdc}
                     --interchange_capnp_schema_dir ${INTERCHANGE_SCHEMA_PATH}
             DEPENDS
-                ${bit_target}
+                ${fasm}
                 ${device}-channels-db
-                ${bit}
+                xc7-${test_name}-fasm2bels-fasm
         )
 
         add_custom_target(
@@ -270,7 +287,6 @@ function(add_xc7_validation_test)
                 ${netlist}
                 ${phys}
                 ${interchange_xdc}
-                ${fasm}
                 ${verilog}
                 ${xdc}
         )
@@ -314,9 +330,38 @@ function(add_xc7_validation_test)
 
         add_custom_target(xc7-${test_name}-fasm2bels-bit DEPENDS ${vivado_bit})
 
+        set(vivado_fasm ${output_dir}/${name}.fasm2bels.bit.fasm)
+        add_custom_command(
+            OUTPUT ${vivado_fasm}
+            COMMAND
+                ${quiet_cmd}
+                ${BIT2FASM}
+                    --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                    --part ${part}
+                    --bitread ${BITREAD}
+                    --fasm_file ${vivado_fasm}
+                    ${vivado_bit}
+            DEPENDS
+                ${vivado_bit}
+                xc7-${test_name}-fasm2bels-bit
+        )
+
+        add_custom_target(xc7-${test_name}-fasm2bels-bit-fasm DEPENDS ${vivado_fasm})
+
+        add_custom_target(xc7-${test_name}-fasm2bels-diff-fasm
+            COMMAND diff -u
+                ${fasm}
+                ${vivado_fasm}
+            DEPENDS
+                xc7-${test_name}-fasm2bels-bit-fasm
+                xc7-${test_name}-fasm2bels-fasm
+                ${fasm}
+                ${vivado_fasm}
+        )
+
         if(NOT ${disable_vivado_test})
-            add_dependencies(all-vendor-bit-tests xc7-${test_name}-fasm2bels-bit)
-            add_dependencies(all-${device}-vendor-bit-tests xc7-${test_name}-fasm2bels-bit)
+            add_dependencies(all-vendor-bit-tests xc7-${test_name}-fasm2bels-diff-fasm)
+            add_dependencies(all-${device}-vendor-bit-tests xc7-${test_name}-fasm2bels-diff-fasm)
         endif()
 
         add_dependencies(all-validation-tests xc7-${test_name}-fasm2bels-dcp)

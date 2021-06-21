@@ -48,6 +48,7 @@ set_program(nextpnr-fpga_interchange)
 set_program(bbasm)
 set_program(xcfasm)
 set_program(bitread)
+set_program(bit2fasm)
 set_program(iverilog)
 set_program(vvp)
 

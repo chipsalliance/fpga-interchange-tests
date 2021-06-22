@@ -30,8 +30,13 @@ build:
 		wget https://github.com/Xilinx/RapidWright/releases/download/v2020.2.5-beta/rapidwright_api_lib-2020.2.5-patch1.zip && \
 		unzip -o rapidwright_api_lib-2020.2.5-patch1.zip && \
 		popd
+	@$(IN_CONDA_ENV) pushd third_party/prjoxide/libprjoxide && \
+		( curl --proto '=https' -sSf https://sh.rustup.rs | sh -s -- -y ) && \
+		source ${HOME}/.cargo/env && \
+		cargo install --path prjoxide --all-features && \
+		popd
 	# Build test suite
-	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake $(CMAKE_FLAGS) ..
+	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake $(CMAKE_FLAGS) -DPRJOXIDE=${HOME}/.cargo/bin/prjoxide ..
 
 clean-build:
 	rm -rf build

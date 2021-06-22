@@ -32,6 +32,9 @@ function(create_prjoxide_device_db)
     set(device ${create_prjoxide_device_db_device})
     set(output_target ${create_prjoxide_device_db_output_target})
     set(prjoxide_device_db ${CMAKE_CURRENT_BINARY_DIR}/${device}.device)
+
+    get_target_property(PRJOXIDE programs PRJOXIDE)
+
     add_custom_command(
         OUTPUT ${prjoxide_device_db}
         COMMAND

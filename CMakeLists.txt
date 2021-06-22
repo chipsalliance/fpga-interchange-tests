@@ -51,6 +51,7 @@ set_program(bitread)
 set_program(bit2fasm)
 set_program(iverilog)
 set_program(vvp)
+set_program(prjoxide)
 
 include(boards/boards.cmake)
 include(devices/chipdb.cmake)

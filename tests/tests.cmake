@@ -83,7 +83,8 @@ function(add_generic_test)
 
         set(test_name "${name}-${board}")
         set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${board}.xdc)
-        set(device_loc ${CMAKE_BINARY_DIR}/devices/${device}/${device}.device)
+        get_property(device_target TARGET device-${device} PROPERTY DEVICE_TARGET)
+        get_property(device_loc TARGET device-${device} PROPERTY DEVICE_LOC)
         set(chipdb_loc ${CMAKE_BINARY_DIR}/devices/${device}/${device}.bin)
 
         set(output_dir ${CMAKE_CURRENT_BINARY_DIR}/${board})
@@ -162,6 +163,7 @@ function(add_generic_test)
             DEPENDS
                 ${arch}-${test_name}-json
                 chipdb-${device}-bin
+                ${device_target}
                 ${device_loc}
                 ${synth_json}
         )

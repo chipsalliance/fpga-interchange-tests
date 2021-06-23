@@ -1,3 +1,6 @@
 env
 build
 src
+capnproto-c++-0.8.0.tar.gz
+capnproto-c++-0.8.0
+capnproto-java

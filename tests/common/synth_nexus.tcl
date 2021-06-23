@@ -4,7 +4,7 @@ foreach src $::env(SOURCES) {
     read_verilog $src
 }
 
-synth_nexus -nolutram -nowidelut -nobram -noccu2 -nodsp
+synth_nexus -nolutram -nowidelut -noccu2 -nodsp
 
 if { $::env(TECHMAP) != "" } {
     techmap -map $::env(TECHMAP)

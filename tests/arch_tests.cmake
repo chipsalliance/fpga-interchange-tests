@@ -380,3 +380,78 @@ function(add_xc7_validation_test)
         endif()
     endforeach()
 endfunction()
+
+function(add_nexus_test)
+    # ~~~
+    # add_nexus_test(
+    #    name <name>
+    #    board <board>
+    #    netlist <logical netlist>
+    #    phys <physical netlist>
+    #    fasm <fasm file>
+    #    top <top>
+    # )
+    #
+    # Generates targets to run nexus-specific test steps such as bitstream generation
+    #
+    # Arguments:
+    #   - name: test name
+    #   - board: name of the board
+    #   - netlist: path to the generated logical netlist
+    #   - phys: path to the generated physical netlist
+    #   - fasm: path to the generated fasm file
+    #   - top: top level module
+    #
+    # Targets generated:
+    #   - <arch>-<name>-<board>-bit     : bitstream generation
+
+    set(options)
+    set(oneValueArgs name board netlist phys fasm top)
+    set(multiValueArgs sources)
+
+    cmake_parse_arguments(
+        add_nexus_test
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    set(name ${add_nexus_test_name})
+    set(board ${add_nexus_test_board})
+    set(netlist ${add_nexus_test_netlist})
+    set(phys ${add_nexus_test_phys})
+    set(top ${add_nexus_test_top})
+    set(sources ${add_nexus_test_sources})
+
+    set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
+
+    get_target_property(PYTHON3 programs PYTHON3)
+    get_target_property(PRJOXIDE programs PRJOXIDE)
+
+    # Get board properties
+    get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
+    get_property(part TARGET board-${board} PROPERTY PART)
+    get_property(arch TARGET board-${board} PROPERTY ARCH)
+
+    set(test_name "${name}-${board}")
+
+    # Bitstream generation target
+    set(bit ${output_dir}/${name}.bit)
+    add_custom_command(
+        OUTPUT ${bit}
+        COMMAND ${CMAKE_COMMAND} -E env
+            ${quiet_cmd}
+            ${PRJOXIDE}
+                pack
+                ${fasm}
+                ${bit}
+        DEPENDS
+            ${arch}-${test_name}-fasm
+            ${fasm}
+        )
+
+    add_custom_target(${arch}-${test_name}-bit DEPENDS ${bit})
+    add_dependencies(all-tests ${arch}-${test_name}-bit)
+    add_dependencies(all-${device}-tests ${arch}-${test_name}-bit)
+endfunction()

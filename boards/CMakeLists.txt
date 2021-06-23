@@ -42,3 +42,12 @@ add_board(
     package clg400
     speedgrade -1
 )
+
+add_board(
+    name lifcl40evn
+    device_family nexus
+    device LIFCL-40
+    arch nexus
+    package CABGA400
+    speedgrade -9
+)

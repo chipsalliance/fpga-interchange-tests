@@ -247,6 +247,16 @@ function(add_generic_test)
                 fasm ${fasm}
                 top ${top}
             )
+        elseif(${arch} STREQUAL "nexus")
+            add_nexus_test(
+                name ${name}
+                board ${board}
+                sources ${sources}
+                netlist ${netlist}
+                phys ${phys}
+                fasm ${fasm}
+                top ${top}
+            )
         endif()
     endforeach()
 endfunction()

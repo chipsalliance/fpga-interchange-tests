@@ -23,32 +23,11 @@ include third_party/make-env/conda.mk
 build:
 	git submodule init
 	git submodule update --init --recursive
-
-	curl -O https://capnproto.org/capnproto-c++-0.8.0.tar.gz
-	tar zxf capnproto-c++-0.8.0.tar.gz
-	pushd capnproto-c++-0.8.0 && \
-		./configure && \
-		$(MAKE) check && \
-		sudo make install && \
-		popd
-
-	git clone https://github.com/capnproto/capnproto-java.git
-	pushd capnproto-java && \
-		$(MAKE) && \
-		sudo make install && \
-		popd
-
 	pushd ${RAPIDWRIGHT_PATH} && \
 		make update_jars && \
 		popd
-
-	pushd third_party/prjoxide/libprjoxide && \
-		( curl --proto '=https' -sSf https://sh.rustup.rs | sh -s -- -y ) && \
-		source ${HOME}/.cargo/env && \
-		cargo install --path prjoxide --all-features && \
-		popd
 	# Build test suite
-	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake $(CMAKE_FLAGS) -DPRJOXIDE=${HOME}/.cargo/bin/prjoxide ..
+	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake $(CMAKE_FLAGS) ..
 
 clean-build:
 	rm -rf build

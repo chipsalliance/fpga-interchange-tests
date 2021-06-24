@@ -13,6 +13,3 @@
 [submodule "third_party/python-fpga-interchange"]
 	path = third_party/python-fpga-interchange
 	url = https://github.com/SymbiFlow/python-fpga-interchange
-[submodule "third_party/prjoxide"]
-	path = third_party/prjoxide
-	url = https://github.com/gatecat/prjoxide

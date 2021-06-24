@@ -12,17 +12,27 @@ module top (
     input  wire clk,
 
     input  wire [1:0] sw,
-    output wire [6:0] led
+    output wire [9:0] led
 );
 
-plle2_test pll_test (
+plle2 plle2 (
     .CLK        (clk),
     .RST        (sw[0]),
 
     .I_PWRDWN   (sw[1]),
 
-    .O_LOCKED   (led[6]),
-    .O_CNT      (led[5:0])
+    .O_LOCKED   (led[8]),
+    .O_CNT      (led[3:0])
+);
+
+mmcme2 mmcme2 (
+    .CLK        (clk),
+    .RST        (sw[0]),
+
+    .I_PWRDWN   (sw[1]),
+
+    .O_LOCKED   (led[9]),
+    .O_CNT      (led[7:4])
 );
 
 endmodule

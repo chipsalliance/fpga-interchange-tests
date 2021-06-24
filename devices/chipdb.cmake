@@ -139,12 +139,15 @@ function(patch_device_with_prim_lib)
     set(output_device_file ${CMAKE_CURRENT_BINARY_DIR}/${device}_prim_lib.device)
     set(output_json_file ${CMAKE_CURRENT_BINARY_DIR}/${device}_prim_lib.json)
 
+    set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
+
     get_target_property(PYTHON3 programs PYTHON3)
     get_target_property(YOSYS programs YOSYS)
 
     add_custom_command(
         OUTPUT ${output_json_file}
         COMMAND
+            ${quiet_cmd}
             ${YOSYS} -p '${yosys_script}\; write_json ${output_json_file}'
     )
 

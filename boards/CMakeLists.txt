@@ -51,6 +51,7 @@ add_board(
     arch xc7
     package ffg901
     speedgrade -1
+    no_fasm
 )
 
 # Fake board, just to test the chip support
@@ -61,6 +62,7 @@ add_board(
     arch xc7
     package ffg1926
     speedgrade -1
+    no_fasm
 )
 
 add_board(

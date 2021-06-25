@@ -95,6 +95,7 @@ function(add_generic_test)
         get_property(package TARGET board-${board} PROPERTY PACKAGE)
         get_property(part TARGET board-${board} PROPERTY PART)
         get_property(arch TARGET board-${board} PROPERTY ARCH)
+        get_property(no_fasm TARGET board-${board} PROPERTY NO_FASM)
 
         set(test_name "${name}-${board}")
 
@@ -254,34 +255,34 @@ function(add_generic_test)
         add_custom_target(${arch}-${test_name}-phys-yaml DEPENDS ${phys_yaml})
 
         # Output FASM target
-        set(fasm ${output_dir}/${name}.fasm)
-        add_custom_command(
-            OUTPUT ${fasm}
-            COMMAND ${CMAKE_COMMAND} -E env
-                ${quiet_cmd}
-                ${PYTHON3} -mfpga_interchange.fasm_generator
-                    --schema_dir ${INTERCHANGE_SCHEMA_PATH}
-                    --family ${arch}
-                    ${device_loc}
-                    ${netlist}
-                    ${phys}
-                    ${fasm}
-            DEPENDS
-                ${device_target}
-                ${arch}-${test_name}-netlist
-                ${arch}-${test_name}-phys
-                ${netlist}
-                ${phys}
-        )
-        add_custom_target(${arch}-${test_name}-fasm DEPENDS ${fasm})
-
-        if(${arch} STREQUAL "xcup")
-            # FASM not supported, make output target the physical netlist
-            add_dependencies(all-tests ${arch}-${test_name}-phys)
-            add_dependencies(all-${device}-tests ${arch}-${test_name}-phys)
+        if(NOT no_fasm)
+          set(fasm ${output_dir}/${name}.fasm)
+          add_custom_command(
+              OUTPUT ${fasm}
+              COMMAND ${CMAKE_COMMAND} -E env
+                  ${quiet_cmd}
+                  ${PYTHON3} -mfpga_interchange.fasm_generator
+                      --schema_dir ${INTERCHANGE_SCHEMA_PATH}
+                      --family ${arch}
+                      ${device_loc}
+                      ${netlist}
+                      ${phys}
+                      ${fasm}
+              DEPENDS
+                  ${device_target}
+                  ${arch}-${test_name}-netlist
+                  ${arch}-${test_name}-phys
+                  ${netlist}
+                  ${phys}
+          )
+  
+          add_custom_target(${arch}-${test_name}-fasm DEPENDS ${fasm})
+          add_dependencies(all-tests ${arch}-${test_name}-fasm)
+          add_dependencies(all-${device}-tests ${arch}-${test_name}-fasm)
         else()
-            add_dependencies(all-tests ${arch}-${test_name}-fasm)
-            add_dependencies(all-${device}-tests ${arch}-${test_name}-fasm)
+          # FASM not supported, make output target the physical netlist
+          add_dependencies(all-tests ${arch}-${test_name}-phys)
+          add_dependencies(all-${device}-tests ${arch}-${test_name}-phys)
         endif()
 
         if(${arch} STREQUAL "xc7")

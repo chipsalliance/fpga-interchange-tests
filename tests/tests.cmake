@@ -275,7 +275,7 @@ function(add_generic_test)
                   ${netlist}
                   ${phys}
           )
-  
+
           add_custom_target(${arch}-${test_name}-fasm DEPENDS ${fasm})
           add_dependencies(all-tests ${arch}-${test_name}-fasm)
           add_dependencies(all-${device}-tests ${arch}-${test_name}-fasm)

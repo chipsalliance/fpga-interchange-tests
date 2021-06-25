@@ -52,6 +52,7 @@ add_board(
     package ffg901
     speedgrade -1
     no_fasm
+    no_bitstream
 )
 
 # Fake board, just to test the chip support
@@ -63,6 +64,7 @@ add_board(
     package ffg1926
     speedgrade -1
     no_fasm
+    no_bitstream
 )
 
 add_board(

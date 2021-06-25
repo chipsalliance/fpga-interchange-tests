@@ -56,6 +56,7 @@ function(add_xc7_test)
     get_property(part TARGET board-${board} PROPERTY PART)
     get_property(arch TARGET board-${board} PROPERTY ARCH)
     get_property(no_fasm TARGET board-${board} PROPERTY NO_FASM)
+    get_property(no_bitstream TARGET board-${board} PROPERTY NO_BITSTREAM)
 
     set(test_name "${name}-${board}")
     set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
@@ -111,33 +112,35 @@ function(add_xc7_test)
     add_custom_target(${arch}-${test_name}-dcp DEPENDS ${dcp})
 
     # Bitstream generation target from DCP
-    set(dcp_vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/dcp_vivado.tcl)
-    set(dcp_bit ${output_dir}/${name}.dcp.bit)
-    add_custom_command(
-        OUTPUT ${dcp_bit}
-        COMMAND ${CMAKE_COMMAND} -E env
-            VIVADO_SETTINGS=${VIVADO_SETTINGS}
-            OUTPUT_DIR=${output_dir}
-            DCP_FILE=${dcp}
-            BIT_FILE=${dcp_bit}
-            ARCH=${arch}
-            ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
-        DEPENDS
-            ${arch}-${test_name}-dcp
-            ${run_vivado}
-            ${dcp_vivado_tcl}
-            ${dcp}
+    if (NOT no_bitstream)
+      set(dcp_vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/dcp_vivado.tcl)
+      set(dcp_bit ${output_dir}/${name}.dcp.bit)
+      add_custom_command(
+          OUTPUT ${dcp_bit}
+          COMMAND ${CMAKE_COMMAND} -E env
+              VIVADO_SETTINGS=${VIVADO_SETTINGS}
+              OUTPUT_DIR=${output_dir}
+              DCP_FILE=${dcp}
+              BIT_FILE=${dcp_bit}
+              ARCH=${arch}
+              ${quiet_cmd}
+              ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
+          DEPENDS
+              ${arch}-${test_name}-dcp
+              ${run_vivado}
+              ${dcp_vivado_tcl}
+              ${dcp}
         WORKING_DIRECTORY
             ${output_dir}
-    )
+      )
 
-    add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
-    add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
-    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+      add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
+      add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+      add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+    endif()
 
     # Bitstream generation target
-    if (NOT no_fasm)
+    if (NOT no_fasm AND NOT no_bitstream)
       set(bit ${output_dir}/${name}.bit)
       add_custom_command(
           OUTPUT ${bit}
@@ -154,7 +157,7 @@ function(add_xc7_test)
           DEPENDS
               ${arch}-${test_name}-fasm
               ${fasm}
-          )  
+          )
 
       set(bit_fasm ${output_dir}/${name}.bit.fasm)
       add_custom_command(
@@ -174,24 +177,26 @@ function(add_xc7_test)
       add_custom_target(xc7-${test_name}-bit-fasm DEPENDS ${bit_fasm})
     endif()
 
-    set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
-    add_custom_command(
-        OUTPUT ${dcp_fasm}
-        COMMAND
-            ${quiet_cmd}
-            ${BIT2FASM}
-                --db-root ${PRJXRAY_DB_DIR}/${device_family}
-                --part ${part}
-                --bitread ${BITREAD}
-                --fasm_file ${dcp_fasm}
-                ${dcp_bit}
-        DEPENDS
-            ${dcp_bit}
-            xc7-${test_name}-dcp-bit
-    )
-    add_custom_target(xc7-${test_name}-dcp-bit-fasm DEPENDS ${dcp_fasm})
+    if (NOT no_bitstream)
+      set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
+      add_custom_command(
+          OUTPUT ${dcp_fasm}
+          COMMAND
+              ${quiet_cmd}
+              ${BIT2FASM}
+                  --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                  --part ${part}
+                  --bitread ${BITREAD}
+                  --fasm_file ${dcp_fasm}
+                  ${dcp_bit}
+          DEPENDS
+              ${dcp_bit}
+              xc7-${test_name}-dcp-bit
+      )
+      add_custom_target(xc7-${test_name}-dcp-bit-fasm DEPENDS ${dcp_fasm})
+    endif()
 
-    if (NOT no_fasm)
+    if (NOT no_fasm AND NOT no_bitstream)
       add_custom_target(xc7-${test_name}-dcp-diff-fasm
           COMMAND diff -u
               ${bit_fasm}

@@ -67,6 +67,7 @@ function(add_xc7_test)
             OUTPUT_DIR=${output_dir}/${name}
             NAME=${name}
             PART=${part}
+            ARCH=${arch}
             TOP=${top}
             XDC=${xdc}
             SOURCES="${sources}"
@@ -115,6 +116,7 @@ function(add_xc7_test)
             OUTPUT_DIR=${output_dir}
             DCP_FILE=${dcp}
             BIT_FILE=${dcp_bit}
+            ARCH=${arch}
             ${quiet_cmd}
             ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
         DEPENDS
@@ -225,6 +227,7 @@ function(add_xcup_test)
             TOP=${top}
             XDC=${xdc}
             SOURCES="${sources}"
+            ARCH=${arch}
             BIT_FILE=${vivado_bit}
             ${quiet_cmd}
             ${run_vivado} -mode batch -source ${vivado_tcl}
@@ -268,6 +271,7 @@ function(add_xcup_test)
             OUTPUT_DIR=${output_dir}
             DCP_FILE=${dcp}
             BIT_FILE=${dcp_bit}
+            ARCH=${arch}
             ${quiet_cmd}
             ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
         DEPENDS
@@ -451,6 +455,7 @@ function(add_xc7_validation_test)
                 OUTPUT_DIR=${output_dir}
                 DCP_FILE=${dcp}
                 BIT_FILE=${vivado_bit}
+                ARCH=${arch}
                 ${quiet_cmd}
                 ${run_vivado} -mode batch -source ${tcl}
             DEPENDS

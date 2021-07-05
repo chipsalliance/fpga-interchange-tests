@@ -226,32 +226,32 @@ function(add_generic_test)
         add_custom_target(${arch}-${test_name}-phys-yaml DEPENDS ${phys_yaml})
 
         # Output FASM target
+        set(fasm ${output_dir}/${name}.fasm)
+        add_custom_command(
+            OUTPUT ${fasm}
+            COMMAND ${CMAKE_COMMAND} -E env
+                ${quiet_cmd}
+                ${PYTHON3} -mfpga_interchange.fasm_generator
+                    --schema_dir ${INTERCHANGE_SCHEMA_PATH}
+                    --family ${arch}
+                    ${device_loc}
+                    ${netlist}
+                    ${phys}
+                    ${fasm}
+            DEPENDS
+                ${device_target}
+                ${arch}-${test_name}-netlist
+                ${arch}-${test_name}-phys
+                ${netlist}
+                ${phys}
+        )
+        add_custom_target(${arch}-${test_name}-fasm DEPENDS ${fasm})
+
         if(${arch} STREQUAL "xcup")
-            # FASM not supported
+            # FASM not supported, make output target the physical netlist
             add_dependencies(all-tests ${arch}-${test_name}-phys)
             add_dependencies(all-${device}-tests ${arch}-${test_name}-phys)
         else()
-            set(fasm ${output_dir}/${name}.fasm)
-            add_custom_command(
-                OUTPUT ${fasm}
-                COMMAND ${CMAKE_COMMAND} -E env
-                    ${quiet_cmd}
-                    ${PYTHON3} -mfpga_interchange.fasm_generator
-                        --schema_dir ${INTERCHANGE_SCHEMA_PATH}
-                        --family ${arch}
-                        ${device_loc}
-                        ${netlist}
-                        ${phys}
-                        ${fasm}
-                DEPENDS
-                    ${device_target}
-                    ${arch}-${test_name}-netlist
-                    ${arch}-${test_name}-phys
-                    ${netlist}
-                    ${phys}
-            )
-
-            add_custom_target(${arch}-${test_name}-fasm DEPENDS ${fasm})
             add_dependencies(all-tests ${arch}-${test_name}-fasm)
             add_dependencies(all-${device}-tests ${arch}-${test_name}-fasm)
         endif()

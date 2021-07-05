@@ -11,25 +11,36 @@ name: FPGA interchange CI tests
 on: [push, pull_request]
 
 jobs:
-  Run-Tests:
+  Check-Repository:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        device: ["xc7a35t", "xc7a100t", "xc7z010", "LIFCL-40"]
     steps:
 
     - uses: actions/checkout@v2
       with:
         submodules: recursive
 
-    - uses: actions/setup-python@v2
-
     - uses: SymbiFlow/actions/checks@main
+
+  Run-Tests:
+    runs-on: [self-hosted, Linux, X64]
+    container: "ubuntu:20.04"
+    strategy:
+      matrix:
+        device: ["xc7a35t", "xc7a100t", "xc7z010", "LIFCL-40"]
+    env:
+      LANG: "en_US.UTF-8"
+      DEBIAN_FRONTEND: "noninteractive"
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Install
       run: |
-        sudo apt-get update
-        sudo apt-get install git make cmake
+        apt-get -qqy update
+        apt-get -qqy install build-essential git make \
+          cmake python3 wget unzip curl openjdk-11-jdk-headless
         git submodule status > .submodules_status
 
     - name: Cache environment
@@ -53,3 +64,9 @@ jobs:
         make all-${{ matrix.device }}-tests -j`nproc`
         make all-${{ matrix.device }}-validation-tests -j`nproc`
         make all-${{ matrix.device }}-simulation-tests -j`nproc`
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: fpga-interchange-tests-performance-graphs
+        path: |
+          **/plot_*.svg

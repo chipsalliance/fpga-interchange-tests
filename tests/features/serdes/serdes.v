@@ -33,7 +33,7 @@ wire clk_fb_o;
 
 reg [3:0] rst_sr;
 
-initial rst_sr <= 4'hF;
+initial rst_sr = 4'hF;
 
 always @(posedge clk)
     if (rst)

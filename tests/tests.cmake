@@ -164,6 +164,25 @@ function(add_generic_test)
 
         add_custom_target(${arch}-${test_name}-netlist DEPENDS ${netlist})
 
+        # Logical Netlist YAML
+        set(netlist_yaml ${output_dir}/${name}.netlist.yaml)
+        add_custom_command(
+            OUTPUT ${netlist_yaml}
+            COMMAND
+                ${PYTHON3} -mfpga_interchange.convert
+                    --schema_dir ${INTERCHANGE_SCHEMA_PATH}
+                    --schema logical
+                    --input_format capnp
+                    --output_format yaml
+                    ${netlist}
+                    ${netlist_yaml}
+            DEPENDS
+                ${arch}-${test_name}-phys
+                ${netlist}
+        )
+
+        add_custom_target(${arch}-${test_name}-netlist-yaml DEPENDS ${netlist_yaml})
+
         # Physical netlist
         set(phys ${output_dir}/${name}.phys)
         set(phys_log ${output_dir}/${name}.phys.log)

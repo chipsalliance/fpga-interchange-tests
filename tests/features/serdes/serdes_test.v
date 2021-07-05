@@ -28,7 +28,7 @@ wire i_rstdiv;
 
 // ISERDES reset generator
 reg [2:0] rst_sr;
-initial   rst_sr <= 3'hF;
+initial   rst_sr = 3'hF;
 
 always @(posedge CLKDIV)
     if (RST) rst_sr <= 3'hF;

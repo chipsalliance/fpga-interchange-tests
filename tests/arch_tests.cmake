@@ -77,6 +77,8 @@ function(add_xc7_test)
             ${run_vivado}
             ${vivado_tcl}
             ${sources}
+        WORKING_DIRECTORY
+            ${output_dir}
     )
 
     add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
@@ -120,6 +122,8 @@ function(add_xc7_test)
             ${run_vivado}
             ${dcp_vivado_tcl}
             ${dcp}
+        WORKING_DIRECTORY
+            ${output_dir}
     )
 
     add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
@@ -326,6 +330,8 @@ function(add_xc7_validation_test)
                 ${dcp}
                 ${run_vivado}
                 ${tcl}
+            WORKING_DIRECTORY
+                ${output_dir}
         )
 
         add_custom_target(xc7-${test_name}-fasm2bels-bit DEPENDS ${vivado_bit})

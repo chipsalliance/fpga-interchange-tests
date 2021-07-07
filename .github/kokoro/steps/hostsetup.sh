@@ -98,6 +98,6 @@ echo "----------------------------------------"
 	echo
 	echo " Build system setup"
 	echo "----------------------------------------"
-	make build
-        echo "----------------------------------------"
+	CMAKE_FLAGS="-DVIVADO_SETTINGS=${VIVADO_SETTINGS}" make build
+	echo "----------------------------------------"
 )

@@ -10,13 +10,10 @@ set(JAVA_HEAP_SPACE "-Xmx32g" CACHE STRING "Heap space reserved for Java")
 set(PYTHON_INTERCHANGE_PATH ${PROJECT_SOURCE_DIR}/third_party/python-fpga-interchange CACHE PATH "Path to the Python FPGA interchange library")
 set(INTERCHANGE_SCHEMA_PATH ${PROJECT_SOURCE_DIR}/third_party/fpga-interchange-schema/interchange CACHE PATH "Path to the FPGA interchange schema dir")
 
-# P&R tools paths
-set(NEXTPNR_SHARE_DIR $ENV{CONDA_PREFIX}/share/nextpnr-fpga_interchange CACHE PATH "Path to the nextpnr-fpga_interchange share directory")
-
 # Simulation libraries paths
 set(XILINX_UNISIM_DIR ${PROJECT_SOURCE_DIR}/third_party/xilinx-unisims/verilog/src/unisims CACHE PATH "Path to the Xilinx Unisims libraries")
 
-set(VIVADO_VERSION 2017.2 CACHE STRING "Vivado version")
+set(VIVADO_VERSION 2019.2 CACHE STRING "Vivado version")
 set(VIVADO_SETTINGS /opt/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh CACHE PATH "Path to the Vivado settings script")
 
 # FASM database directory

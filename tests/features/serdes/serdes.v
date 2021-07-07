@@ -103,12 +103,16 @@ wire T_DAT;
 
 IOBUF iobuf(.I(O_DAT), .O(I_DAT), .T(T_DAT), .IO(io));
 
+wire SYSCLK_BUFG, CLKDIV_BUFG;
+BUFG sysclk_bufg(.I(SYSCLK), .O(SYSCLK_BUFG));
+BUFG clkdiv_bufg(.I(CLKDIV), .O(CLKDIV_BUFG));
+
 serdes_test #(
     .DATA_WIDTH   (DATA_WIDTH),
     .DATA_RATE    (DATA_RATE)
 ) serdes_test (
-    .SYSCLK     (SYSCLK),
-    .CLKDIV     (CLKDIV),
+    .SYSCLK     (SYSCLK_BUFG),
+    .CLKDIV     (CLKDIV_BUFG),
     .RST        (RST),
 
     .OUTPUTS    (OUTPUTS),

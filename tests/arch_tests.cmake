@@ -455,7 +455,7 @@ function(add_xc7_validation_test)
                 OUTPUT_DIR=${output_dir}
                 DCP_FILE=${dcp}
                 BIT_FILE=${vivado_bit}
-                ARCH=${arch}
+                ARCH=xc7
                 ${quiet_cmd}
                 ${run_vivado} -mode batch -source ${tcl}
             DEPENDS

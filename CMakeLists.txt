@@ -13,7 +13,7 @@ set(INTERCHANGE_SCHEMA_PATH ${PROJECT_SOURCE_DIR}/third_party/fpga-interchange-s
 # Simulation libraries paths
 set(XILINX_UNISIM_DIR ${PROJECT_SOURCE_DIR}/third_party/xilinx-unisims/verilog/src/unisims CACHE PATH "Path to the Xilinx Unisims libraries")
 
-set(VIVADO_VERSION 2017.2 CACHE STRING "Vivado version")
+set(VIVADO_VERSION 2019.2 CACHE STRING "Vivado version")
 set(VIVADO_SETTINGS /opt/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh CACHE PATH "Path to the Vivado settings script")
 
 # FASM database directory

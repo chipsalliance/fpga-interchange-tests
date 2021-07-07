@@ -25,9 +25,10 @@ read_xdc -no_add $::env(XDC)
 
 place_design
 route_design
-
-set_property CFGBVS VCCO [current_design]
-set_property CONFIG_VOLTAGE 3.3 [current_design]
+if { $::env(ARCH) == "xc7" } {
+    set_property CFGBVS VCCO [current_design]
+    set_property CONFIG_VOLTAGE 3.3 [current_design]
+}
 set_property BITSTREAM.GENERAL.PERFRAMECRC YES [current_design]
 
 # Reports

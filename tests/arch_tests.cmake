@@ -67,6 +67,7 @@ function(add_xc7_test)
             OUTPUT_DIR=${output_dir}/${name}
             NAME=${name}
             PART=${part}
+            ARCH=${arch}
             TOP=${top}
             XDC=${xdc}
             SOURCES="${sources}"
@@ -115,6 +116,7 @@ function(add_xc7_test)
             OUTPUT_DIR=${output_dir}
             DCP_FILE=${dcp}
             BIT_FILE=${dcp_bit}
+            ARCH=${arch}
             ${quiet_cmd}
             ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
         DEPENDS
@@ -152,6 +154,136 @@ function(add_xc7_test)
     add_custom_target(${arch}-${test_name}-bit DEPENDS ${bit})
     add_dependencies(all-tests ${arch}-${test_name}-bit)
     add_dependencies(all-${device}-tests ${arch}-${test_name}-bit)
+endfunction()
+
+function(add_xcup_test)
+    # ~~~
+    # add_xcup_test(
+    #    name <name>
+    #    board <board>
+    #    netlist <logical netlist>
+    #    phys <physical netlist>
+    #    fasm <fasm file>
+    #    top <top>
+    # )
+    #
+    # Generates targets to run UltraScale+-specific test steps such as bitstream generation
+    #
+    # Arguments:
+    #   - name: test name
+    #   - board: name of the board
+    #   - netlist: path to the generated logical netlist
+    #   - phys: path to the generated physical netlist
+    #   - fasm: path to the generated fasm file
+    #   - top: top level module
+    #
+    # Targets generated:
+    #   - <arch>-<name>-<board>-dcp     : dcp generation
+    #   - <arch>-<name>-<board>-dcp-bit : dcp to bitstream generation
+    #   - <arch>-<name>-<board>-bit     : bitstream generation
+
+    set(options)
+    set(oneValueArgs name board netlist phys fasm top)
+    set(multiValueArgs sources)
+
+    cmake_parse_arguments(
+        add_xcup_test
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    set(name ${add_xcup_test_name})
+    set(board ${add_xcup_test_board})
+    set(netlist ${add_xcup_test_netlist})
+    set(phys ${add_xcup_test_phys})
+    set(top ${add_xcup_test_top})
+    set(sources ${add_xcup_test_sources})
+
+    set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
+
+    get_target_property(PYTHON3 programs PYTHON3)
+
+    # Get board properties
+    get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
+    get_property(part TARGET board-${board} PROPERTY PART)
+    get_property(arch TARGET board-${board} PROPERTY ARCH)
+
+    set(test_name "${name}-${board}")
+    set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${board}.xdc)
+    set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
+
+    # Bitstream generation target from DCP
+    set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
+    set(vivado_bit ${output_dir}/${name}.vivado.bit)
+    add_custom_command(
+        OUTPUT ${vivado_bit}
+        COMMAND ${CMAKE_COMMAND} -E env
+            VIVADO_SETTINGS=${VIVADO_SETTINGS}
+            OUTPUT_DIR=${output_dir}/${name}
+            NAME=${name}
+            PART=${part}
+            TOP=${top}
+            XDC=${xdc}
+            SOURCES="${sources}"
+            ARCH=${arch}
+            BIT_FILE=${vivado_bit}
+            ${quiet_cmd}
+            ${run_vivado} -mode batch -source ${vivado_tcl}
+        DEPENDS
+            ${run_vivado}
+            ${vivado_tcl}
+            ${sources}
+    )
+
+    add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
+    add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+
+    # DCP generation target
+    set(dcp ${output_dir}/${name}.dcp)
+    add_custom_command(
+        OUTPUT ${dcp}
+        COMMAND ${CMAKE_COMMAND} -E env
+            RAPIDWRIGHT_PATH=${RAPIDWRIGHT_PATH}
+            ${INVOKE_RAPIDWRIGHT} ${JAVA_HEAP_SPACE}
+            com.xilinx.rapidwright.interchange.PhysicalNetlistToDcp
+            ${netlist} ${phys} ${xdc} ${dcp}
+        DEPENDS
+            ${INVOKE_RAPIDWRIGHT}
+            ${arch}-${test_name}-netlist
+            ${arch}-${test_name}-phys
+            ${netlist}
+            ${phys}
+            ${xdc}
+    )
+
+    add_custom_target(${arch}-${test_name}-dcp DEPENDS ${dcp})
+
+    # Bitstream generation target from DCP
+    set(dcp_vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/dcp_vivado.tcl)
+    set(dcp_bit ${output_dir}/${name}.dcp.bit)
+    add_custom_command(
+        OUTPUT ${dcp_bit}
+        COMMAND ${CMAKE_COMMAND} -E env
+            VIVADO_SETTINGS=${VIVADO_SETTINGS}
+            OUTPUT_DIR=${output_dir}
+            DCP_FILE=${dcp}
+            BIT_FILE=${dcp_bit}
+            ARCH=${arch}
+            ${quiet_cmd}
+            ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
+        DEPENDS
+            ${arch}-${test_name}-dcp
+            ${run_vivado}
+            ${dcp_vivado_tcl}
+            ${dcp}
+    )
+
+    add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
+    add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
 endfunction()
 
 function(add_xc7_validation_test)
@@ -323,6 +455,7 @@ function(add_xc7_validation_test)
                 OUTPUT_DIR=${output_dir}
                 DCP_FILE=${dcp}
                 BIT_FILE=${vivado_bit}
+                ARCH=xc7
                 ${quiet_cmd}
                 ${run_vivado} -mode batch -source ${tcl}
             DEPENDS

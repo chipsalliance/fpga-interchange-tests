@@ -6,9 +6,10 @@
 #   - BIT_FILE
 
 open_checkpoint $::env(DCP_FILE)
-
-set_property CFGBVS VCCO [current_design]
-set_property CONFIG_VOLTAGE 3.3 [current_design]
+if { $::env(ARCH) == "xc7" } {
+	set_property CFGBVS VCCO [current_design]
+	set_property CONFIG_VOLTAGE 3.3 [current_design]
+}
 set_property BITSTREAM.GENERAL.PERFRAMECRC YES [current_design]
 
 # Disable some DRC checks

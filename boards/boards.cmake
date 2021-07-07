@@ -22,12 +22,13 @@ function(add_board)
     #   - arch: architecture name: e.g. xc7, nexus, etc.
     #   - package: one of the packages available for a given device. E.g. cpg236
     #   - speedgrade: speedgrade of the chip. E.g -1, -2, -3
+    #   - part: the full vendor part name, if it's not of the form <device><package><speedgrade>
     #
     # Targets generated:
     #   - board-<name>
 
     set(options)
-    set(oneValueArgs name device_family device arch package speedgrade)
+    set(oneValueArgs name device_family device arch package speedgrade part)
     set(multiValueArgs)
 
     cmake_parse_arguments(
@@ -44,6 +45,11 @@ function(add_board)
     set(arch ${add_board_arch})
     set(package ${add_board_package})
     set(speedgrade ${add_board_speedgrade})
+    set(part ${add_board_part})
+
+    if ("${part}" STREQUAL "")
+        set(part ${device}${package}${speedgrade})
+    endif()
 
     add_custom_target(board-${name} DEPENDS device-${device})
     set_target_properties(
@@ -54,6 +60,6 @@ function(add_board)
             ARCH ${arch}
             PACKAGE ${package}
             SPEEDGRADE ${speedgrade}
-            PART ${device}${package}${speedgrade}
+            PART ${part}
     )
 endfunction()

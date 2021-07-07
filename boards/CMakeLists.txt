@@ -44,6 +44,16 @@ add_board(
 )
 
 add_board(
+    name zcu104
+    device_family zynqup
+    device xczu7ev
+    arch xcup
+    package ffvc1156
+    speedgrade -2
+    part xczu7ev-ffvc1156-2-e
+)
+
+add_board(
     name lifcl40evn
     device_family nexus
     device LIFCL-40

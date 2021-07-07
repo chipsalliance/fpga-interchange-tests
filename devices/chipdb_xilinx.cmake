@@ -138,3 +138,74 @@ function(generate_xc7_device_db)
         set(${device_target} ${constraints_luts_device} PARENT_SCOPE)
     endif()
 endfunction()
+
+function(generate_xcup_device_db)
+    # ~~~
+    # generate_xcup_device_db(
+    #    device <common device>
+    #    part <part>
+    #    device_target <variable name for device target>
+    # )
+    # ~~~
+    #
+    # Generates a chipdb BBA file, starting from a RapidWright device database which is then patched.
+    # Patches applied:
+    #   - constraints patch
+    #   - luts patch
+    #
+    # Arguments:
+    #   - device: common device name of a set of parts. E.g.xczu2cg-sbva484-2-i and xczu2cg-sbva484-1-i
+    #             share the same xczu2cg device prefix
+    #   - part: one among the parts available for a given device
+    #   - device_target: variable name that will hold the output device target for the parent scope
+
+    set(options)
+    set(oneValueArgs device part device_target)
+    set(multiValueArgs)
+
+    cmake_parse_arguments(
+        create_rapidwright_device_db
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    set(device ${create_rapidwright_device_db_device})
+    set(part ${create_rapidwright_device_db_part})
+    set(device_target ${create_rapidwright_device_db_device_target})
+
+    create_rapidwright_device_db(
+        device ${device}
+        part ${part}
+        output_target rapidwright_device
+    )
+
+    # Generate constraints patch
+    create_patched_device_db(
+        device ${device}
+        patch_name constraints
+        patch_path constraints
+        patch_format yaml
+        patch_data ${PYTHON_INTERCHANGE_PATH}/test_data/xcup_constraints.yaml
+        input_device ${rapidwright_device}
+        output_target constraints_device
+        output_name ${device}_constraints
+    )
+
+    # Generate lut constraints patch
+    create_patched_device_db(
+        device ${device}
+        patch_name constraints-luts
+        patch_path lutDefinitions
+        patch_format yaml
+        patch_data ${PYTHON_INTERCHANGE_PATH}/test_data/xcup_luts.yaml
+        input_device ${constraints_device}
+        output_target constraints_luts_device
+        output_name ${device}
+    )
+
+    if(DEFINED device_target)
+        set(${device_target} ${constraints_luts_device} PARENT_SCOPE)
+    endif()
+endfunction()

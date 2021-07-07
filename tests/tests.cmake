@@ -117,7 +117,7 @@ function(add_generic_test)
         add_custom_target(${arch}-${test_name}-json DEPENDS ${synth_json})
 
         set(simlib_dir "")
-        if(${arch} STREQUAL "xc7")
+        if(${arch} STREQUAL "xc7" OR ${arch} STREQUAL "xcup")
             set(simlib_dir ${XILINX_UNISIM_DIR})
         endif()
         if(DEFINED testbench AND NOT ${simlib_dir} STREQUAL "")
@@ -245,13 +245,29 @@ function(add_generic_test)
                 ${netlist}
                 ${phys}
         )
-
         add_custom_target(${arch}-${test_name}-fasm DEPENDS ${fasm})
-        add_dependencies(all-tests ${arch}-${test_name}-fasm)
-        add_dependencies(all-${device}-tests ${arch}-${test_name}-fasm)
+
+        if(${arch} STREQUAL "xcup")
+            # FASM not supported, make output target the physical netlist
+            add_dependencies(all-tests ${arch}-${test_name}-phys)
+            add_dependencies(all-${device}-tests ${arch}-${test_name}-phys)
+        else()
+            add_dependencies(all-tests ${arch}-${test_name}-fasm)
+            add_dependencies(all-${device}-tests ${arch}-${test_name}-fasm)
+        endif()
 
         if(${arch} STREQUAL "xc7")
             add_xc7_test(
+                name ${name}
+                board ${board}
+                sources ${sources}
+                netlist ${netlist}
+                phys ${phys}
+                fasm ${fasm}
+                top ${top}
+            )
+        elseif(${arch} STREQUAL "xcup")
+            add_xcup_test(
                 name ${name}
                 board ${board}
                 sources ${sources}

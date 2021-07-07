@@ -13,18 +13,20 @@ module top (
 
     input  wire rst,
 
-    input  wire [7:0] sw,
-    output wire [9:0] led,
+    input  wire [11:0] sw,
+    output wire [12:0] led,
 
-    inout wire io
+    inout wire [5:0] io
 );
 
 localparam CLKFBOUT_MULT = 8;
-localparam DATA_WIDTH = 8;
+localparam DATA_WIDTH = 2;
 localparam DATA_RATE = "SDR";
+localparam NUM_SERDES = 6;
 
 wire SYSCLK;
 wire CLKDIV;
+wire REFCLK;
 
 wire O_LOCKED;
 
@@ -54,6 +56,7 @@ PLLE2_ADV #(
     .CLKFBOUT_MULT      (CLKFBOUT_MULT),
     .CLKOUT0_DIVIDE     (CLKFBOUT_MULT),
     .CLKOUT1_DIVIDE     (CLKFBOUT_MULT * DIVIDE_RATE),
+    .CLKOUT2_DIVIDE     (CLKFBOUT_MULT / 2), // 200 MHz
 
     .STARTUP_WAIT       ("FALSE"),
 
@@ -70,6 +73,7 @@ PLLE2_ADV #(
 
     .CLKOUT0    (SYSCLK),
     .CLKOUT1    (CLKDIV),
+    .CLKOUT2    (REFCLK),
 
     // Stub inputs
     .CLKIN2     (1'b0),
@@ -81,49 +85,45 @@ PLLE2_ADV #(
     .DI         (16'b0)
 );
 
-// Test uints
-wire [7:0] OUTPUTS;
+wire REFCLK_BUFG, SYSCLK_BUFG, CLKDIV_BUFG;
 
-wire [7:0] INPUTS = sw[7:0];
+BUFG ref_bufg (.I(REFCLK), .O(REFCLK_BUFG));
+BUFG sys_bufg (.I(SYSCLK), .O(SYSCLK_BUFG));
+BUFG div_bufg (.I(CLKDIV), .O(CLKDIV_BUFG));
 
-localparam MASK = DATA_WIDTH == 2 ? 8'b00000011 :
-                  DATA_WIDTH == 3 ? 8'b00000111 :
-                  DATA_WIDTH == 4 ? 8'b00001111 :
-                  DATA_WIDTH == 5 ? 8'b00011111 :
-                  DATA_WIDTH == 6 ? 8'b00111111 :
-                  DATA_WIDTH == 7 ? 8'b01111111 :
-                /*DATA_WIDTH == 8*/ 8'b11111111;
-
-wire [7:0] MASKED_INPUTS = INPUTS & MASK;
-
-wire I_DAT;
-wire O_DAT;
-wire T_DAT;
-
-
-IOBUF iobuf(.I(O_DAT), .O(I_DAT), .T(T_DAT), .IO(io));
-
-wire SYSCLK_BUFG, CLKDIV_BUFG;
-BUFG sysclk_bufg(.I(SYSCLK), .O(SYSCLK_BUFG));
-BUFG clkdiv_bufg(.I(CLKDIV), .O(CLKDIV_BUFG));
-
-serdes_test #(
-    .DATA_WIDTH   (DATA_WIDTH),
-    .DATA_RATE    (DATA_RATE)
-) serdes_test (
-    .SYSCLK     (SYSCLK_BUFG),
-    .CLKDIV     (CLKDIV_BUFG),
-    .RST        (RST),
-
-    .OUTPUTS    (OUTPUTS),
-    .INPUTS     (MASKED_INPUTS),
-
-    .I_DAT      (I_DAT),
-    .O_DAT      (O_DAT),
-    .T_DAT      (T_DAT)
+IDELAYCTRL idelayctrl (
+    .REFCLK (REFCLK_BUFG)
 );
 
-wire [7:0] MASKED_OUTPUTS = OUTPUTS & MASK;
+// Test uints
+wire [11:0] OUTPUTS;
+
+wire [NUM_SERDES-1:0] I_DAT;
+wire [NUM_SERDES-1:0] O_DAT;
+wire [NUM_SERDES-1:0] T_DAT;
+
+genvar i;
+generate
+    for(i = 0; i < NUM_SERDES; i = i + 1) begin
+        IOBUF iobuf(.I(O_DAT[i]), .O(I_DAT[i]), .T(T_DAT[i]), .IO(io[i]));
+
+        serdes_test #(
+            .DATA_WIDTH   (DATA_WIDTH),
+            .DATA_RATE    (DATA_RATE)
+        ) serdes_test (
+            .SYSCLK     (SYSCLK_BUFG),
+            .CLKDIV     (CLKDIV_BUFG),
+            .RST        (RST),
+
+            .OUTPUTS    (OUTPUTS[i*2 + 1: i*2]),
+            .INPUTS     (sw[i*2 + 1: i*2]),
+
+            .I_DAT      (I_DAT[i]),
+            .O_DAT      (O_DAT[i]),
+            .T_DAT      (T_DAT[i])
+        );
+    end
+endgenerate
 
 // I/O connections
 reg [23:0] heartbeat_cnt;
@@ -132,6 +132,6 @@ always @(posedge SYSCLK)
     heartbeat_cnt <= heartbeat_cnt + 1;
 
 assign led[0] = heartbeat_cnt[22];
-assign led[8:1] = MASKED_OUTPUTS;
+assign led[12:1] = OUTPUTS;
 
 endmodule

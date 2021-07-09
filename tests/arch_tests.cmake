@@ -151,6 +151,52 @@ function(add_xc7_test)
             ${fasm}
         )
 
+    set(bit_fasm ${output_dir}/${name}.bit.fasm)
+    add_custom_command(
+        OUTPUT ${bit_fasm}
+        COMMAND
+            ${quiet_cmd}
+            ${BIT2FASM}
+                --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                --part ${part}
+                --bitread ${BITREAD}
+                --fasm_file ${bit_fasm}
+                ${bit}
+        DEPENDS
+            ${bit}
+            xc7-${test_name}-bit
+    )
+    add_custom_target(xc7-${test_name}-bit-fasm DEPENDS ${bit_fasm})
+
+    set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
+    add_custom_command(
+        OUTPUT ${dcp_fasm}
+        COMMAND
+            ${quiet_cmd}
+            ${BIT2FASM}
+                --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                --part ${part}
+                --bitread ${BITREAD}
+                --fasm_file ${dcp_fasm}
+                ${dcp_bit}
+        DEPENDS
+            ${dcp_bit}
+            xc7-${test_name}-dcp-bit
+    )
+    add_custom_target(xc7-${test_name}-dcp-bit-fasm DEPENDS ${dcp_fasm})
+
+
+    add_custom_target(xc7-${test_name}-dcp-diff-fasm
+        COMMAND diff -u
+            ${bit_fasm}
+            ${dcp_fasm}
+        DEPENDS
+            xc7-${test_name}-bit-fasm
+            xc7-${test_name}-dcp-bit-fasm
+            ${bit_fasm}
+            ${dcp_fasm}
+    )
+
     add_custom_target(${arch}-${test_name}-bit DEPENDS ${bit})
     add_dependencies(all-tests ${arch}-${test_name}-bit)
     add_dependencies(all-${device}-tests ${arch}-${test_name}-bit)

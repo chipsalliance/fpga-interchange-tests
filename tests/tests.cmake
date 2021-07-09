@@ -266,6 +266,11 @@ function(add_generic_test)
                 fasm ${fasm}
                 top ${top}
             )
+            add_xc7_timing_test(
+                name ${name}
+                device ${device}
+                board ${board}
+            )
         elseif(${arch} STREQUAL "xcup")
             add_xcup_test(
                 name ${name}

@@ -209,3 +209,63 @@ function(generate_xcup_device_db)
         set(${device_target} ${constraints_luts_device} PARENT_SCOPE)
     endif()
 endfunction()
+
+function(generate_xc7_device_with_timings)
+    # ~~~
+    # generate_xc7_device_with_timings(
+    #    device <common device>
+    #    input_device <input device>
+    #    output_device <variable name for device target>
+    #    family <xilinx family>
+    # )
+    # ~~~
+    #
+    # Generates capnp device with timing patches applied.
+    #
+    # Arguments:
+    #   - device: common device name of a set of parts. E.g. xc7a35tcsg324-1 and xc7a35tcpg236-1
+    #             share the same xc7a35t device prefix
+    #   - input_device: name of the file that contains device for patching
+    #   - output_device: variable name that will hold the output device target for the parent scope
+    #   - family: xilinx family name for device eg.: artix7, zynq7
+
+    set(options)
+    set(oneValueArgs device input_device output_device family)
+    set(multiValueArgs)
+
+    cmake_parse_arguments(
+        create_xc7_device_with_timings
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    set(device ${create_xc7_device_with_timings_device})
+    set(input_device ${create_xc7_device_with_timings_input_device})
+    set(output_device ${create_xc7_device_with_timings_output_device})
+    set(family ${create_xc7_device_with_timings_family})
+
+    get_target_property(input_device_loc ${input_device} LOCATION)
+    set(patched_device ${CMAKE_CURRENT_BINARY_DIR}/${device}_timing.device)
+    add_custom_command(
+        OUTPUT ${patched_device}
+        COMMAND
+            ${PYTHON3} -mfpga_interchange.device_timing_patching
+                --family xc7
+                --schema_dir ${INTERCHANGE_SCHEMA_PATH}
+                --timing_dir ${PRJXRAY_DB_DIR}/${family}
+                ${input_device_loc}
+                ${patched_device}
+        DEPENDS
+            ${input_device}
+            ${input_device_loc}
+    )
+
+    add_custom_target(timing-${device}-device DEPENDS ${patched_device})
+    set_property(TARGET timing-${device}-device PROPERTY LOCATION ${patched_device})
+
+    if(DEFINED device_target)
+        set(${output_device} timing-${device}-device PARENT_SCOPE)
+    endif()
+endfunction()

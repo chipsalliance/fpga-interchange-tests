@@ -20,6 +20,7 @@ third_party/make-env/conda.mk:
 
 include third_party/make-env/conda.mk
 
+.PHONY: build
 build:
 	git submodule init
 	git submodule update --init --recursive
@@ -29,5 +30,6 @@ build:
 	# Build test suite
 	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake ${CMAKE_FLAGS} ..
 
+.PHONY: clean-build
 clean-build:
-	rm -rf build
+	rm -rf build/*

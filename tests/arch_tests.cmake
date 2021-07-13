@@ -154,6 +154,56 @@ function(add_xc7_test)
     add_custom_target(${arch}-${test_name}-bit DEPENDS ${bit})
     add_dependencies(all-tests ${arch}-${test_name}-bit)
     add_dependencies(all-${device}-tests ${arch}-${test_name}-bit)
+
+    # generate vivado timing report
+    set(vivado_report ${output_dir}/vivado_report.txt)
+    set(vivado_timing_tcl ${CMAKE_SOURCE_DIR}/tests/common/timing_dump_vivado.tcl)
+    message(STATUS "${arch} ${test_name} ${board} ${name}")
+    add_custom_command(
+        OUTPUT ${vivado_report}
+        COMMAND ${CMAKE_COMMAND} -E env
+            VIVADO_SETTINGS=${VIVADO_SETTINGS}
+            ${quiet_cmd}
+            ${run_vivado} -mode tcl -source ${vivado_timing_tcl} -tclargs ${dcp} ${vivado_report}
+        DEPENDS
+            ${dcp}
+    )
+
+    add_custom_target(${arch}-${test_name}-vivado-report DEPENDS ${vivado_report})
+
+    # generate custom timing report
+    set(custom_report ${output_dir}/custom_report.txt)
+    set(phys ${output_dir}/${name}.phys)
+    set(device_db ${CMAKE_BINARY_DIR}/devices/${device}/${device}_timing.device)
+    add_custom_command(
+        OUTPUT ${custom_report}
+        COMMAND ${CMAKE_COMMAND} -E env
+            python3 -m fpga_interchange.static_timing_analysis --schema_dir ${INTERCHANGE_SCHEMA_PATH} --device ${device_db}
+            --physical_netlist ${phys} --compact > ${custom_report}
+        DEPENDS
+            ${arch}-${test_name}-phys
+            timing-${device}-device
+    )
+
+    add_custom_target(${arch}-${test_name}-custom-report DEPENDS ${custom_report})
+
+    # generate comparasion report
+    set(compare_report ${output_dir}/compare_report.txt)
+    add_custom_command(
+        OUTPUT ${compare_report}
+        COMMAND
+            python3 -m fpga_interchange.compare_timings
+            --base_timing ${vivado_report}
+            --compare_timing ${custom_report}
+            --output_file ${compare_report}
+        DEPENDS
+            ${arch}-${test_name}-vivado-report
+            ${arch}-${test_name}-custom-report
+    )
+
+    add_custom_target(${arch}-${test_name}-compare-timings DEPENDS ${compare_report})
+    add_dependencies(all-timing-comparasion-tests ${arch}-${test_name}-compare-timings)
+    add_dependencies(all-${device}-tests ${arch}-${test_name}-compare-timings)
 endfunction()
 
 function(add_xcup_test)
@@ -284,6 +334,7 @@ function(add_xcup_test)
     add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
     add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
     add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+
 endfunction()
 
 function(add_xc7_validation_test)
@@ -518,92 +569,6 @@ function(add_xc7_validation_test)
             )
         endif()
     endforeach()
-endfunction()
-
-function(add_xc7_timing_test)
-    # ~~~
-    # add_xc7_timing_test(
-    #    name <name>
-    #    device <device>
-    #    board <board>
-    # )
-    #
-    # Patches xc7 devices with timing data from prjxray-db
-    #
-    # Arguments:
-    #   - name: test name
-    #
-    # Targets generated:
-    #   - vivado_report.txt    : vivado timing report
-    #   - custom_report.txt    : python fpga interchange STA timing report
-    #   - compare_report.txt   : compare report between vivado and python fpga interchange STA values
-
-    set(options)
-    set(oneValueArgs name device board)
-    set(multiValueArgs)
-
-    cmake_parse_arguments(
-        add_xc7_timing_test
-        "${options}"
-        "${oneValueArgs}"
-        "${multiValueArgs}"
-        ${ARGN}
-    )
-
-    set(device ${add_xc7_timing_test_device})
-    set(name ${add_xc7_timing_test_name})
-    set(board ${add_xc7_timing_test_board})
-
-    set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
-    set(test_name "${name}-${board}")
-    set(dcp ${output_dir}/${name}.dcp)
-    set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
-    set(vivado_report ${output_dir}/vivado_report.txt)
-    set(vivado_timing_tcl ${CMAKE_SOURCE_DIR}/tests/common/timing_dump_vivado.tcl)
-    message(STATUS "${arch} ${test_name} ${board} ${name}")
-    add_custom_command(
-        OUTPUT ${vivado_report}
-        COMMAND ${CMAKE_COMMAND} -E env
-            VIVADO_SETTINGS=${VIVADO_SETTINGS}
-            ${quiet_cmd}
-            ${run_vivado} -mode tcl -source ${vivado_timing_tcl} -tclargs ${dcp} ${vivado_report}
-        DEPENDS
-            ${dcp}
-    )
-
-    add_custom_target(${arch}-${test_name}-vivado-report DEPENDS ${vivado_report})
-
-    set(custom_report ${output_dir}/custom_report.txt)
-    set(phys ${output_dir}/${name}.phys)
-    set(device_db ${CMAKE_BINARY_DIR}/devices/${device}/${device}_timing.device)
-    add_custom_command(
-        OUTPUT ${custom_report}
-        COMMAND ${CMAKE_COMMAND} -E env
-            python3 -m fpga_interchange.static_timing_analysis --schema_dir ${INTERCHANGE_SCHEMA_PATH} --device ${device_db}
-            --physical_netlist ${phys} --compact > ${custom_report}
-        DEPENDS
-            ${arch}-${test_name}-phys
-            timing-${device}-device
-    )
-
-    add_custom_target(${arch}-${test_name}-custom-report DEPENDS ${custom_report})
-
-    set(compare_report ${output_dir}/compare_report.txt)
-    add_custom_command(
-        OUTPUT ${compare_report}
-        COMMAND
-            python3 -m fpga_interchange.compare_timings
-            --base_timing ${vivado_report}
-            --compare_timing ${custom_report}
-            --output_file ${compare_report}
-        DEPENDS
-            ${arch}-${test_name}-vivado-report
-            ${arch}-${test_name}-custom-report
-    )
-
-    add_custom_target(${arch}-${test_name}-compare-timings DEPENDS ${compare_report})
-    add_dependencies(xilinx-timing-tests ${arch}-${test_name}-compare-timings)
-
 endfunction()
 
 function(add_nexus_test)

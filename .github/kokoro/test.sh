@@ -11,6 +11,9 @@ set -e
 
 cd github/$KOKORO_DIR
 
+INSTALL_DIR="$(pwd)/install"
+export CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
+
 source ./.github/kokoro/steps/xilinx.sh
 source ./.github/kokoro/steps/hostsetup.sh
 source ./.github/kokoro/steps/hostinfo.sh
@@ -33,5 +36,28 @@ echo "-------------------------------------------"
     make all-validation-tests -j$NUM_CORES
     make all-vendor-bit-tests -j$NUM_CORES
     popd
+)
+echo "-------------------------------------------"
+
+echo
+echo "==========================================="
+echo "Install interchange devices"
+echo "-------------------------------------------"
+(
+    source env/conda/bin/activate fpga-interchange
+    pushd build
+    make install
+    popd
+    cp environment.yml $INSTALL_DIR
+    mkdir -p $INSTALL_DIR/techmaps
+    cp tests/common/remap*.v $INSTALL_DIR/techmaps
+
+    du -ah $INSTALL_DIR
+    export GIT_HASH=$(git rev-parse --short HEAD)
+    tar -I "pixz" -cvf interchange-techmaps-${GIT_HASH}.tar.xz -C $INSTALL_DIR techmaps
+    for device in $(ls $INSTALL_DIR/devices)
+    do
+        tar -I "pixz" -cvf interchange-$device-${GIT_HASH}.tar.xz -C $INSTALL_DIR/devices $device
+    done
 )
 echo "-------------------------------------------"

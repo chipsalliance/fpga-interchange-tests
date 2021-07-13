@@ -64,6 +64,7 @@ sudo apt-get install -y \
         jq \
         make \
         nodejs \
+        pixz \
         psmisc \
         python \
         python3 \
@@ -98,6 +99,6 @@ echo "----------------------------------------"
 	echo
 	echo " Build system setup"
 	echo "----------------------------------------"
-	CMAKE_FLAGS="-DVIVADO_SETTINGS=${VIVADO_SETTINGS}" make build
+	CMAKE_FLAGS="${CMAKE_FLAGS} -DVIVADO_SETTINGS=${VIVADO_SETTINGS}" make build
 	echo "----------------------------------------"
 )

@@ -65,6 +65,27 @@ OSERDESE2 #(
     .TQ     (T_DAT)
 );
 
+wire DDLY;
+
+IDELAYE2 #(
+    .IDELAY_TYPE    ("FIXED"),
+    .DELAY_SRC      ("IDATAIN"),
+    .IDELAY_VALUE   (5'd23)
+) idelay (
+    .C              (SYSCLK),
+    .CE             (1'b1),
+    .LD             (1'b1),
+    .INC            (1'b1),
+    .IDATAIN        (I_DAT),
+    .DATAOUT        (DDLY),
+
+    // Stub inputs
+    .REGRST         (1'b0),
+    .LDPIPEEN       (1'b0),
+    .DATAIN         (1'b0),
+    .CINVCTRL       (1'b0)
+);
+
 ISERDESE2 #(
     .DATA_RATE      (DATA_RATE),
     .DATA_WIDTH     (DATA_WIDTH),
@@ -77,7 +98,7 @@ ISERDESE2 #(
     .CE1        (1'b1),
     .CE2        (1'b1),
     .RST        (i_rstdiv),
-    .D          (I_DAT),
+    .DDLY       (DDLY),
     .Q1         (OUTPUTS[7]),
     .Q2         (OUTPUTS[6]),
     .Q3         (OUTPUTS[5]),

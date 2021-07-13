@@ -36,7 +36,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: env
-        key: env-${{ hashFiles('**/environment.yml', '**/requirements.txt') }}
+        key: env-${{ hashFiles('**/environment.yml', '**/requirements.txt', '**/third_party') }}
 
     - name: Create environment
       if: steps.cache-env.outputs.cache-hit != 'true'

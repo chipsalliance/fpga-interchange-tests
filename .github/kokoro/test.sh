@@ -35,7 +35,7 @@ echo "-------------------------------------------"
     make all-tests -j$NUM_CORES
     make all-validation-tests -j$NUM_CORES
     make all-vendor-bit-tests -j$NUM_CORES
-    make xilinx-timing-tests -j$NUM_CORES
+    make all-timing-comparasion-tests -j$NUM_CORES
     popd
 )
 echo "-------------------------------------------"

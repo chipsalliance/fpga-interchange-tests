@@ -76,3 +76,6 @@ set_property IOSTANDARD LVCMOS33 [get_ports io[2]]
 set_property IOSTANDARD LVCMOS33 [get_ports io[3]]
 set_property IOSTANDARD LVCMOS33 [get_ports io[4]]
 set_property IOSTANDARD LVCMOS33 [get_ports io[5]]
+
+# LOC constraint
+set_property LOC IDELAYCTRL_X0Y0 [get_cells idelayctrl]

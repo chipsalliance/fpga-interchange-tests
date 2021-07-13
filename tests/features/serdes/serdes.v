@@ -91,6 +91,7 @@ BUFG ref_bufg (.I(REFCLK), .O(REFCLK_BUFG));
 BUFG sys_bufg (.I(SYSCLK), .O(SYSCLK_BUFG));
 BUFG div_bufg (.I(CLKDIV), .O(CLKDIV_BUFG));
 
+(* BEL="IDELAYCTRL" *)
 IDELAYCTRL idelayctrl (
     .REFCLK (REFCLK_BUFG)
 );

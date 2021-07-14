@@ -36,3 +36,7 @@ build: update
 .PHONY: clean-build
 clean-build:
 	rm -rf build/*
+
+.PHONY:
+third_party_SHA:
+	git submodule status > third_party_versions.txt

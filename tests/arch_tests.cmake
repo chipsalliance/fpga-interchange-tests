@@ -203,7 +203,7 @@ function(add_xc7_test)
 
     add_custom_target(${arch}-${test_name}-compare-timings DEPENDS ${compare_report})
     add_dependencies(all-timing-comparasion-tests ${arch}-${test_name}-compare-timings)
-    add_dependencies(all-${device}-tests ${arch}-${test_name}-compare-timings)
+    add_dependencies(all-${device}-timing-comparasion-tests ${arch}-${test_name}-compare-timings)
 endfunction()
 
 function(add_xcup_test)

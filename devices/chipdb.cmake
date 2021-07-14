@@ -11,6 +11,7 @@ function(create_patched_device_db)
     #    patch_data <patch_data>
     #    input_device <input device target>
     #    output_target <output device target>
+    #    output_name <output device name>
     # )
     # ~~~
     #
@@ -28,6 +29,7 @@ function(create_patched_device_db)
     #   - patch_data: path to the patch_data required for the fpga_interchange.patch call
     #   - input_device: target for the device that needs to be patched
     #   - output_target: variable name that will hold the output device target for the parent scope
+    #   - output_name: output device name
     #
     # Targets generated:
     #   - <patch_name>-<device>-device
@@ -100,6 +102,7 @@ function(patch_device_with_prim_lib)
     #    yosys_script <yosys script>
     #    input_device <input device target>
     #    output_target <output device target>
+    #    output_name <output device name>
     # )
     # ~~~
     #
@@ -114,12 +117,13 @@ function(patch_device_with_prim_lib)
     #   - yosys_script: yosys script to produce cell library
     #   - input_device: target for the device that needs to be patched
     #   - output_target: variable name that will hold the output device target for the parent scope
+    #   - output_name: output device name
     #
     # Targets generated:
     #   - prims-<device>-device
 
     set(options)
-    set(oneValueArgs device yosys_script input_device output_target)
+    set(oneValueArgs device yosys_script input_device output_target output_name)
     set(multiValueArgs)
 
     cmake_parse_arguments(
@@ -134,9 +138,10 @@ function(patch_device_with_prim_lib)
     set(yosys_script ${patch_device_with_prim_lib_yosys_script})
     set(input_device ${patch_device_with_prim_lib_input_device})
     set(output_target ${patch_device_with_prim_lib_output_target})
+    set(output_name ${patch_device_with_prim_lib_output_name})
 
     get_target_property(input_device_loc ${input_device} LOCATION)
-    set(output_device_file ${CMAKE_CURRENT_BINARY_DIR}/${device}_prim_lib.device)
+    set(output_device_file ${CMAKE_CURRENT_BINARY_DIR}/${output_name}.device)
     set(output_json_file ${CMAKE_CURRENT_BINARY_DIR}/${device}_prim_lib.json)
 
     set(quiet_cmd ${CMAKE_SOURCE_DIR}/utils/quiet_cmd.sh)
@@ -278,6 +283,17 @@ function(generate_chipdb)
     add_custom_target(all-${device}-validation-tests)
     add_custom_target(all-${device}-vendor-bit-tests)
     add_custom_target(all-${device}-simulation-tests)
+
+    install(FILES ${device_loc} DESTINATION devices/${device})
+    install(FILES ${chipdb_bin} DESTINATION devices/${device})
+
+    add_custom_target(
+        install_${device}_device
+        ALL
+        DEPENDS
+            ${device_target}
+            chipdb-${device}-bin
+    )
 
 endfunction()
 

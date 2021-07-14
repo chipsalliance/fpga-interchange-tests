@@ -31,7 +31,7 @@ function(create_prjoxide_device_db)
 
     set(device ${create_prjoxide_device_db_device})
     set(output_target ${create_prjoxide_device_db_output_target})
-    set(prjoxide_device_db ${CMAKE_CURRENT_BINARY_DIR}/${device}.device)
+    set(prjoxide_device_db ${CMAKE_CURRENT_BINARY_DIR}/prjoxide_${device}.device)
 
     get_target_property(PRJOXIDE programs PRJOXIDE)
 
@@ -96,6 +96,7 @@ function(generate_nexus_device_db)
         yosys_script synth_nexus
         input_device ${prjoxide_device}
         output_target prjoxide_prims_device
+        output_name ${device}
     )
 
     if(DEFINED device_target)

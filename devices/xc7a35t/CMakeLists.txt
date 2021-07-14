@@ -2,6 +2,7 @@ generate_xc7_device_db(
     device xc7a35t
     part xc7a35tcsg324-1
     device_target xc7a35t_target
+    family artix7
 )
 
 generate_chipdb(
@@ -10,11 +11,4 @@ generate_chipdb(
     device_target ${xc7a35t_target}
     device_config ${PYTHON_INTERCHANGE_PATH}/test_data/series7_device_config.yaml
     test_package csg324
-)
-
-generate_xc7_device_with_timings(
-    device xc7a35t
-    input_device ${xc7a35t_target}
-    output_device xc7a35t_timing_target
-    family artix7
 )

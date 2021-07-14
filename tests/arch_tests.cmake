@@ -178,8 +178,11 @@ function(add_xc7_test)
     add_custom_command(
         OUTPUT ${custom_report}
         COMMAND ${CMAKE_COMMAND} -E env
-            python3 -m fpga_interchange.static_timing_analysis --schema_dir ${INTERCHANGE_SCHEMA_PATH} --device ${device_db}
-            --physical_netlist ${phys} --compact > ${custom_report}
+            ${PYTHON3} -m fpga_interchange.static_timing_analysis
+            --schema_dir ${INTERCHANGE_SCHEMA_PATH}
+            --device ${device_db}
+            --physical_netlist ${phys}
+            --compact > ${custom_report}
         DEPENDS
             ${arch}-${test_name}-phys
             timing-${device}-device
@@ -192,7 +195,7 @@ function(add_xc7_test)
     add_custom_command(
         OUTPUT ${compare_report}
         COMMAND
-            python3 -m fpga_interchange.compare_timings
+            ${PYTHON3} -m fpga_interchange.compare_timings
             --base_timing ${vivado_report}
             --compare_timing ${custom_report}
             --output_file ${compare_report}

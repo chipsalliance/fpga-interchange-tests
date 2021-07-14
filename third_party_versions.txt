@@ -1,5 +1,5 @@
  b106c3ab421fe7b9b5986c42a234b3fba2190e3b third_party/RapidWright (v2020.2.6-beta-2-gb106c3a)
- e1b906fb15873c65f88c4793714f726c23d736e8 third_party/fpga-interchange-schema (v0.0-75-ge1b906f)
++78abf3f30770ccc6d0e1f5dbfeaef2666f55acf6 third_party/fpga-interchange-schema (v0.0-75-g78abf3f)
  9b07ad2bb62fbf8af789c9e4669715c974b4912d third_party/make-env (v0.0-51-g9b07ad2)
- fd777df3b5763f17d0554ae45c903ca3317ee065 third_party/python-fpga-interchange (v0.0.16-17-gfd777df)
++ddad49dc5c0a0acd151fdf9600031f124089f1a2 third_party/python-fpga-interchange (v0.0.16-21-gddad49d)
  1c8e05fd1e9a79ceb8b996a0996674122eed086f third_party/xilinx-unisims (heads/master)

@@ -95,17 +95,17 @@ function(generate_xc7_device_db)
     set(multiValueArgs)
 
     cmake_parse_arguments(
-        create_rapidwright_device_db
+        generate_xc7_device_db
         "${options}"
         "${oneValueArgs}"
         "${multiValueArgs}"
         ${ARGN}
     )
 
-    set(device ${create_rapidwright_device_db_device})
-    set(part ${create_rapidwright_device_db_part})
-    set(device_target ${create_rapidwright_device_db_device_target})
-    set(family ${create_rapidwright_device_db_family})
+    set(device ${generate_xc7_device_db_device})
+    set(part ${generate_xc7_device_db_part})
+    set(device_target ${generate_xc7_device_db_device_target})
+    set(family ${generate_xc7_device_db_family})
 
     create_rapidwright_device_db(
         device ${device}
@@ -134,7 +134,7 @@ function(generate_xc7_device_db)
         patch_data ${PYTHON_INTERCHANGE_PATH}/test_data/series7_luts.yaml
         input_device ${constraints_device}
         output_target constraints_luts_device
-        output_name ${device}
+        output_name ${device}_constraints_luts
     )
 
     get_target_property(input_device_loc ${constraints_luts_device} LOCATION)

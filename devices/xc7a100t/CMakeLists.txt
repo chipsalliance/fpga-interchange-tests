@@ -2,6 +2,7 @@ generate_xc7_device_db(
     device xc7a100t
     part xc7a100tcsg324-1
     device_target xc7a100t_target
+    family artix7
 )
 
 generate_chipdb(

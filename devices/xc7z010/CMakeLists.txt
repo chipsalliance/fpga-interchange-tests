@@ -2,6 +2,7 @@ generate_xc7_device_db(
     device xc7z010
     part xc7z010clg400-1
     device_target xc7z010_target
+    family zynq7
 )
 
 generate_chipdb(

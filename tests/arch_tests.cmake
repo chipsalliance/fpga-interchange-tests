@@ -174,13 +174,13 @@ function(add_xc7_test)
     # generate custom timing report
     set(custom_report ${output_dir}/custom_report.txt)
     set(phys ${output_dir}/${name}.phys)
-    set(device_db ${CMAKE_BINARY_DIR}/devices/${device}/${device}_timing.device)
+    get_target_property(timing_target_loc timing-${device}-device LOCATION)
     add_custom_command(
         OUTPUT ${custom_report}
         COMMAND ${CMAKE_COMMAND} -E env
             ${PYTHON3} -m fpga_interchange.static_timing_analysis
             --schema_dir ${INTERCHANGE_SCHEMA_PATH}
-            --device ${device_db}
+            --device ${timing_target_loc}
             --physical_netlist ${phys}
             --compact > ${custom_report}
         DEPENDS

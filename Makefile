@@ -28,12 +28,8 @@ update:
 		make update_jars && \
 		popd
 
-.PHONY:
-third_party_SHA:
-	git submodule status > third_party_versions.txt
-
 .PHONY: build
-build: update third_party_SHA
+build: update
 	# Build test suite
 	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake ${CMAKE_FLAGS} ..
 

@@ -30,13 +30,14 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install git make cmake
+        git submodule status > .submodules_status
 
     - name: Cache environment
       id: cache-env
       uses: actions/cache@v2
       with:
         path: env
-        key: env-${{ hashFiles('**/environment.yml', '**/requirements.txt', '**/third_party_versions.txt') }}
+        key: env-${{ hashFiles('**/environment.yml', '**/requirements.txt', '**/.submodules_status') }}
 
     - name: Create environment
       if: steps.cache-env.outputs.cache-hit != 'true'

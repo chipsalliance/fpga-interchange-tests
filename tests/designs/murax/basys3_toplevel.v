@@ -16,14 +16,6 @@ module toplevel(
     output [15:0] io_led
   );
 
-  // Divide clock by 2
-  reg clk50 = 1'b0;
-  always @(posedge io_mainClk)
-      clk50 <= !clk50;
-
-  wire clk50_bufg;
-  BUFG bufg50 (.I(clk50), .O(clk50_bufg));
-
   wire [31:0] io_gpioA_read;
   wire [31:0] io_gpioA_write;
   wire [31:0] io_gpioA_writeEnable;
@@ -40,7 +32,7 @@ module toplevel(
 
   Murax murax (
     .io_asyncReset(0),
-    .io_mainClk (clk50_bufg ),
+    .io_mainClk (io_mainClk ),
     .io_jtag_tck(1'b0),
     .io_jtag_tdi(1'b0),
     .io_jtag_tms(1'b0),

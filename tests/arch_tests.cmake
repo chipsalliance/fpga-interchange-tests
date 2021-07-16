@@ -204,7 +204,6 @@ function(add_xc7_test)
     # generate vivado timing report
     set(vivado_report ${output_dir}/vivado_report.txt)
     set(vivado_timing_tcl ${CMAKE_SOURCE_DIR}/tests/common/timing_dump_vivado.tcl)
-    message(STATUS "${arch} ${test_name} ${board} ${name}")
     add_custom_command(
         OUTPUT ${vivado_report}
         COMMAND ${CMAKE_COMMAND} -E env

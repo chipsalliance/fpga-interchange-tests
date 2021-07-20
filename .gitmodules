@@ -12,4 +12,4 @@
 	url = https://github.com/SymbiFlow/XilinxUnisimLibrary.git
 [submodule "third_party/python-fpga-interchange"]
 	path = third_party/python-fpga-interchange
-	url = https://github.com/SymbiFlow/python-fpga-interchange
+	url = https://github.com/gatecat/python-fpga-interchange

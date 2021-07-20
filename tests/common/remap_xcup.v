@@ -17,3 +17,9 @@ module BUF(input I, output O);
 LUT1 #(.INIT(2'b10)) _TECHMAP_REPLACE_ (.I0(I), .O(O));
 
 endmodule
+
+module BUFG(input I, output O);
+
+BUFGCE #(.SIM_DEVICE("ULTRASCALE_PLUS")) _TECHMAP_REPLACE_ (.I(I), .CE(1'b1), .O(O));
+
+endmodule

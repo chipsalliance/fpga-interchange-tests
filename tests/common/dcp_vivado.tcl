@@ -19,7 +19,10 @@ set_property IS_ENABLED 0 [get_drc_checks {NSTD-1}]
 # Reports
 report_utilization -file $::env(OUTPUT_DIR)/utilization.rpt
 report_clock_utilization -file $::env(OUTPUT_DIR)/clock_utilization.rpt
-report_timing_summary -datasheet -max_paths 10 -file $::env(OUTPUT_DIR)/timing_summary.rpt
+if { $::env(ARCH) != "xcup" } {
+	# This segfaults Vivado on the counter-zcu104 example...
+	report_timing_summary -datasheet -max_paths 10 -file $::env(OUTPUT_DIR)/timing_summary.rpt
+}
 report_power -file $::env(OUTPUT_DIR)/power.rpt
 report_route_status -file $::env(OUTPUT_DIR)/route_status.rpt
 

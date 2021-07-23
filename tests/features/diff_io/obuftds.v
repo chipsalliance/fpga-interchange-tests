@@ -8,9 +8,10 @@
 
 // Truth tables (SW and LED corresponding to the basys3 board):
 //
-// SW8  | LED3 LED2
-//  0   |  1    0
-//  1   |  0    1
+// SW8 | SW9 | LED3 | LED2 |
+//  0  |  0  |  1   |  0   |
+//  1  |  0  |  0   |  1   |
+//  x  |  1  |  z   |  z   |
 
 `default_nettype none
 

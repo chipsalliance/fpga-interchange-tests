@@ -16,14 +16,15 @@ module tb;
 reg clk;
 reg rst;
 
-reg [1:0] sw;
+reg  sig;
+wire led;
 
 always #5 clk <= !clk;
 
 initial begin
     clk = 1'b0;
     rst = 1'b1;
-    sw  = 2'd0;
+    sig = 1'b0;
 
     #10 rst = 1'b0;
 
@@ -35,21 +36,22 @@ end
 wire diff_p, diff_n;
 
 top dut(
-    .sw(sw),
+    .led(led),
 
-    .diff_p(diff_p),
-    .diff_n(diff_n)
+    .diff_i_p(diff_p),
+    .diff_i_n(diff_n)
 );
+
+assign diff_p =  sig;
+assign diff_n = !sig;
 
 always @(posedge clk) begin
     if (rst)
-        sw <= 0;
+        sig <= 0;
     else
-        sw <= sw + 1;
+        sig <= ~sig;
 
-    assert(sw != 2'b00   || diff_n === 1    && diff_p == 0,    sw);
-    assert(sw != 2'b01   || diff_n === 0    && diff_p == 1,    sw);
-    assert(sw[1] != 1'b1 || diff_n === 1'bz && diff_p == 1'bz, sw);
+    assert(sig == led, sig);
 end
 
 endmodule

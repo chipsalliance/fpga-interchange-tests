@@ -4,6 +4,7 @@ function(add_xc7_test)
     #    name <name>
     #    board <board>
     #    netlist <logical netlist>
+    #    xdc <XDC file>
     #    phys <physical netlist>
     #    fasm <fasm file>
     #    top <top>
@@ -15,6 +16,7 @@ function(add_xc7_test)
     #   - name: test name
     #   - board: name of the board
     #   - netlist: path to the generated logical netlist
+    #   - xdc: path to the XDC file with constraints
     #   - phys: path to the generated physical netlist
     #   - fasm: path to the generated fasm file
     #   - top: top level module
@@ -25,7 +27,7 @@ function(add_xc7_test)
     #   - <arch>-<name>-<board>-bit     : bitstream generation
 
     set(options)
-    set(oneValueArgs name board netlist phys fasm top)
+    set(oneValueArgs name board netlist xdc phys fasm top)
     set(multiValueArgs sources)
 
     cmake_parse_arguments(
@@ -39,6 +41,7 @@ function(add_xc7_test)
     set(name ${add_xc7_test_name})
     set(board ${add_xc7_test_board})
     set(netlist ${add_xc7_test_netlist})
+    set(xdc ${add_xc7_test_xdc})
     set(phys ${add_xc7_test_phys})
     set(top ${add_xc7_test_top})
     set(sources ${add_xc7_test_sources})
@@ -54,7 +57,6 @@ function(add_xc7_test)
     get_property(arch TARGET board-${board} PROPERTY ARCH)
 
     set(test_name "${name}-${board}")
-    set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${board}.xdc)
     set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
 
     # Bitstream generation target from DCP
@@ -77,7 +79,7 @@ function(add_xc7_test)
         DEPENDS
             ${run_vivado}
             ${vivado_tcl}
-            ${sources}
+            ${sources} ${xdc}
         WORKING_DIRECTORY
             ${output_dir}
     )
@@ -202,7 +204,7 @@ function(add_xc7_test)
     add_dependencies(all-${device}-tests ${arch}-${test_name}-bit)
 
     # generate vivado timing report
-    set(vivado_report ${output_dir}/vivado_report.txt)
+    set(vivado_report ${output_dir}/${test_name}-vivado_report.txt)
     set(vivado_timing_tcl ${CMAKE_SOURCE_DIR}/tests/common/timing_dump_vivado.tcl)
     add_custom_command(
         OUTPUT ${vivado_report}
@@ -217,7 +219,7 @@ function(add_xc7_test)
     add_custom_target(${arch}-${test_name}-vivado-report DEPENDS ${vivado_report})
 
     # generate custom timing report
-    set(custom_report ${output_dir}/custom_report.txt)
+    set(custom_report ${output_dir}/${test_name}-custom_report.txt)
     set(phys ${output_dir}/${name}.phys)
     get_target_property(timing_target_loc timing-${device}-device LOCATION)
     add_custom_command(
@@ -236,7 +238,7 @@ function(add_xc7_test)
     add_custom_target(${arch}-${test_name}-custom-report DEPENDS ${custom_report})
 
     # generate comparasion report
-    set(compare_report ${output_dir}/compare_report.txt)
+    set(compare_report ${output_dir}/${test_name}-compare_report.txt)
     add_custom_command(
         OUTPUT ${compare_report}
         COMMAND
@@ -260,6 +262,7 @@ function(add_xcup_test)
     #    name <name>
     #    board <board>
     #    netlist <logical netlist>
+    #    xdc <XDC file>
     #    phys <physical netlist>
     #    fasm <fasm file>
     #    top <top>
@@ -271,6 +274,7 @@ function(add_xcup_test)
     #   - name: test name
     #   - board: name of the board
     #   - netlist: path to the generated logical netlist
+    #   - xdc: path to the XDC file with constraints
     #   - phys: path to the generated physical netlist
     #   - fasm: path to the generated fasm file
     #   - top: top level module
@@ -281,7 +285,7 @@ function(add_xcup_test)
     #   - <arch>-<name>-<board>-bit     : bitstream generation
 
     set(options)
-    set(oneValueArgs name board netlist phys fasm top)
+    set(oneValueArgs name board netlist xdc phys fasm top)
     set(multiValueArgs sources)
 
     cmake_parse_arguments(
@@ -295,6 +299,7 @@ function(add_xcup_test)
     set(name ${add_xcup_test_name})
     set(board ${add_xcup_test_board})
     set(netlist ${add_xcup_test_netlist})
+    set(xdc ${add_xcup_test_xdc})
     set(phys ${add_xcup_test_phys})
     set(top ${add_xcup_test_top})
     set(sources ${add_xcup_test_sources})
@@ -309,7 +314,6 @@ function(add_xcup_test)
     get_property(arch TARGET board-${board} PROPERTY ARCH)
 
     set(test_name "${name}-${board}")
-    set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${board}.xdc)
     set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
 
     # Bitstream generation target from DCP

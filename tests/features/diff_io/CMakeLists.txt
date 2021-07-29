@@ -1,5 +1,5 @@
 add_generic_test(
-    name io_obuftds
+    name obuftds
     board_list basys3
     constr_prefix obuftds
     sources obuftds.v
@@ -7,7 +7,7 @@ add_generic_test(
 )
 
 add_generic_test(
-    name io_obufds
+    name obufds
     board_list basys3
     constr_prefix obufds
     sources obufds.v
@@ -15,7 +15,7 @@ add_generic_test(
 )
 
 add_generic_test(
-    name io_ibufds
+    name ibufds
     board_list basys3
     constr_prefix ibufds
     sources ibufds.v
@@ -23,7 +23,7 @@ add_generic_test(
 )
 
 add_generic_test(
-    name io_iobufds
+    name iobufds
     board_list basys3
     constr_prefix iobufds
     sources iobufds.v

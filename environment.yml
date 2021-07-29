@@ -12,10 +12,10 @@ channels:
     - litex-hub
 dependencies:
     - litex-hub::capnproto-java=0.1.5_0012_g44a8c1e=20201104_165332
+    - litex-hub::prjxray-db=0.0_252_g8372b58=20210723_083625
     - litex-hub::prjxray-tools=0.1_2842_g6867429c=20210301_104249
-    - litex-hub::prjxray-db=0.0_252_g8372b58=20210622_220029
-    - litex-hub::yosys=0.9_5457_gc6681508=20210615_141355_py38
-    - litex-hub::nextpnr-fpga_interchange=v0.0_3690_g2c459961=20210625_074838
+    - litex-hub::yosys=0.9_5520_ga0e912ba=20210723_083625_py37
+    - litex-hub::nextpnr-fpga_interchange=v0.0_3722_geb6817c2=20210723_083625_py37
     - litex-hub::iverilog=s20150603_0957_gad862020=20201120_145821
     - litex-hub::prjoxide=v0.0_376_gd0b0340=20210624_125028
     - swig

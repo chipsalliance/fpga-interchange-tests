@@ -11,18 +11,18 @@ module ram0(
     input wrclk,
     input [15:0] di,
     input wren,
-    input [9:0] wraddr,
+    input [10:0] wraddr,
     // Read port
     input rdclk,
     input rden,
-    input [9:0] rdaddr,
+    input [10:0] rdaddr,
     output reg [15:0] do);
 
-    (* ram_style = "block" *) reg [15:0] ram[0:1023];
+    (* ram_style = "block" *) reg [15:0] ram[0:2047];
 
     integer i;
     initial begin
-        for (i=0; (i<1024); i=(i+1)) begin
+        for (i=0; (i<2048); i=(i+1)) begin
             if ( i % 10 == 0)
                 ram[i] = 16'b00000000_00000001;
             else if ( i % 10 == 1)
@@ -65,13 +65,19 @@ module top (
     input  wire rx,
     output wire tx,
 
+    input  wire butu,
+    input  wire butd,
+    input  wire butl,
+    input  wire butr,
+    input  wire butc,
+
     input  wire [15:0] sw,
     output wire [15:0] led
 );
     wire rden;
     reg wren;
-    wire [9:0] rdaddr;
-    wire [9:0] wraddr;
+    wire [10:0] rdaddr;
+    wire [10:0] wraddr;
     wire [15:0] di;
     wire [15:0] do;
     ram0 ram(
@@ -85,7 +91,7 @@ module top (
         .do(do)
     );
 
-    reg [9:0] address_reg;
+    reg [10:0] address_reg;
     reg [15:0] data_reg;
     reg [15:0] out_reg;
 
@@ -113,7 +119,7 @@ module top (
     assign input_mode[0] = sw[12];
     assign input_mode[1] = sw[13];
 
-    assign we = sw[11];
+    assign we = butc;
     assign led = out_reg;
     assign di = data_reg;
     assign rden = 1;
@@ -134,7 +140,7 @@ module top (
         end
 
         if(input_mode == 0) begin
-            address_reg <= sw[9:0];
+            address_reg <= sw[10:0];
             wren <= 0;
         end else if(input_mode == 1) begin
             data_reg[7:0] <= sw[7:0];

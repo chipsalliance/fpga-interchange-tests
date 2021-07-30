@@ -18,11 +18,11 @@ reg clk;
 reg rx;
 reg [15:0] sw;
 
-reg [10:0] check_counter;
+reg [11:0] check_counter;
 
 reg rst;
 
-reg [15:0] ram[0:1023];
+reg [15:0] ram[0:2047];
 
 always #5 clk <= !clk;
 
@@ -36,9 +36,9 @@ initial begin
 
     // The RAM content is present on the output
     // after two clock cycles
-    check_counter = 11'd2045;
+    check_counter = 12'd4093;
 
-    for ( i = 0; i < 1024; i = i + 1) begin
+    for ( i = 0; i < 2048; i = i + 1) begin
         if ( i % 10 == 0)
             ram[i] = 16'b00000000_00000001;
         else if ( i % 10 == 1)
@@ -65,7 +65,7 @@ initial begin
 
     $dumpfile(`STRINGIFY(`VCD));
     $dumpvars;
-    #20000 $finish();
+    #40000 $finish();
 end
 
 wire tx;
@@ -85,21 +85,21 @@ always @(posedge clk) begin
 
     assert(tx == rx, tx);
 
-    if (sw == 16'd1023 || rst) begin
+    if (sw == 16'd2047 || rst) begin
         sw <= 0;
     end else begin
         sw <= sw + 1;
     end
 
     if (rst) begin
-        check_counter <= 11'd2045;
-    end else if (check_counter == 11'd1023) begin
-        check_counter <= 11'd0;
+        check_counter <= 12'd4093;
+    end else if (check_counter == 12'd2047) begin
+        check_counter <= 12'd0;
     end else begin
         check_counter <= check_counter + 1;
     end
 
-    for ( i = 0; i < 1023; i = i + 1) begin
+    for ( i = 0; i < 2048; i = i + 1) begin
         assert(check_counter != i || led == ram[i], led);
     end
 end

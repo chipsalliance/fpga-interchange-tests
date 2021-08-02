@@ -73,7 +73,7 @@ function(add_xc7_test)
             SOURCES="${sources}"
             BIT_FILE=${vivado_bit}
             ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${vivado_tcl}
+            ${run_vivado} -mode batch -source ${vivado_tcl} -notrace -nojournal
         DEPENDS
             ${run_vivado}
             ${vivado_tcl}
@@ -118,7 +118,7 @@ function(add_xc7_test)
             BIT_FILE=${dcp_bit}
             ARCH=${arch}
             ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
+            ${run_vivado} -mode batch -source ${dcp_vivado_tcl} -notrace -nojournal
         DEPENDS
             ${arch}-${test_name}-dcp
             ${run_vivado}
@@ -328,7 +328,7 @@ function(add_xcup_test)
             ARCH=${arch}
             BIT_FILE=${vivado_bit}
             ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${vivado_tcl}
+            ${run_vivado} -mode batch -source ${vivado_tcl} -notrace -nojournal
         DEPENDS
             ${run_vivado}
             ${vivado_tcl}
@@ -371,7 +371,7 @@ function(add_xcup_test)
             BIT_FILE=${dcp_bit}
             ARCH=${arch}
             ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
+            ${run_vivado} -mode batch -source ${dcp_vivado_tcl} -notrace -nojournal
         DEPENDS
             ${arch}-${test_name}-dcp
             ${run_vivado}
@@ -556,7 +556,7 @@ function(add_xc7_validation_test)
                 BIT_FILE=${vivado_bit}
                 ARCH=xc7
                 ${quiet_cmd}
-                ${run_vivado} -mode batch -source ${tcl}
+                ${run_vivado} -mode batch -source ${tcl} -notrace -nojournal
             DEPENDS
                 xc7-${test_name}-fasm2bels-dcp
                 ${dcp}

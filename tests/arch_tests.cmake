@@ -223,7 +223,7 @@ function(add_xc7_test)
         COMMAND ${CMAKE_COMMAND} -E env
             VIVADO_SETTINGS=${VIVADO_SETTINGS}
             ${quiet_cmd}
-            ${run_vivado} -mode tcl -source ${vivado_timing_tcl} -tclargs ${dcp} ${vivado_report}
+            ${run_vivado} -mode tcl -source ${vivado_timing_tcl} -tclargs ${dcp} ${vivado_report} -notrace -nojournal
         DEPENDS
             ${dcp}
     )

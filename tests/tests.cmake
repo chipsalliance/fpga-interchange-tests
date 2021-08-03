@@ -226,6 +226,7 @@ function(add_generic_test)
                     --phys ${phys}
                     --package ${package}
                     --log ${phys_log}
+                    --debug
             DEPENDS
                 ${arch}-${test_name}-netlist
                 ${xdc}

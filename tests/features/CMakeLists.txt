@@ -1,6 +1,7 @@
 add_subdirectory(clock_gen)
 add_subdirectory(diff_io)
 add_subdirectory(sing_io)
+add_subdirectory(dram)
 add_subdirectory(lut)
 add_subdirectory(ram)
 add_subdirectory(ram_36bit)

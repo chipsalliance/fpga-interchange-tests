@@ -202,14 +202,14 @@ function(add_xc7_test)
     add_dependencies(all-${device}-tests ${arch}-${test_name}-bit)
 
     # generate vivado timing report
-    set(vivado_report ${output_dir}/vivado_report.txt)
+    set(vivado_report ${output_dir}/${name}_vivado_report.txt)
     set(vivado_timing_tcl ${CMAKE_SOURCE_DIR}/tests/common/timing_dump_vivado.tcl)
     add_custom_command(
         OUTPUT ${vivado_report}
         COMMAND ${CMAKE_COMMAND} -E env
             VIVADO_SETTINGS=${VIVADO_SETTINGS}
             ${quiet_cmd}
-            ${run_vivado} -mode tcl -source ${vivado_timing_tcl} -tclargs ${dcp} ${vivado_report}
+            ${run_vivado} -mode tcl -source ${vivado_timing_tcl} -tclargs ${dcp} ${vivado_report} -notrace -nojournal
         DEPENDS
             ${dcp}
     )
@@ -217,7 +217,7 @@ function(add_xc7_test)
     add_custom_target(${arch}-${test_name}-vivado-report DEPENDS ${vivado_report})
 
     # generate custom timing report
-    set(custom_report ${output_dir}/custom_report.txt)
+    set(custom_report ${output_dir}/${name}_custom_report.txt)
     set(phys ${output_dir}/${name}.phys)
     get_target_property(timing_target_loc timing-${device}-device LOCATION)
     add_custom_command(
@@ -236,7 +236,7 @@ function(add_xc7_test)
     add_custom_target(${arch}-${test_name}-custom-report DEPENDS ${custom_report})
 
     # generate comparasion report
-    set(compare_report ${output_dir}/compare_report.txt)
+    set(compare_report ${output_dir}/${name}_compare_report.txt)
     add_custom_command(
         OUTPUT ${compare_report}
         COMMAND

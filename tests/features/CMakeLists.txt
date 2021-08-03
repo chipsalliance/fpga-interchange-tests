@@ -1,4 +1,5 @@
 add_subdirectory(clock_gen)
+add_subdirectory(dram)
 add_subdirectory(iobuf)
 add_subdirectory(lut)
 add_subdirectory(ram)

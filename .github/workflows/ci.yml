@@ -44,7 +44,9 @@ jobs:
       run: make env
 
     - name: Build CMake
-      run: make build
+      run: |
+        make update
+        make build
 
     - name: Run tests
       run: |

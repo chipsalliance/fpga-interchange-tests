@@ -99,6 +99,7 @@ echo "----------------------------------------"
 	echo
 	echo " Build system setup"
 	echo "----------------------------------------"
+	make update
 	CMAKE_FLAGS="${CMAKE_FLAGS} -DVIVADO_SETTINGS=${VIVADO_SETTINGS}" make build
 	echo "----------------------------------------"
 )

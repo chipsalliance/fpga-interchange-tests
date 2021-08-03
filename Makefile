@@ -29,7 +29,7 @@ update:
 		popd
 
 .PHONY: build
-build: update
+build:
 	# Build test suite
 	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake ${CMAKE_FLAGS} ..
 

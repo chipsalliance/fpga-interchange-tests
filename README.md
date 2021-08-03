@@ -16,6 +16,12 @@ Enter the environment by running:
 make enter
 ```
 
+To update the RapidWright data run:
+
+```
+make update
+```
+
 To build the CMake infrastructure and the required tools run:
 
 ```

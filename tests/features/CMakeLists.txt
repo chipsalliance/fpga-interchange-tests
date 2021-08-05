@@ -7,3 +7,5 @@ add_subdirectory(ram_36bit)
 add_subdirectory(ram36)
 add_subdirectory(serdes)
 add_subdirectory(wire)
+add_subdirectory(pll)
+

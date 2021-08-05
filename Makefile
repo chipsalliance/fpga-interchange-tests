@@ -27,6 +27,12 @@ update:
 	pushd ${RAPIDWRIGHT_PATH} && \
 		make update_jars && \
 		popd
+	# FIXME: Temporary patch for RapidWright. See https://github.com/Xilinx/RapidWright/issues/209
+	pushd ${RAPIDWRIGHT_PATH} && \
+		wget https://github.com/Xilinx/RapidWright/releases/download/v2020.2.7-beta/rapidwright_api_lib-2020.2.7-patch1.zip && \
+		unzip -o rapidwright_api_lib-2020.2.7-patch1.zip && \
+		rm -rf rapidwright_api_lib-2020.2.7-patch1.zip && \
+		popd
 
 .PHONY: build
 build: update

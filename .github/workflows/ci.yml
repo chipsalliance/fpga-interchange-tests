@@ -26,7 +26,7 @@ jobs:
     container: "ubuntu:20.04"
     strategy:
       matrix:
-        device: ["xc7a35t", "xc7a100t", "xc7z010", "LIFCL-40"]
+        device: ["xc7a35t", "xc7a100t", "xc7a200t", "xc7z010", "xczu7ev", "LIFCL-40"]
     env:
       LANG: "en_US.UTF-8"
       DEBIAN_FRONTEND: "noninteractive"
@@ -41,17 +41,8 @@ jobs:
         apt-get -qqy update
         apt-get -qqy install build-essential git make \
           cmake python3 wget unzip curl openjdk-11-jdk-headless
-        git submodule status > .submodules_status
-
-    - name: Cache environment
-      id: cache-env
-      uses: actions/cache@v2
-      with:
-        path: env
-        key: env-${{ hashFiles('**/environment.yml', '**/requirements.txt', '**/.submodules_status') }}
 
     - name: Create environment
-      if: steps.cache-env.outputs.cache-hit != 'true'
       run: make env
 
     - name: Build CMake

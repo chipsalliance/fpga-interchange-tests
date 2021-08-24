@@ -58,13 +58,11 @@ jobs:
     - name: Prepare report
       run: |
         cd build
-        python3 ../utils/report_targets.py all-${{ matrix.device }}-tests.log report-tests.csv
-        python3 ../utils/report_targets.py all-${{ matrix.device }}-validation-tests.log report-validation-tests.csv
-        python3 ../utils/report_targets.py all-${{ matrix.device }}-simulation-tests.log report-simulation-tests.csv
+        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv
 
     - uses: actions/upload-artifact@v2
       with:
         name: fpga-interchange-tests-${{ matrix.device }}
         path: |
           **/plot_*.svg
-          build/report-*.csv
+          build/report*.csv

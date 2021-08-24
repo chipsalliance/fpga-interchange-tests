@@ -296,5 +296,7 @@ function(generate_chipdb)
             chipdb-${device}-bin
     )
 
+    add_dependencies(all-device-data chipdb-${device}-bin)
+
 endfunction()
 

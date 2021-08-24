@@ -46,6 +46,10 @@ all_stages = [
     "fasm2bels-bit-fasm",
     "fasm2bels-dcp",
     "fasm2bels-diff-fasm",
+    "vivado-bit",
+    "vivado-report",
+    "custom-report",
+    "compare-timings",
 ]
 
 

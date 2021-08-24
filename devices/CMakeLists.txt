@@ -1,3 +1,6 @@
+# A cutom target which gathers all device data preparation targets
+add_custom_target(all-device-data)
+
 # Artix-7 devices
 add_subdirectory(xc7a35t)
 add_subdirectory(xc7a100t)

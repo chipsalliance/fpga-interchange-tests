@@ -26,19 +26,43 @@ fi
 
 echo
 echo "==========================================="
+echo "Building device data"
+echo "-------------------------------------------"
+(
+    source env/conda/bin/activate fpga-interchange
+    pushd build
+    make all-device-data -j$NUM_CORES
+    popd
+)
+echo "-------------------------------------------"
+
+echo
+echo "==========================================="
 echo "Running FPGA interchange tests"
 echo "-------------------------------------------"
 (
     source env/conda/bin/activate fpga-interchange
     pushd build
-    make all-simulation-tests -j$NUM_CORES
-    make all-tests -j$NUM_CORES
-    make all-validation-tests -j$NUM_CORES
-    make all-vendor-bit-tests -j$NUM_CORES
-    make all-timing-comparasion-tests -j$NUM_CORES
+    set +e
+    for TARGET in all-simulation-tests all-tests all-validation-tests all-vendor-bit-tests all-timing-comparison-tests
+    do
+        make ${TARGET} -j$NUM_CORES -k --output-sync=target 2>&1 | tee ${TARGET}.log
+    done
     popd
 )
 echo "-------------------------------------------"
+
+echo
+echo "==========================================="
+echo "Preparing design status report"
+echo "-------------------------------------------"
+(
+    source env/conda/bin/activate fpga-interchange
+    pushd build
+    python ../utils/report_targets.py --log `find . -name "all*tests.log"` --csv report.csv
+    cat report.csv
+    popd
+)
 
 echo
 echo "==========================================="

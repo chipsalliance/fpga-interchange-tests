@@ -95,8 +95,7 @@ jobs:
           report/build/*
 
     - name: Deploy to GH pages
-      # FIXME: Always deploy
-      #if: ${{ github.event_name == 'push' && github.branch == 'master' }}
+      if: ${{ github.event_name == 'push' && github.branch == 'master' }}
       run: |
         cd report/build/html
         git init

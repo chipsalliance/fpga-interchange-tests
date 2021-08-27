@@ -66,3 +66,45 @@ jobs:
         path: |
           **/plot_*.svg
           build/report*.csv
+
+  Prepare-Design-Status-Report:
+    runs-on: ubuntu-18.04
+    needs: Run-Tests
+    steps:
+
+    - uses: actions/checkout@v2
+    
+    - uses: actions/download-artifact@v2
+
+    - name: Result aggregation
+      run: |
+        python3 ./utils/aggregate_results.py --inp . --out ./report/source
+
+    - name: Webpage build
+      run: |
+        cd report
+        pip3 install setuptools
+        pip3 install -r requirements.txt
+        make html
+        touch build/html/.nojekyll
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: aggregated-results
+        path: |
+          report/build/*
+
+    - name: Deploy to GH pages
+      # FIXME: Always deploy
+      #if: ${{ github.event_name == 'push' && github.branch == 'master' }}
+      run: |
+        cd report/build/html
+        git init
+        cp ../../../.git/config ./.git/config
+        git add .
+        git config --local user.email "push@gha"
+        git config --local user.name "GHA"
+        git commit -am "update ${{ github.sha }}"
+        git push -u origin +HEAD:gh-pages
+        rm -rf .git
+

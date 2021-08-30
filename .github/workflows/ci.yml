@@ -25,6 +25,7 @@ jobs:
     runs-on: [self-hosted, Linux, X64]
     container: "ubuntu:20.04"
     strategy:
+      fail-fast: false
       matrix:
         device: ["xc7a35t", "xc7a100t", "xc7z010", "LIFCL-40"]
     env:
@@ -40,33 +41,69 @@ jobs:
       run: |
         apt-get -qqy update
         apt-get -qqy install build-essential git make \
-          cmake python3 wget unzip curl openjdk-11-jdk-headless
+          cmake python3 wget unzip curl openjdk-11-jdk-headless capnproto
         git submodule status > .submodules_status
 
-    - name: Cache environment
-      id: cache-env
-      uses: actions/cache@v2
-      with:
-        path: env
-        key: env-${{ hashFiles('**/environment.yml', '**/requirements.txt', '**/.submodules_status') }}
-
     - name: Create environment
-      if: steps.cache-env.outputs.cache-hit != 'true'
       run: make env
 
     - name: Build CMake
-      run: make build
+      run: |
+        make build
 
     - name: Run tests
       run: |
-        source env/conda/bin/activate fpga-interchange
+        .github/scripts/tests.sh ${{ matrix.device }}
+
+    - name: Prepare report
+      run: |
         cd build
-        make all-${{ matrix.device }}-tests -j`nproc`
-        make all-${{ matrix.device }}-validation-tests -j`nproc`
-        make all-${{ matrix.device }}-simulation-tests -j`nproc`
+        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv
 
     - uses: actions/upload-artifact@v2
       with:
-        name: fpga-interchange-tests-performance-graphs
+        name: fpga-interchange-tests-${{ matrix.device }}
         path: |
           **/plot_*.svg
+          build/report*.csv
+
+  Prepare-Design-Status-Report:
+    runs-on: ubuntu-18.04
+    needs: Run-Tests
+    steps:
+
+    - uses: actions/checkout@v2
+    
+    - uses: actions/download-artifact@v2
+
+    - name: Result aggregation
+      run: |
+        python3 ./utils/aggregate_results.py --inp . --out ./report/source
+
+    - name: Webpage build
+      run: |
+        cd report
+        pip3 install setuptools
+        pip3 install -r requirements.txt
+        make html
+        touch build/html/.nojekyll
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: aggregated-results
+        path: |
+          report/build/*
+
+    - name: Deploy to GH pages
+      if: ${{ github.event_name == 'push' && github.branch == 'master' }}
+      run: |
+        cd report/build/html
+        git init
+        cp ../../../.git/config ./.git/config
+        git add .
+        git config --local user.email "push@gha"
+        git config --local user.name "GHA"
+        git commit -am "update ${{ github.sha }}"
+        git push -u origin +HEAD:gh-pages
+        rm -rf .git
+

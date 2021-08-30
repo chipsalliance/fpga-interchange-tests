@@ -95,7 +95,7 @@ jobs:
           report/build/*
 
     - name: Deploy to GH pages
-      if: ${{ github.event_name == 'push' && github.branch == 'master' }}
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       run: |
         cd report/build/html
         git init

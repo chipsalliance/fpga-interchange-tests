@@ -8,4 +8,4 @@ add_subdirectory(ram36)
 add_subdirectory(serdes)
 add_subdirectory(wire)
 add_subdirectory(pll)
-
+add_subdirectory(mmcm)

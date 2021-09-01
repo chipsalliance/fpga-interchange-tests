@@ -46,6 +46,7 @@ PLLE2_ADV #(
     .STARTUP_WAIT       ("FALSE")
 ) pll (
     .CLKIN1     (CLK),
+    .CLKINSEL   (1'b1),
 
     .RST        (RST),
     .PWRDWN     (I_PWRDWN),
@@ -57,23 +58,7 @@ PLLE2_ADV #(
     .CLKOUT0    (clk[0]),
     .CLKOUT1    (clk[1]),
     .CLKOUT2    (clk[2]),
-    .CLKOUT3    (clk[3]),
-
-    // Stub outputs
-    .CLKOUT4    (clk[4]),
-    .CLKOUT5    (clk[5]),
-
-    .DRDY       (drdy),
-    .DO         (do),
-
-    // Stub inputs
-    .CLKIN2     (1'b0),
-    .CLKINSEL   (1'b1),
-    .DADDR      (7'b0),
-    .DCLK       (1'b0),
-    .DEN        (1'b0),
-    .DWE        (1'b0),
-    .DI         (16'b0)
+    .CLKOUT3    (clk[3])
 );
 
 assign clk_fb_i = clk_fb_o;

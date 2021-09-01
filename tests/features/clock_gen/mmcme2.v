@@ -67,30 +67,7 @@ MMCME2_ADV #(
     .CLKOUT2    (clk[2]),
     .CLKOUT2B   (clkb_out[2]),
     .CLKOUT3    (clk[3]),
-    .CLKOUT3B   (clkb_out[3]),
-
-    // Stub outputs
-    .CLKOUT4    (clk[4]),
-    .CLKOUT5    (clk[5]),
-    .CLKOUT6    (clk[6]),
-
-    .PSDONE         (psdone),
-    .DRDY           (drdy),
-    .DO             (do),
-    .CLKINSTOPPED   (clkinstopped),
-    .CLKFBSTOPPED   (clkfbstopped),
-
-    // Stub inputs
-    .DADDR      (7'b0),
-    .DCLK       (1'b0),
-    .DEN        (1'b0),
-    .DWE        (1'b0),
-    .DI         (16'b0),
-    .CLKIN2     (1'b0),
-    .CLKINSEL   (1'b1),
-    .PSCLK      (1'b0),
-    .PSEN       (1'b0),
-    .PSINCDEC   (1'b0)
+    .CLKOUT3B   (clkb_out[3])
 );
 
 assign clk_fb_i = clk_fb_o;

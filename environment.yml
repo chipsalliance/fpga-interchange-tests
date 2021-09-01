@@ -14,8 +14,8 @@ dependencies:
     - litex-hub::capnproto-java=0.1.5_0012_g44a8c1e=20201104_165332
     - litex-hub::prjxray-db=0.0_253_gcd41f08=20210803_101414
     - litex-hub::prjxray-tools=0.1_2932_gf7f06896=20210730_085634
-    - litex-hub::yosys=0.9_5530_gc016f6a4=20210730_085634_py37
-    - litex-hub::nextpnr-fpga_interchange=v0.0_3730_g0991003d=20210730_085634_py37
+    - litex-hub::yosys=0.9_5586_gb2e97174=20210818_135210_py37
+    - litex-hub::nextpnr-fpga_interchange=v0.0_3771_g0c40bed4=20210818_135210_py37
     - litex-hub::iverilog=0_8_5850_g540555fc=20210730_085634
     - litex-hub::prjoxide=v0.0_398_g711770c=20210730_085634
     - swig

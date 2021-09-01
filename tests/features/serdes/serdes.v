@@ -33,6 +33,8 @@ wire O_LOCKED;
 wire clk_fb_i;
 wire clk_fb_o;
 
+assign clk_fb_i = clk_fb_o;
+
 reg [3:0] rst_sr;
 
 initial rst_sr = 4'hF;
@@ -52,6 +54,7 @@ PLLE2_ADV #(
     .COMPENSATION       ("ZHOLD"),
 
     .CLKIN1_PERIOD      (10.0),
+    .CLKIN2_PERIOD      (10.0),
 
     .CLKFBOUT_MULT      (CLKFBOUT_MULT),
     .CLKOUT0_DIVIDE     (CLKFBOUT_MULT),
@@ -63,6 +66,8 @@ PLLE2_ADV #(
     .DIVCLK_DIVIDE      (1'd1)
 ) pll (
     .CLKIN1     (clk),
+    .CLKIN2     (clk),
+    .CLKINSEL   (1'b1),
 
     .RST        (RST),
     .PWRDWN     (0),
@@ -73,16 +78,7 @@ PLLE2_ADV #(
 
     .CLKOUT0    (SYSCLK),
     .CLKOUT1    (CLKDIV),
-    .CLKOUT2    (REFCLK),
-
-    // Stub inputs
-    .CLKIN2     (1'b0),
-    .CLKINSEL   (1'b1),
-    .DADDR      (7'b0),
-    .DCLK       (1'b0),
-    .DEN        (1'b0),
-    .DWE        (1'b0),
-    .DI         (16'b0)
+    .CLKOUT2    (REFCLK)
 );
 
 wire REFCLK_BUFG, SYSCLK_BUFG, CLKDIV_BUFG;

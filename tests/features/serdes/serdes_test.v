@@ -77,13 +77,7 @@ IDELAYE2 #(
     .LD             (1'b1),
     .INC            (1'b1),
     .IDATAIN        (I_DAT),
-    .DATAOUT        (DDLY),
-
-    // Stub inputs
-    .REGRST         (1'b0),
-    .LDPIPEEN       (1'b0),
-    .DATAIN         (1'b0),
-    .CINVCTRL       (1'b0)
+    .DATAOUT        (DDLY)
 );
 
 ISERDESE2 #(
@@ -106,13 +100,7 @@ ISERDESE2 #(
     .Q5         (OUTPUTS[3]),
     .Q6         (OUTPUTS[2]),
     .Q7         (OUTPUTS[1]),
-    .Q8         (OUTPUTS[0]),
-
-    // Stub inputs
-    .BITSLIP        (1'b0),
-
-    .DYNCLKDIVSEL   (1'b0),
-    .DYNCLKSEL      (1'b0)
+    .Q8         (OUTPUTS[0])
 );
 
 endmodule

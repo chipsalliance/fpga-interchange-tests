@@ -23,7 +23,7 @@ BUILT_TARGET_RE = \
     re.compile(r".*Built\starget\s(?P<target>.*)")
 
 FAILED_TARGET_RE = \
-    re.compile(r".*recipe\sfor\starget\s'(?P<target>.*)'\sfailed")
+    re.compile(r".*\/(?P<target>.*)\.dir\/.*not\sremade\sbecause\sof\serrors\.")
 
 all_stages = [
     "json",
@@ -151,12 +151,7 @@ def main():
             # Failed
             match = FAILED_TARGET_RE.match(line)
             if match is not None:
-                path = match.group("target").split(os.path.sep)
-                temp = [p for p in path if p.endswith(".dir")]
-                if not temp:
-                    continue
-
-                target = temp[0].replace(".dir", "")
+                target = match.group("target")
                 failed_targets.add(target)
 
     # Sanity check

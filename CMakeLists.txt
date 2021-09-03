@@ -58,10 +58,11 @@ include(tests/arch_tests.cmake)
 include(tests/tests.cmake)
 
 add_custom_target(all-tests)
-add_custom_target(all-timing-comparasion-tests)
+add_custom_target(all-timing-comparison-tests)
 add_custom_target(all-validation-tests)
 add_custom_target(all-vendor-bit-tests)
 add_custom_target(all-simulation-tests)
+add_custom_target(list-allowed-failing-tests)
 
 add_subdirectory(boards)
 add_subdirectory(devices)

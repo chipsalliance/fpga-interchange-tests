@@ -44,10 +44,11 @@ echo "-------------------------------------------"
     source env/conda/bin/activate fpga-interchange
     pushd build
     set +e
-    for TARGET in all-simulation-tests all-tests all-validation-tests all-vendor-bit-tests all-timing-comparison-tests
+    for TARGET in simulation-tests tests validation-tests vendor-bit-tests timing-comparison-tests
     do
-        make ${TARGET} -j$NUM_CORES -k --output-sync=target 2>&1 | tee ${TARGET}.log
+        make all-${TARGET} -j$NUM_CORES -k --output-sync=target 2>&1 | tee all-${TARGET}.log
     done
+    make list-allowed-failing-tests | tee allowed-failures.log
     popd
 )
 echo "-------------------------------------------"
@@ -59,7 +60,7 @@ echo "-------------------------------------------"
 (
     source env/conda/bin/activate fpga-interchange
     pushd build
-    python ../utils/report_targets.py --log `find . -name "all*tests.log"` --csv report.csv
+    python ../utils/report_targets.py --log `find . -name "all*tests.log"` --csv report.csv --allowed-failures allowed-failures.log
     cat report.csv
     popd
 )

@@ -100,7 +100,7 @@ def identify_target(target):
 
 
 def main():
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--log",
@@ -113,11 +113,24 @@ def main():
         type=str,
         help="Output CSV report"
     )
+    parser.add_argument(
+        "--allowed-failures",
+        type=str,
+        help="Log with allowed failures"
+    )
 
     args = parser.parse_args()
 
     built_targets = set()
     failed_targets = set()
+    allowed_failures = set()
+
+    with open(args.allowed_failures, "r") as fp:
+        data = fp.readlines()
+        for line in data:
+            if "allowed to fail" in line:
+                arch, design = line.split()[0].split("-")
+                allowed_failures.add((arch, design))
 
     # Read logs
     for log_name in args.log:
@@ -152,6 +165,7 @@ def main():
 
     # Identify tests and their statuses
     designs = dict()
+    hard_failures = set()
 
     for target in built_targets:
 
@@ -160,7 +174,6 @@ def main():
             continue
 
         arch, design, board, stage = fields
-        print("V", arch, design, board, stage)
 
         key = (arch, design, board)
         if key not in designs:
@@ -174,7 +187,9 @@ def main():
             continue
 
         arch, design, board, stage = fields
-        print("X", arch, design, board, stage)
+
+        if (arch, design) not in allowed_failures:
+            hard_failures.add((arch, design))
 
         key = (arch, design, board)
         if key not in designs:
@@ -208,6 +223,13 @@ def main():
                             pass
                         else:
                             assert False, (key2, stage, v1, v2)
+
+    if hard_failures:
+        print("Tests not allowed to fail:")
+        for arch, design in hard_failures:
+            print(f"\t{arch} {design}")
+
+        exit(1)
 
     # Output report
     with open(args.csv, "w") as fp:

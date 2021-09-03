@@ -58,7 +58,7 @@ jobs:
     - name: Prepare report
       run: |
         cd build
-        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv
+        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allowed-failures allowed-failures.log
 
     - uses: actions/upload-artifact@v2
       with:

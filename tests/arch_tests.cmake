@@ -237,7 +237,7 @@ function(add_xc7_test)
 
     add_custom_target(${arch}-${test_name}-custom-report DEPENDS ${custom_report})
 
-    # generate comparasion report
+    # generate comparison report
     set(compare_report ${output_dir}/${test_name}-compare_report.txt)
     add_custom_command(
         OUTPUT ${compare_report}
@@ -252,8 +252,8 @@ function(add_xc7_test)
     )
 
     add_custom_target(${arch}-${test_name}-compare-timings DEPENDS ${compare_report})
-    add_dependencies(all-timing-comparasion-tests ${arch}-${test_name}-compare-timings)
-    add_dependencies(all-${device}-timing-comparasion-tests ${arch}-${test_name}-compare-timings)
+    add_dependencies(all-timing-comparison-tests ${arch}-${test_name}-compare-timings)
+    add_dependencies(all-${device}-timing-comparison-tests ${arch}-${test_name}-compare-timings)
 endfunction()
 
 function(add_xcup_test)

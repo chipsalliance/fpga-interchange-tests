@@ -23,6 +23,8 @@ do
     make all-${DEVICE}-${SUITE} -j`nproc` -k --output-sync=target 2>&1 | tee all-${DEVICE}-${SUITE}.log
 done
 
+make list-allowed-failing-tests | tee allowed-failures.log
+
 # Do not fail here so that failing designs are included in the report generated
 # later.
 exit 0

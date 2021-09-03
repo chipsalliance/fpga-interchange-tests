@@ -77,7 +77,7 @@ CI performance graph
 
 
 def main():
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--inp",
@@ -138,7 +138,7 @@ def main():
         target_name_map = \
             list(TARGET_NAME_MAP) + list(ARCH_TARGET_NAME_MAP.get(arch, ()))
 
-        # Generate CSV table      
+        # Generate CSV table
         designs = dict()
         for row in rows:
             key = (row["design"], row["board"])
@@ -186,7 +186,7 @@ def main():
     with open(fname, "w") as fp:
         for device in sorted(device_files.keys()):
             fp.write(".. include:: {}.rst\n".format(device))
-        
+
 
 # =============================================================================
 

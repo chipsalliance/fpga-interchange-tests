@@ -10,6 +10,14 @@ add_generic_test(
 
 add_generic_test(
     name murax
+    board_list arty35t
+    top toplevel
+    sources arty35t_toplevel.v
+    absolute_sources ${murax}
+)
+
+add_generic_test(
+    name murax
     board_list lifcl40evn
     top toplevel
     sources lifcl40evn_toplevel.v

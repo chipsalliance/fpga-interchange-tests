@@ -613,6 +613,8 @@ function(add_xc7_validation_test)
         )
 
         if(NOT ${disable_vivado_test})
+            add_dependencies(all-vendor-bit-tests xc7-${test_name}-dcp-diff-fasm)
+            add_dependencies(all-${device}-vendor-bit-tests xc7-${test_name}-dcp-diff-fasm)
             add_dependencies(all-vendor-bit-tests xc7-${test_name}-fasm2bels-diff-fasm)
             add_dependencies(all-${device}-vendor-bit-tests xc7-${test_name}-fasm2bels-diff-fasm)
         endif()

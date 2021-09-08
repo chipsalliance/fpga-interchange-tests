@@ -15,7 +15,7 @@ dependencies:
     - litex-hub::prjxray-db=0.0_253_gcd41f08=20210803_101414
     - litex-hub::prjxray-tools=0.1_2932_gf7f06896=20210730_085634
     - litex-hub::yosys=0.9_5586_gb2e97174=20210818_135210_py37
-    - litex-hub::nextpnr-fpga_interchange=v0.0_3771_g0c40bed4=20210818_135210_py37
+    - litex-hub::nextpnr-fpga_interchange=v0.0_3777_g675a96fc=20210908_082818_py37
     - litex-hub::iverilog=0_8_5850_g540555fc=20210730_085634
     - litex-hub::prjoxide=v0.0_398_g711770c=20210730_085634
     - swig

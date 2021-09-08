@@ -4,6 +4,10 @@ foreach src $::env(SOURCES) {
     read_verilog $src
 }
 
+if { $::env(RETARGET) != "" } {
+    techmap -map $::env(RETARGET)
+}
+
 synth_xilinx -flatten -nolutram -nowidelut -nosrl -nodsp
 
 if { $::env(TECHMAP) != "" } {

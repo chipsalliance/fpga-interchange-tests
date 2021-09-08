@@ -18,6 +18,7 @@ dependencies:
     - litex-hub::nextpnr-fpga_interchange=v0.0_3777_g675a96fc=20210908_082818_py37
     - litex-hub::iverilog=0_8_5850_g540555fc=20210730_085634
     - litex-hub::prjoxide=v0.0_398_g711770c=20210730_085634
+    - litex-hub::gcc-riscv64-elf-newlib=9.2.0=20201119_154229
     - swig
     - pip
     - pip:

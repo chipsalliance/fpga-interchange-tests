@@ -15,6 +15,8 @@ set_property BITSTREAM.GENERAL.PERFRAMECRC YES [current_design]
 # Disable some DRC checks
 # TODO: understand why the XDC output with IO constr generated from fasm2bels is empty.
 set_property IS_ENABLED 0 [get_drc_checks {NSTD-1}]
+set_property IS_ENABLED 0 [get_drc_checks {REQP-159}]
+set_property IS_ENABLED 0 [get_drc_checks {REQP-85}]
 
 # Reports
 report_utilization -file $::env(OUTPUT_DIR)/utilization.rpt

@@ -56,6 +56,7 @@ include(devices/chipdb.cmake)
 # Tests CMake functions
 include(tests/arch_tests.cmake)
 include(tests/tests.cmake)
+include(tests/litex.cmake)
 
 add_custom_target(all-tests)
 add_custom_target(all-timing-comparison-tests)

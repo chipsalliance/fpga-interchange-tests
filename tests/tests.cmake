@@ -5,10 +5,12 @@ function(add_generic_test)
     #    board_list <board_list>
     #    sources <sources list>
     #    [absolute_sources <sources list>]
+    #    [built_sources <sources list>]
     #    [tcl <tcl>]
     #    [top <top name>]
     #    [testbench]
     #    [constr_prefix <prefix>]
+    #    [retarget <retarget file>]
     # )
     #
     # Generates targets to run desired tests
@@ -20,6 +22,7 @@ function(add_generic_test)
     #   - tcl: tcl script used for synthesis
     #   - sources: list of HDL sources
     #   - absoulute_sources (optional): list of sources with an absoulute path.
+    #   - built_sources (optional): list of sources that are built by a third_party tool.
     #   - top (optional): name of the top level module.
     #                     If not provided, "top" is assigned as top level module
     #   - testbench (optional): verilog testbench to verify the correctness of the design
@@ -27,6 +30,8 @@ function(add_generic_test)
     #   - constr_prefix (optional): When given the expected constraints file
     #                               name will be <constr_prefix>-<board>.xdc
     #                               If not provided it will be just <board>.xdc
+    #   - retarget (optional): If specified, runs the retarget step to remap some
+    #                          old and unused primitives into the newer equivalent
     #
     # Targets generated:
     #   - <arch>-<name>-<board>-json     : synthesis output
@@ -35,8 +40,8 @@ function(add_generic_test)
     #   - <arch>-<name>-<board>-fasm     : fasm file
 
     set(options failure_allowed)
-    set(oneValueArgs name tcl top testbench constr_prefix)
-    set(multiValueArgs board_list sources absolute_sources)
+    set(oneValueArgs name tcl top testbench constr_prefix generated_xdc retarget)
+    set(multiValueArgs board_list sources absolute_sources built_sources)
 
     cmake_parse_arguments(
         add_generic_test
@@ -51,6 +56,8 @@ function(add_generic_test)
     set(testbench ${add_generic_test_testbench})
     set(tcl ${add_generic_test_tcl})
     set(constr_prefix ${add_generic_test_constr_prefix})
+    set(generated_xdc ${add_generic_test_generated_xdc})
+    set(retarget ${add_generic_test_retarget})
     set(failure_allowed ${add_generic_test_failure_allowed})
 
     set(sources)
@@ -59,6 +66,9 @@ function(add_generic_test)
     endforeach()
     foreach(source ${add_generic_test_absolute_sources})
         list(APPEND sources ${source})
+    endforeach()
+    foreach(source ${add_generic_test_built_sources})
+        list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/${source})
     endforeach()
 
     if (NOT DEFINED top)
@@ -87,7 +97,12 @@ function(add_generic_test)
         get_property(arch TARGET board-${board} PROPERTY ARCH)
 
         set(test_name "${name}-${board}")
-        set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${prefix}${board}.xdc)
+
+        if(DEFINED generated_xdc)
+            set(xdc ${generated_xdc})
+        else()
+            set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${prefix}${board}.xdc)
+        endif()
         get_property(device_target TARGET device-${device} PROPERTY DEVICE_TARGET)
         get_property(device_loc TARGET device-${device} PROPERTY DEVICE_LOC)
         set(chipdb_loc ${CMAKE_BINARY_DIR}/devices/${device}/${device}.bin)
@@ -117,6 +132,7 @@ function(add_generic_test)
                 OUT_JSON=${synth_json}
                 OUT_VERILOG=${synth_verilog}
                 TECHMAP=${techmap}
+                RETARGET=${retarget}
                 ${quiet_cmd}
                 ${YOSYS} -c ${synth_tcl} -l ${synth_log}
             DEPENDS

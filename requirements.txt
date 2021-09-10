@@ -6,16 +6,16 @@ git+https://github.com/SymbiFlow/prjxray.git
 git+https://github.com/SymbiFlow/symbiflow-xc-fasm.git
 git+https://github.com/capnproto/pycapnp.git
 git+https://github.com/SymbiFlow/symbiflow-xc-fasm2bels.git
-third_party/python-fpga-interchange
+-e third_party/python-fpga-interchange
 
 # Litex
-third_party/litex
-third_party/litex-boards
-third_party/litedram
-third_party/liteeth
-third_party/liteiclink
-third_party/pythondata-cpu-vexriscv
-third_party/pythondata-software-compiler_rt
-third_party/migen
+-e third_party/litex
+-e third_party/litex-boards
+-e third_party/litedram
+-e third_party/liteeth
+-e third_party/liteiclink
+-e third_party/pythondata-cpu-vexriscv
+-e third_party/pythondata-software-compiler_rt
+-e third_party/migen
 
 

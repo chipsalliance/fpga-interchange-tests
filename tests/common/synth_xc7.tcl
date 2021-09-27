@@ -8,7 +8,7 @@ if { $::env(RETARGET) != "" } {
     techmap -map $::env(RETARGET)
 }
 
-synth_xilinx -flatten -nolutram -nowidelut -nosrl -nodsp
+synth_xilinx -flatten -nowidelut -nosrl -nodsp
 
 if { $::env(TECHMAP) != "" } {
     techmap -map $::env(TECHMAP)

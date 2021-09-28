@@ -62,34 +62,36 @@ function(add_xc7_test)
     set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
 
     # Bitstream generation target from DCP
-    set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
-    set(vivado_bit ${output_dir}/${name}.vivado.bit)
-    add_custom_command(
-        OUTPUT ${vivado_bit}
-        COMMAND ${CMAKE_COMMAND} -E env
-            VIVADO_SETTINGS=${VIVADO_SETTINGS}
-            OUTPUT_DIR=${output_dir}/${name}
-            NAME=${name}
-            PART=${part}
-            ARCH=${arch}
-            TOP=${top}
-            XDC=${xdc}
-            SOURCES="${sources}"
-            BIT_FILE=${vivado_bit}
-            ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${vivado_tcl}
-        DEPENDS
-            ${run_vivado}
-            ${vivado_tcl}
-            ${sources} ${xdc}
-            ${arch}-${name}-${board}-output-dir
-        WORKING_DIRECTORY
-            ${output_dir}
-    )
+    if (NOT no_bitstream)
+      set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
+      set(vivado_bit ${output_dir}/${name}.vivado.bit)
+      add_custom_command(
+          OUTPUT ${vivado_bit}
+          COMMAND ${CMAKE_COMMAND} -E env
+              VIVADO_SETTINGS=${VIVADO_SETTINGS}
+              OUTPUT_DIR=${output_dir}/${name}
+              NAME=${name}
+              PART=${part}
+              ARCH=${arch}
+              TOP=${top}
+              XDC=${xdc}
+              SOURCES="${sources}"
+              BIT_FILE=${vivado_bit}
+              ${quiet_cmd}
+              ${run_vivado} -mode batch -source ${vivado_tcl}
+          DEPENDS
+              ${run_vivado}
+              ${vivado_tcl}
+              ${sources} ${xdc}
+              ${arch}-${name}-${board}-output-dir
+          WORKING_DIRECTORY
+              ${output_dir}
+      )
 
-    add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
-    add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
-    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+      add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
+      add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+      add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+    endif()
 
     # DCP generation target
     set(dcp ${output_dir}/${name}.dcp)

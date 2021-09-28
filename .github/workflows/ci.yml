@@ -20,6 +20,10 @@ jobs:
         submodules: recursive
 
     - uses: SymbiFlow/actions/checks@main
+      with:
+        exclude_license:
+          - ./tests/designs/litex_linux/arty.v
+          - ./third_party/pythondata-cpu-vexriscv_smp/*
 
   Run-Tests:
     runs-on: [self-hosted, Linux, X64]

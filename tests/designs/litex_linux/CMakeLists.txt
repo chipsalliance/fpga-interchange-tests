@@ -1,4 +1,14 @@
-set(vexriscv_dir ${CMAKE_SOURCE_DIR}/third_party/pythondata-cpu-vexriscv_smp/pythondata_cpu_vexriscv_smp/verilog)
+get_python_cpu_data(
+    VexRiscvLitexSmpCluster_Cc1_Iw32Is4096Iy1_Dw32Ds4096Dy1_Ldw128_Ood.v
+    pythondata_cpu_vexriscv_smp
+    vexriscv
+)
+
+get_python_cpu_data(
+    Ram_1w_1rs_Generic.v
+    pythondata_cpu_vexriscv_smp
+    ram
+)
 
 set(retarget ${CMAKE_SOURCE_DIR}/tests/common/retarget_xc7.v)
 
@@ -24,8 +34,8 @@ add_generic_test(
     sources
         arty.v
     absolute_sources
-        ${vexriscv_dir}/VexRiscvLitexSmpCluster_Cc1_Iw32Is4096Iy1_Dw32Ds4096Dy1_Ldw128_Ood.v
-        ${vexriscv_dir}/Ram_1w_1rs_Generic.v
+        ${vexriscv}
+        ${ram}
     retarget ${retarget}
     failure_allowed
 )

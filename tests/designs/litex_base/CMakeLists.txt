@@ -1,4 +1,9 @@
-set(vexriscv ${CMAKE_SOURCE_DIR}/third_party/pythondata-cpu-vexriscv/pythondata_cpu_vexriscv/verilog/VexRiscv.v)
+get_python_cpu_data(
+    VexRiscv.v
+    pythondata_cpu_vexriscv
+    vexriscv
+)
+
 set(arty_gateware_dir ${CMAKE_CURRENT_BINARY_DIR}/digilent_arty/gateware)
 
 set(retarget ${CMAKE_SOURCE_DIR}/tests/common/retarget_xc7.v)

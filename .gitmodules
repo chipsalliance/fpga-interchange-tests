@@ -34,9 +34,3 @@
 [submodule "third_party/litex-boards"]
 	path = third_party/litex-boards
 	url = https://github.com/litex-hub/litex-boards.git
-[submodule "third_party/pythondata-cpu-vexriscv"]
-	path = third_party/pythondata-cpu-vexriscv
-	url = https://github.com/litex-hub/pythondata-cpu-vexriscv.git
-[submodule "third_party/pythondata-cpu-vexriscv_smp"]
-	path = third_party/pythondata-cpu-vexriscv_smp
-	url = https://github.com/litex-hub/pythondata-cpu-vexriscv_smp.git

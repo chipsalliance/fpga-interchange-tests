@@ -55,39 +55,43 @@ function(add_xc7_test)
     get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
     get_property(part TARGET board-${board} PROPERTY PART)
     get_property(arch TARGET board-${board} PROPERTY ARCH)
+    get_property(no_fasm TARGET board-${board} PROPERTY NO_FASM)
+    get_property(no_bitstream TARGET board-${board} PROPERTY NO_BITSTREAM)
 
     set(test_name "${name}-${board}")
     set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
 
     # Bitstream generation target from DCP
-    set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
-    set(vivado_bit ${output_dir}/${name}.vivado.bit)
-    add_custom_command(
-        OUTPUT ${vivado_bit}
-        COMMAND ${CMAKE_COMMAND} -E env
-            VIVADO_SETTINGS=${VIVADO_SETTINGS}
-            OUTPUT_DIR=${output_dir}/${name}
-            NAME=${name}
-            PART=${part}
-            ARCH=${arch}
-            TOP=${top}
-            XDC=${xdc}
-            SOURCES="${sources}"
-            BIT_FILE=${vivado_bit}
-            ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${vivado_tcl}
-        DEPENDS
-            ${run_vivado}
-            ${vivado_tcl}
-            ${sources} ${xdc}
-            ${arch}-${name}-${board}-output-dir
-        WORKING_DIRECTORY
-            ${output_dir}
-    )
+    if (NOT no_bitstream)
+      set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
+      set(vivado_bit ${output_dir}/${name}.vivado.bit)
+      add_custom_command(
+          OUTPUT ${vivado_bit}
+          COMMAND ${CMAKE_COMMAND} -E env
+              VIVADO_SETTINGS=${VIVADO_SETTINGS}
+              OUTPUT_DIR=${output_dir}/${name}
+              NAME=${name}
+              PART=${part}
+              ARCH=${arch}
+              TOP=${top}
+              XDC=${xdc}
+              SOURCES="${sources}"
+              BIT_FILE=${vivado_bit}
+              ${quiet_cmd}
+              ${run_vivado} -mode batch -source ${vivado_tcl}
+          DEPENDS
+              ${run_vivado}
+              ${vivado_tcl}
+              ${sources} ${xdc}
+              ${arch}-${name}-${board}-output-dir
+          WORKING_DIRECTORY
+              ${output_dir}
+      )
 
-    add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
-    add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
-    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+      add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
+      add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+      add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+    endif()
 
     # DCP generation target
     set(dcp ${output_dir}/${name}.dcp)
@@ -110,95 +114,102 @@ function(add_xc7_test)
     add_custom_target(${arch}-${test_name}-dcp DEPENDS ${dcp})
 
     # Bitstream generation target from DCP
-    set(dcp_vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/dcp_vivado.tcl)
-    set(dcp_bit ${output_dir}/${name}.dcp.bit)
-    add_custom_command(
-        OUTPUT ${dcp_bit}
-        COMMAND ${CMAKE_COMMAND} -E env
-            VIVADO_SETTINGS=${VIVADO_SETTINGS}
-            OUTPUT_DIR=${output_dir}
-            DCP_FILE=${dcp}
-            BIT_FILE=${dcp_bit}
-            ARCH=${arch}
-            ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
-        DEPENDS
-            ${arch}-${test_name}-dcp
-            ${run_vivado}
-            ${dcp_vivado_tcl}
-            ${dcp}
+    if (NOT no_bitstream)
+      set(dcp_vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/dcp_vivado.tcl)
+      set(dcp_bit ${output_dir}/${name}.dcp.bit)
+      add_custom_command(
+          OUTPUT ${dcp_bit}
+          COMMAND ${CMAKE_COMMAND} -E env
+              VIVADO_SETTINGS=${VIVADO_SETTINGS}
+              OUTPUT_DIR=${output_dir}
+              DCP_FILE=${dcp}
+              BIT_FILE=${dcp_bit}
+              ARCH=${arch}
+              ${quiet_cmd}
+              ${run_vivado} -mode batch -source ${dcp_vivado_tcl}
+          DEPENDS
+              ${arch}-${test_name}-dcp
+              ${run_vivado}
+              ${dcp_vivado_tcl}
+              ${dcp}
         WORKING_DIRECTORY
             ${output_dir}
-    )
+      )
 
-    add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
-    add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
-    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+      add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
+      add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+      add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+    endif()
 
     # Bitstream generation target
-    set(bit ${output_dir}/${name}.bit)
-    add_custom_command(
-        OUTPUT ${bit}
-        COMMAND ${CMAKE_COMMAND} -E env
-            ${quiet_cmd}
-            ${XCFASM}
-                --db-root ${PRJXRAY_DB_DIR}/${device_family}
-                --part ${part}
-                --part_file ${PRJXRAY_DB_DIR}/${device_family}/${part}/part.yaml
-                --sparse
-                --emit_pudc_b_pullup
-                --fn_in ${fasm}
-                --bit_out ${bit}
-        DEPENDS
-            ${arch}-${test_name}-fasm
-            ${fasm}
-        )
+    if (NOT no_fasm AND NOT no_bitstream)
+      set(bit ${output_dir}/${name}.bit)
+      add_custom_command(
+          OUTPUT ${bit}
+          COMMAND ${CMAKE_COMMAND} -E env
+              ${quiet_cmd}
+              ${XCFASM}
+                  --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                  --part ${part}
+                  --part_file ${PRJXRAY_DB_DIR}/${device_family}/${part}/part.yaml
+                  --sparse
+                  --emit_pudc_b_pullup
+                  --fn_in ${fasm}
+                  --bit_out ${bit}
+          DEPENDS
+              ${arch}-${test_name}-fasm
+              ${fasm}
+          )
 
-    set(bit_fasm ${output_dir}/${name}.bit.fasm)
-    add_custom_command(
-        OUTPUT ${bit_fasm}
-        COMMAND
-            ${quiet_cmd}
-            ${BIT2FASM}
-                --db-root ${PRJXRAY_DB_DIR}/${device_family}
-                --part ${part}
-                --bitread ${BITREAD}
-                --fasm_file ${bit_fasm}
-                ${bit}
-        DEPENDS
-            ${bit}
-            xc7-${test_name}-bit
-    )
-    add_custom_target(xc7-${test_name}-bit-fasm DEPENDS ${bit_fasm})
+      set(bit_fasm ${output_dir}/${name}.bit.fasm)
+      add_custom_command(
+          OUTPUT ${bit_fasm}
+          COMMAND
+              ${quiet_cmd}
+              ${BIT2FASM}
+                  --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                  --part ${part}
+                  --bitread ${BITREAD}
+                  --fasm_file ${bit_fasm}
+                  ${bit}
+          DEPENDS
+              ${bit}
+              xc7-${test_name}-bit
+      )
+      add_custom_target(xc7-${test_name}-bit-fasm DEPENDS ${bit_fasm})
+    endif()
 
-    set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
-    add_custom_command(
-        OUTPUT ${dcp_fasm}
-        COMMAND
-            ${quiet_cmd}
-            ${BIT2FASM}
-                --db-root ${PRJXRAY_DB_DIR}/${device_family}
-                --part ${part}
-                --bitread ${BITREAD}
-                --fasm_file ${dcp_fasm}
-                ${dcp_bit}
-        DEPENDS
-            ${dcp_bit}
-            xc7-${test_name}-dcp-bit
-    )
-    add_custom_target(xc7-${test_name}-dcp-bit-fasm DEPENDS ${dcp_fasm})
+    if (NOT no_bitstream)
+      set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
+      add_custom_command(
+          OUTPUT ${dcp_fasm}
+          COMMAND
+              ${quiet_cmd}
+              ${BIT2FASM}
+                  --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                  --part ${part}
+                  --bitread ${BITREAD}
+                  --fasm_file ${dcp_fasm}
+                  ${dcp_bit}
+          DEPENDS
+              ${dcp_bit}
+              xc7-${test_name}-dcp-bit
+      )
+      add_custom_target(xc7-${test_name}-dcp-bit-fasm DEPENDS ${dcp_fasm})
+    endif()
 
-
-    add_custom_target(xc7-${test_name}-dcp-diff-fasm
-        COMMAND diff -u
-            ${bit_fasm}
-            ${dcp_fasm}
-        DEPENDS
-            xc7-${test_name}-bit-fasm
-            xc7-${test_name}-dcp-bit-fasm
-            ${bit_fasm}
-            ${dcp_fasm}
-    )
+    if (NOT no_fasm AND NOT no_bitstream)
+      add_custom_target(xc7-${test_name}-dcp-diff-fasm
+          COMMAND diff -u
+              ${bit_fasm}
+              ${dcp_fasm}
+          DEPENDS
+              xc7-${test_name}-bit-fasm
+              xc7-${test_name}-dcp-bit-fasm
+              ${bit_fasm}
+              ${dcp_fasm}
+      )
+    endif()
 
     add_custom_target(${arch}-${test_name}-bit DEPENDS ${bit})
     add_dependencies(all-tests ${arch}-${test_name}-bit)

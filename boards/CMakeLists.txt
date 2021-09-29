@@ -43,6 +43,30 @@ add_board(
     speedgrade -1
 )
 
+# Fake board, just to test the chip support
+add_board(
+    name xc7k480t_board
+    device_family kintex7
+    device xc7k480t
+    arch xc7
+    package ffg901
+    speedgrade -1
+    no_fasm
+    no_bitstream
+)
+
+# Fake board, just to test the chip support
+add_board(
+    name xc7vx980t_board
+    device_family virtex7
+    device xc7vx980t
+    arch xc7
+    package ffg1926
+    speedgrade -1
+    no_fasm
+    no_bitstream
+)
+
 add_board(
     name zcu104
     device_family zynqup
@@ -51,6 +75,7 @@ add_board(
     package ffvc1156
     speedgrade -2
     part xczu7ev-ffvc1156-2-e
+    no_fasm
 )
 
 add_board(

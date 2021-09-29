@@ -23,11 +23,13 @@ function(add_board)
     #   - package: one of the packages available for a given device. E.g. cpg236
     #   - speedgrade: speedgrade of the chip. E.g -1, -2, -3
     #   - part: the full vendor part name, if it's not of the form <device><package><speedgrade>
+    #   - no_fasm: when provided disables the FASM generation target
+    #   - no_bitstream: disables bitstream generation for the board
     #
     # Targets generated:
     #   - board-<name>
 
-    set(options)
+    set(options no_fasm no_bitstream)
     set(oneValueArgs name device_family device arch package speedgrade part)
     set(multiValueArgs)
 
@@ -51,6 +53,9 @@ function(add_board)
         set(part ${device}${package}${speedgrade})
     endif()
 
+    set(no_fasm ${add_board_no_fasm})
+    set(no_bitstream ${add_board_no_bitstream})
+
     add_custom_target(board-${name} DEPENDS device-${device})
     set_target_properties(
         board-${name}
@@ -61,5 +66,7 @@ function(add_board)
             PACKAGE ${package}
             SPEEDGRADE ${speedgrade}
             PART ${part}
+            NO_FASM ${no_fasm}
+            NO_BITSTREAM ${no_bitstream}
     )
 endfunction()

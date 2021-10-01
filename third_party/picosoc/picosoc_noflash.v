@@ -53,6 +53,12 @@ module picosoc_noflash (
 	parameter [31:0] STACKADDR = (4*MEM_WORDS);       // end of memory
 	parameter [31:0] PROGADDR_RESET = 32'h 0010_0000; // 1 MB into flash
 
+	reg clk50;
+	wire clk50_bufg;
+	always @(posedge clk)
+		clk50 <= !clk50;
+	BUFG bufg(.I(clk50), .O(clk50_bufg));
+
 	reg [31:0] irq;
 	wire irq_stall = 0;
 	wire irq_uart = 0;
@@ -94,11 +100,11 @@ module picosoc_noflash (
 	wire [31:0] simpleuart_reg_dat_do;
 	wire        simpleuart_reg_dat_wait;
 
-	assign mem_ready = 
+	assign mem_ready =
             (iomem_valid && iomem_ready) || progmem_ready || ram_ready || spimemio_cfgreg_sel ||
 			simpleuart_reg_div_sel || (simpleuart_reg_dat_sel && !simpleuart_reg_dat_wait);
 
-	assign mem_rdata = 
+	assign mem_rdata =
             (iomem_valid && iomem_ready) ? iomem_rdata :
             progmem_ready ? progmem_rdata :
             ram_ready ? ram_rdata :
@@ -106,7 +112,7 @@ module picosoc_noflash (
 			simpleuart_reg_div_sel ? simpleuart_reg_div_do :
 			simpleuart_reg_dat_sel ? simpleuart_reg_dat_do : 32'h 0000_0000;
 
-`ifdef SIMULATION    
+`ifdef SIMULATION
 	wire        trace_valid;
 	wire [35:0] trace_data;
     integer     trace_file;
@@ -121,14 +127,14 @@ module picosoc_noflash (
 		.ENABLE_MUL(1),
 		.ENABLE_DIV(1),
 		.ENABLE_IRQ(1),
-`ifdef SIMULATION    
+`ifdef SIMULATION
 		.ENABLE_IRQ_QREGS(0),
         .ENABLE_TRACE(1)
 `else
 		.ENABLE_IRQ_QREGS(0)
 `endif
 	) cpu (
-		.clk         (clk        ),
+		.clk         (clk50_bufg ),
 		.resetn      (resetn     ),
 		.mem_valid   (mem_valid  ),
 		.mem_instr   (mem_instr  ),
@@ -148,7 +154,7 @@ module picosoc_noflash (
 
     // This it the program ROM memory for the PicoRV32
     progmem progmem (
-        .clk    (clk),
+        .clk    (clk50_bufg),
         .rstn   (resetn),
 
         .valid  (mem_valid && mem_addr >= 4*MEM_WORDS && mem_addr < 32'h 0200_0000),
@@ -158,7 +164,7 @@ module picosoc_noflash (
     );
 
 	simpleuart simpleuart (
-		.clk         (clk         ),
+		.clk         (clk50_bufg  ),
 		.resetn      (resetn      ),
 
 		.ser_tx      (ser_tx      ),
@@ -175,11 +181,11 @@ module picosoc_noflash (
 		.reg_dat_wait(simpleuart_reg_dat_wait)
 	);
 
-	always @(posedge clk)
+	always @(posedge clk50_bufg)
 		ram_ready <= mem_valid && !mem_ready && mem_addr < 4*MEM_WORDS;
 
 	picosoc_mem #(.WORDS(MEM_WORDS)) memory (
-		.clk(clk),
+		.clk(clk50_bufg),
 		.wen((mem_valid && !mem_ready && mem_addr < 4*MEM_WORDS) ? mem_wstrb : 4'b0),
 		.addr(mem_addr[23:2]),
 		.wdata(mem_wdata),
@@ -188,7 +194,7 @@ module picosoc_noflash (
 
     // Simulation debug
 `ifdef SIMULATION
-    always @(posedge clk)
+    always @(posedge clk50_bufg)
         if (resetn) begin
             if ( mem_instr && mem_valid && mem_ready)
                 $display("Inst rd: [0x%08X] = 0x%08X", mem_addr, mem_rdata);
@@ -200,10 +206,10 @@ module picosoc_noflash (
     initial begin
 
         trace_file = $fopen("testbench.trace", "w");
-        repeat (10) @(posedge clk);
+        repeat (10) @(posedge clk50_bufg);
 
         while(1) begin
-            @(posedge clk)
+            @(posedge clk50_bufg)
             if (resetn && trace_valid)
                 $fwrite(trace_file, "%x\n", trace_data);
                 $fflush(trace_file);

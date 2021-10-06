@@ -14,6 +14,8 @@ cd github/$KOKORO_DIR
 INSTALL_DIR="$(pwd)/install"
 export CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}"
 
+DEVICES="xc7a35t xc7a100t xc7a200t xc7z010 xczu7ev"
+
 source ./.github/kokoro/steps/xilinx.sh
 source ./.github/kokoro/steps/hostsetup.sh
 source ./.github/kokoro/steps/hostinfo.sh
@@ -31,7 +33,10 @@ echo "-------------------------------------------"
 (
     source env/conda/bin/activate fpga-interchange
     pushd build
-    make all-device-data -j$NUM_CORES
+    for DEVICE in $DEVICES
+    do
+        make chipdb-$DEVICE-bin -j$NUM_CORES
+    done
     popd
 )
 echo "-------------------------------------------"
@@ -46,7 +51,10 @@ echo "-------------------------------------------"
     set +e
     for TARGET in simulation-tests tests validation-tests vendor-bit-tests timing-comparison-tests
     do
-        make all-${TARGET} -j$NUM_CORES -k --output-sync=target 2>&1 | tee all-${TARGET}.log
+        for DEVICE in $DEVICES
+        do
+            make all-$DEVICE-$TARGET -j$NUM_CORES -k --output-sync=target 2>&1 | tee all-${DEVICE}-${TARGET}.log
+        done
     done
     make list-allowed-failing-tests | tee allowed-failures.log
     popd

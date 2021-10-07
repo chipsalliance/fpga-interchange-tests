@@ -49,7 +49,7 @@ echo "-------------------------------------------"
     source env/conda/bin/activate fpga-interchange
     pushd build
     set +e
-    for TARGET in simulation-tests tests validation-tests vendor-bit-tests timing-comparison-tests
+    for TARGET in simulation-tests tests validation-tests vendor-bit-tests
     do
         for DEVICE in $DEVICES
         do

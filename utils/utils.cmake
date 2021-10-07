@@ -16,3 +16,21 @@ function(set_program program)
         programs PROPERTIES ${program_upper} ${${program_upper}}
     )
 endfunction()
+
+function(get_python_cpu_data data_file cpu_library output_var)
+    # Executes the script to retrieve the data files for the LiteX CPUs
+    # and saves the output in a variable
+
+    get_target_property(PYTHON3 programs PYTHON3)
+    set(script ${PROJECT_SOURCE_DIR}/utils/get_cpu_litex_data.py)
+    execute_process(
+        COMMAND
+            ${PYTHON3} ${script}
+                --data-file ${data_file}
+                --cpu-library ${cpu_library}
+        OUTPUT_VARIABLE
+            output
+    )
+
+    set(${output_var} ${output} PARENT_SCOPE)
+endfunction()

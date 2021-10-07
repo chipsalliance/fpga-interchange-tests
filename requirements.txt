@@ -14,8 +14,9 @@ git+https://github.com/SymbiFlow/symbiflow-xc-fasm2bels.git
 -e third_party/litedram
 -e third_party/liteeth
 -e third_party/liteiclink
--e third_party/pythondata-cpu-vexriscv
 -e third_party/pythondata-software-compiler_rt
 -e third_party/migen
 
-
+# CPU data
+git+https://github.com/litex-hub/pythondata-cpu-vexriscv_smp
+git+https://github.com/litex-hub/pythondata-cpu-vexriscv

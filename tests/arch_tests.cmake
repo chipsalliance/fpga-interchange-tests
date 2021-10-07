@@ -78,7 +78,7 @@ function(add_xc7_test)
               SOURCES="${sources}"
               BIT_FILE=${vivado_bit}
               ${quiet_cmd}
-              ${run_vivado} -mode batch -source ${vivado_tcl} -notrace -nojurnal
+              ${run_vivado} -mode batch -source ${vivado_tcl} -notrace -nojournal
           DEPENDS
               ${run_vivado}
               ${vivado_tcl}

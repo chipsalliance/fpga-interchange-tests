@@ -53,6 +53,7 @@ jobs:
 
     - name: Build CMake
       run: |
+        make update
         make build
 
     - name: Run tests

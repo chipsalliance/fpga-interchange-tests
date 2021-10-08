@@ -17,6 +17,5 @@ add_generic_test(
     name picosoc
     board_list basys3
     top top
-    sources basys3.v
     absolute_sources ${picosoc_dir}/basys3.v ${picosoc_sources}
 )

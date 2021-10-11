@@ -226,6 +226,8 @@ function(add_generic_test)
                     --phys ${phys}
                     --package ${package}
                     --log ${phys_log}
+                    # TODO: re-enable once https://github.com/SymbiFlow/fpga-interchange-tests/issues/75 is fixed
+                    --disable-lut-mapping-cache
             DEPENDS
                 ${arch}-${test_name}-netlist
                 ${xdc}

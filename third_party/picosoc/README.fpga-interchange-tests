@@ -1,0 +1,11 @@
+Name: PicoSoC is a simple PicoRV32 example design that can run code directly from an SPI flash chip
+Short Name: PicoSoC
+URL: https://github.com/cliffordwolf/picorv32/tree/master/picosoc
+Version: 1.0
+License: ISC
+
+Description:
+This package is used as a testbench for the fpga-interchange-tests project.
+
+Local Modifications:
+This test is the [PicoSoC from PicoRV32](https://github.com/cliffordwolf/picorv32/tree/master/picosoc) copied from [revision 9129d18bf5699e69f25edffa7864aaf88d6dd385](https://github.com/cliffordwolf/picorv32/commit/9129d18bf5699e69f25edffa7864aaf88d6dd385).

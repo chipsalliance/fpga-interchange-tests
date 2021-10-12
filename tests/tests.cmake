@@ -86,6 +86,7 @@ function(add_generic_test)
 
     get_target_property(YOSYS programs YOSYS)
     get_target_property(NEXTPNR_FPGA_INTERCHANGE programs NEXTPNR_FPGA_INTERCHANGE)
+    get_target_property(VPR programs VPR)
     get_target_property(PYTHON3 programs PYTHON3)
 
     foreach(board ${add_generic_test_board_list})
@@ -215,26 +216,44 @@ function(add_generic_test)
         # Physical netlist
         set(phys ${output_dir}/${name}.phys)
         set(phys_log ${output_dir}/${name}.phys.log)
-        add_custom_command(
-            OUTPUT ${phys}
-            COMMAND
-                ${quiet_cmd}
-                ${NEXTPNR_FPGA_INTERCHANGE}
-                    --chipdb ${chipdb_loc}
-                    --xdc ${xdc}
-                    --netlist ${netlist}
-                    --phys ${phys}
-                    --package ${package}
-                    --log ${phys_log}
-                    # TODO: re-enable once https://github.com/SymbiFlow/fpga-interchange-tests/issues/75 is fixed
-                    --disable-lut-mapping-cache
-            DEPENDS
-                ${arch}-${test_name}-netlist
-                ${xdc}
-                chipdb-${device}-bin
-                ${chipdb_loc}
-                ${netlist}
-        )
+        if (${PNR_TOOL} STREQUAL "nextpnr")
+            add_custom_command(
+                OUTPUT ${phys}
+                COMMAND
+                    ${quiet_cmd}
+                    ${NEXTPNR_FPGA_INTERCHANGE}
+                        --chipdb ${chipdb_loc}
+                        --xdc ${xdc}
+                        --netlist ${netlist}
+                        --phys ${phys}
+                        --package ${package}
+                        --log ${phys_log}
+                        # TODO: re-enable once https://github.com/SymbiFlow/fpga-interchange-tests/issues/75 is fixed
+                        --disable-lut-mapping-cache
+                DEPENDS
+                    ${arch}-${test_name}-netlist
+                    ${xdc}
+                    chipdb-${device}-bin
+                    ${chipdb_loc}
+                    ${netlist}
+            )
+        elseif (${PNR_TOOL} STREQUAL "vpr")
+            add_custom_command(
+                OUTPUT ${phys}
+                COMMAND
+                    ${VPR}
+                    ${device_loc} ${netlist}
+                    --fpga_interchange_device
+                    --fpga_interchange_netlist
+                DEPENDS
+                    ${arch}-${test_name}-netlist
+                    ${xdc}
+                    ${device_target}
+                    ${device_loc}
+                    ${netlist}
+            )
+        endif()
+
 
         # Physical Netlist YAML
         set(phys_yaml ${output_dir}/${name}.phys.yaml)

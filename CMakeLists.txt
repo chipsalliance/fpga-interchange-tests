@@ -16,6 +16,8 @@ set(XILINX_UNISIM_DIR ${PROJECT_SOURCE_DIR}/third_party/xilinx-unisims/verilog/s
 set(VIVADO_VERSION 2019.2 CACHE STRING "Vivado version")
 set(VIVADO_SETTINGS /opt/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh CACHE PATH "Path to the Vivado settings script")
 
+set(PNR_TOOL "nextpnr" CACHE STRING "Place and Route tool to use")
+
 # FASM database directory
 find_program(PRJXRAY_CONFIG prjxray-config)
 if (NOT ${PRJXRAY_CONFIG} STREQUAL "PRJXRAY_CONFIG-NOTFOUND")
@@ -39,16 +41,17 @@ endif ()
 include(utils/utils.cmake)
 
 add_custom_target(programs)
-set_program(python3)
-set_program(yosys)
-set_program(nextpnr-fpga_interchange)
 set_program(bbasm)
-set_program(xcfasm)
-set_program(bitread)
 set_program(bit2fasm)
+set_program(bitread)
 set_program(iverilog)
-set_program(vvp)
+set_program(nextpnr-fpga_interchange)
 set_program(prjoxide)
+set_program(python3)
+set_program(vpr)
+set_program(vvp)
+set_program(xcfasm)
+set_program(yosys)
 
 include(boards/boards.cmake)
 include(devices/chipdb.cmake)

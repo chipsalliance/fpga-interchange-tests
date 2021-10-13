@@ -1,5 +1,6 @@
 include(${CMAKE_SOURCE_DIR}/devices/chipdb_xilinx.cmake)
 include(${CMAKE_SOURCE_DIR}/devices/chipdb_nexus.cmake)
+include(${CMAKE_SOURCE_DIR}/devices/chipdb_testarch.cmake)
 
 function(create_patched_device_db)
     # ~~~

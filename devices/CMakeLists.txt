@@ -21,3 +21,6 @@ add_subdirectory(xc7vx980t)
 # Nexus devices
 add_subdirectory(LIFCL-17)
 add_subdirectory(LIFCL-40)
+
+# Test architecture
+add_subdirectory(testarch)

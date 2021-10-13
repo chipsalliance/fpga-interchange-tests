@@ -86,3 +86,15 @@ add_board(
     package CABGA400
     speedgrade -9
 )
+
+# Fake board to test the test architecture
+add_board(
+    name testboard
+    device_family test
+    device testarch
+    arch testarch
+    package test_package
+    speedgrade -1
+    no_fasm
+    no_bitstream
+)

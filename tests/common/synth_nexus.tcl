@@ -6,9 +6,7 @@ foreach src $::env(SOURCES) {
 
 synth_nexus -nolutram -nowidelut -noccu2 -nodsp
 
-if { $::env(TECHMAP) != "" } {
-    techmap -map $::env(TECHMAP)
-}
+techmap -map $::env(LIB_DIR)/remap_nexus.v
 
 # opt_expr -undriven makes sure all nets are driven, if only by the $undef
 # net.

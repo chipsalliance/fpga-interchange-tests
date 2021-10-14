@@ -84,7 +84,7 @@ echo "-------------------------------------------"
     popd
     cp environment.yml $INSTALL_DIR
     mkdir -p $INSTALL_DIR/techmaps
-    cp tests/common/remap*.v $INSTALL_DIR/techmaps
+    cp tests/common/libs/*.v $INSTALL_DIR/techmaps
 
     du -ah $INSTALL_DIR
     export GIT_HASH=$(git rev-parse --short HEAD)

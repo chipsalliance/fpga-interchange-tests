@@ -6,9 +6,7 @@ foreach src $::env(SOURCES) {
 
 synth_xilinx -flatten -noclkbuf -nolutram -nowidelut -nosrl -nocarry -nodsp -arch xcup
 
-if { $::env(TECHMAP) != "" } {
-    techmap -map $::env(TECHMAP)
-}
+techmap -map $::env(LIB_DIR)/remap_xcup.v
 
 # opt_expr -undriven makes sure all nets are driven, if only by the $undef
 # net.

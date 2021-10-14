@@ -10,7 +10,6 @@ function(add_generic_test)
     #    [top <top name>]
     #    [testbench]
     #    [constr_prefix <prefix>]
-    #    [retarget <retarget file>]
     # )
     #
     # Generates targets to run desired tests
@@ -30,8 +29,6 @@ function(add_generic_test)
     #   - constr_prefix (optional): When given the expected constraints file
     #                               name will be <constr_prefix>-<board>.xdc
     #                               If not provided it will be just <board>.xdc
-    #   - retarget (optional): If specified, runs the retarget step to remap some
-    #                          old and unused primitives into the newer equivalent
     #
     # Targets generated:
     #   - <arch>-<name>-<board>-json     : synthesis output
@@ -40,7 +37,7 @@ function(add_generic_test)
     #   - <arch>-<name>-<board>-fasm     : fasm file
 
     set(options failure_allowed)
-    set(oneValueArgs name tcl top testbench constr_prefix generated_xdc retarget)
+    set(oneValueArgs name tcl top testbench constr_prefix generated_xdc)
     set(multiValueArgs board_list sources absolute_sources built_sources)
 
     cmake_parse_arguments(
@@ -57,7 +54,6 @@ function(add_generic_test)
     set(tcl ${add_generic_test_tcl})
     set(constr_prefix ${add_generic_test_constr_prefix})
     set(generated_xdc ${add_generic_test_generated_xdc})
-    set(retarget ${add_generic_test_retarget})
     set(failure_allowed ${add_generic_test_failure_allowed})
 
     set(sources)
@@ -86,8 +82,10 @@ function(add_generic_test)
 
     get_target_property(YOSYS programs YOSYS)
     get_target_property(NEXTPNR_FPGA_INTERCHANGE programs NEXTPNR_FPGA_INTERCHANGE)
+    get_target_property(VPR programs VPR)
     get_target_property(PYTHON3 programs PYTHON3)
 
+    set(lib_dir ${CMAKE_SOURCE_DIR}/tests/common/libs)
     foreach(board ${add_generic_test_board_list})
         # Get board properties
         get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
@@ -107,7 +105,6 @@ function(add_generic_test)
         get_property(device_target TARGET device-${device} PROPERTY DEVICE_TARGET)
         get_property(device_loc TARGET device-${device} PROPERTY DEVICE_LOC)
         set(chipdb_loc ${CMAKE_BINARY_DIR}/devices/${device}/${device}.bin)
-        set(techmap ${CMAKE_SOURCE_DIR}/tests/common/remap_${arch}.v)
 
         set(output_dir ${CMAKE_CURRENT_BINARY_DIR}/${board})
         add_custom_command(
@@ -132,13 +129,11 @@ function(add_generic_test)
                 SOURCES="${sources}"
                 OUT_JSON=${synth_json}
                 OUT_VERILOG=${synth_verilog}
-                TECHMAP=${techmap}
-                RETARGET=${retarget}
+                LIB_DIR=${lib_dir}
                 ${quiet_cmd}
                 ${YOSYS} -c ${synth_tcl} -l ${synth_log}
             DEPENDS
                 ${sources}
-                ${techmap}
                 ${synth_tcl}
                 ${arch}-${test_name}-output-dir
         )
@@ -206,7 +201,7 @@ function(add_generic_test)
                     ${netlist}
                     ${netlist_yaml}
             DEPENDS
-                ${arch}-${test_name}-phys
+                ${arch}-${test_name}-netlist
                 ${netlist}
         )
 
@@ -215,26 +210,46 @@ function(add_generic_test)
         # Physical netlist
         set(phys ${output_dir}/${name}.phys)
         set(phys_log ${output_dir}/${name}.phys.log)
-        add_custom_command(
-            OUTPUT ${phys}
-            COMMAND
-                ${quiet_cmd}
-                ${NEXTPNR_FPGA_INTERCHANGE}
-                    --chipdb ${chipdb_loc}
-                    --xdc ${xdc}
-                    --netlist ${netlist}
-                    --phys ${phys}
-                    --package ${package}
-                    --log ${phys_log}
-                    # TODO: re-enable once https://github.com/SymbiFlow/fpga-interchange-tests/issues/75 is fixed
-                    --disable-lut-mapping-cache
-            DEPENDS
-                ${arch}-${test_name}-netlist
-                ${xdc}
-                chipdb-${device}-bin
-                ${chipdb_loc}
-                ${netlist}
-        )
+        if (${PNR_TOOL} STREQUAL "nextpnr")
+            add_custom_command(
+                OUTPUT ${phys}
+                COMMAND
+                    ${quiet_cmd}
+                    ${NEXTPNR_FPGA_INTERCHANGE}
+                        --chipdb ${chipdb_loc}
+                        --xdc ${xdc}
+                        --netlist ${netlist}
+                        --phys ${phys}
+                        --package ${package}
+                        --log ${phys_log}
+                        # TODO: re-enable once https://github.com/SymbiFlow/fpga-interchange-tests/issues/75 is fixed
+                        --disable-lut-mapping-cache
+                DEPENDS
+                    ${arch}-${test_name}-netlist
+                    ${xdc}
+                    chipdb-${device}-bin
+                    ${chipdb_loc}
+                    ${netlist}
+            )
+        elseif (${PNR_TOOL} STREQUAL "vpr")
+            # TODO: This command is only for development purposes at the moment.
+            #       It errors out if run with the current VTR version from conda,
+            #       as VTR does not yet support the interchange format.
+            add_custom_command(
+                OUTPUT ${phys}
+                COMMAND
+                    ${VPR}
+                    ${device_loc} ${netlist}
+                    --fpga_interchange_device
+                    --fpga_interchange_netlist
+                DEPENDS
+                    ${arch}-${test_name}-netlist
+                    ${device_target}
+                    ${device_loc}
+                    ${netlist}
+            )
+        endif()
+
 
         # Physical Netlist YAML
         set(phys_yaml ${output_dir}/${name}.phys.yaml)

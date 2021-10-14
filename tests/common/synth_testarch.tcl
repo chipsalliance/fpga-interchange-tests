@@ -4,11 +4,11 @@ foreach src $::env(SOURCES) {
     read_verilog $src
 }
 
-techmap -map $::env(LIB_DIR)/retarget_xc7.v
+read_verilog -lib -specify $::env(LIB_DIR)/cell_sim_test.v
 
-synth_xilinx -flatten -nowidelut -nosrl -nodsp
+synth
 
-techmap -map $::env(LIB_DIR)/remap_xc7.v
+techmap -map $::env(LIB_DIR)/remap_test.v
 
 # opt_expr -undriven makes sure all nets are driven, if only by the $undef
 # net.

@@ -8,6 +8,6 @@
 
 module $_OR_(input A, input B, output Y);
 
-    LUT _TECHMAP_REPLACE_ (.A0(A), .A1(B), .A2(1'b0), .A3(1'b0), .O(Y));
+    LUT #(.INIT("16'h000E")) _TECHMAP_REPLACE_ (.A0(A), .A1(B), .A2(1'b0), .A3(1'b0), .O(Y));
 
 endmodule

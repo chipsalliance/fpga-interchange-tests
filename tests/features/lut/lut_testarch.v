@@ -27,6 +27,6 @@ assign o0_wire = i0_wire | i1_wire;
 assign o1_wire = i2_wire | i3_wire;
 assign ff_wire = i4_wire | i0_wire;
 
-FF ff_0(.D(ff_wire), .C(1'b1), .R(1'b0), .Q(o2_wire));
+DFF ff_0(.D(ff_wire), .C(1'b1), .R(1'b0), .Q(o2_wire));
 
 endmodule

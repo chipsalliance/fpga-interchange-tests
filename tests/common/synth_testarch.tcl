@@ -9,7 +9,6 @@ read_verilog -lib -specify $::env(LIB_DIR)/cell_sim_test.v
 synth -lut 4
 
 techmap -map $::env(LIB_DIR)/remap_test.v
-hilomap -hicell VCC V -locell GND G
 
 # opt_expr -undriven makes sure all nets are driven, if only by the $undef
 # net.
@@ -19,5 +18,4 @@ opt_clean
 setundef -zero -params
 
 write_json $::env(OUT_JSON)
-write_blif $::env(OUT_JSON).blif
 write_verilog $::env(OUT_VERILOG)

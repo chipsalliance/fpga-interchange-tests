@@ -214,7 +214,6 @@ function(add_generic_test)
             add_custom_command(
                 OUTPUT ${phys}
                 COMMAND
-                    ${quiet_cmd}
                     ${NEXTPNR_FPGA_INTERCHANGE}
                         --chipdb ${chipdb_loc}
                         --xdc ${xdc}
@@ -242,11 +241,17 @@ function(add_generic_test)
                     ${device_loc} ${netlist}
                     --fpga_interchange_device
                     --fpga_interchange_netlist
+                    --circuit_format fpga-interchange
+                    --echo_file on
+                    --timing_analysis off
+                    --clustering_pin_feasibility_filter off
                 DEPENDS
                     ${arch}-${test_name}-netlist
                     ${device_target}
                     ${device_loc}
                     ${netlist}
+                WORKING_DIRECTORY
+                    ${output_dir}
             )
         endif()
 

@@ -6,7 +6,7 @@ foreach src $::env(SOURCES) {
 
 read_verilog -lib -specify $::env(LIB_DIR)/cell_sim_test.v
 
-synth
+synth -lut 4
 
 techmap -map $::env(LIB_DIR)/remap_test.v
 

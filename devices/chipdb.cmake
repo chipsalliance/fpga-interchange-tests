@@ -91,6 +91,17 @@ function(create_patched_device_db)
                 ${output_device_file}.yaml
         DEPENDS ${output_device_file})
 
+    add_custom_target(${patch_name}-${device}-device-json
+        COMMAND
+            ${PYTHON3} -mfpga_interchange.convert
+                --schema_dir ${INTERCHANGE_SCHEMA_PATH}
+                --schema device
+                --input_format capnp
+                --output_format json
+                ${output_device_file}
+                ${output_device_file}.json
+        DEPENDS ${output_device_file})
+
     if (DEFINED output_target)
         set(${output_target} ${patch_name}-${device}-device PARENT_SCOPE)
     endif()

@@ -52,19 +52,7 @@ function(generate_testarch_device_db)
     add_custom_target(testarch-${device}-device DEPENDS ${out_file})
     set_property(TARGET testarch-${device}-device PROPERTY LOCATION ${out_file})
 
-    # Generate lut constraints patch
-    create_patched_device_db(
-        device ${device}
-        patch_name luts
-        patch_path lutDefinitions
-        patch_format yaml
-        patch_data ${PYTHON_INTERCHANGE_PATH}/test_data/gen_luts.yaml
-        input_device testarch-${device}-device
-        output_target luts_device
-        output_name ${device}_luts
-    )
-
     if (DEFINED output_target)
-        set(${output_target} ${luts_device} PARENT_SCOPE)
+        set(${output_target} testarch-${device}-device PARENT_SCOPE)
     endif()
 endfunction()

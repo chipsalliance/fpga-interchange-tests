@@ -3,7 +3,7 @@
 	url = https://github.com/SymbiFlow/make-env.git
 [submodule "third_party/fpga-interchange-schema"]
 	path = third_party/fpga-interchange-schema
-	url = https://github.com/SymbiFlow/fpga-interchange-schema.git
+	url = https://github.com/chipsalliance/fpga-interchange-schema.git
 [submodule "third_party/RapidWright"]
 	path = third_party/RapidWright
 	url = https://github.com/Xilinx/RapidWright.git
@@ -12,7 +12,7 @@
 	url = https://github.com/SymbiFlow/XilinxUnisimLibrary.git
 [submodule "third_party/python-fpga-interchange"]
 	path = third_party/python-fpga-interchange
-	url = https://github.com/SymbiFlow/python-fpga-interchange
+	url = https://github.com/chipsalliance/python-fpga-interchange
 [submodule "third_party/litex"]
 	path = third_party/litex
 	url = https://github.com/enjoy-digital/litex.git

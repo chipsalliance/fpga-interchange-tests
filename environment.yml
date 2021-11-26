@@ -14,12 +14,12 @@ dependencies:
     - litex-hub::capnproto-java=0.1.5_0012_g44a8c1e=20201104_165332
     - litex-hub::gcc-riscv64-elf-newlib=9.2.0=20201119_154229
     - litex-hub::iverilog=0_8_5850_g540555fc=20210730_085634
-    - litex-hub::nextpnr-fpga_interchange=v0.0_3848_g9c32e2d8=20211001_162618_py37
-    - litex-hub::prjoxide=v0.0_398_g711770c=20210730_085634
-    - litex-hub::prjxray-db=0.0_253_gcd41f08=20210923_204342
-    - litex-hub::prjxray-tools=0.1_2932_gf7f06896=20210923_204342
-    - litex-hub::vtr-optimized=8.0.0_4694_g37d5576d5=20211005_122659
-    - litex-hub::yosys=0.9_5612_g7a7df9a3=20210927_142647_py37
+    - litex-hub::nextpnr-fpga_interchange
+    - litex-hub::prjoxide
+    - litex-hub::prjxray-db
+    - litex-hub::prjxray-tools
+    - litex-hub::vtr-optimized
+    - litex-hub::yosys
     - swig
     - pip
     - pip:

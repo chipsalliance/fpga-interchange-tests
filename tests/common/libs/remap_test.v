@@ -8,7 +8,7 @@
 
 module $_OR_(input A, input B, output Y);
 
-    LUT #(.INIT("16'h000E")) _TECHMAP_REPLACE_ (.A0(A), .A1(B), .A2(1'b0), .A3(1'b0), .O(Y));
+    LUT2 #(.INIT("4'hE")) _TECHMAP_REPLACE_ (.I0(A), .I1(B), .O(Y));
 
 endmodule
 
@@ -27,16 +27,16 @@ module \$lut (A, Y);
   output Y;
   generate
     if (WIDTH == 1) begin
-      LUT #(.INIT(LUT)) _TECHMAP_REPLACE_ (.A0(A[0]), .A1(1'b0), .A2(1'b0), .A3(1'b0), .O(Y));
+      LUT1 #(.INIT(LUT)) _TECHMAP_REPLACE_ (.I0(A[0]), .O(Y));
     end else
     if (WIDTH == 2) begin
-      LUT #(.INIT(LUT)) _TECHMAP_REPLACE_ (.A0(A[0]), .A1(A[1]), .A2(1'b0), .A3(1'b0), .O(Y));
+      LUT2 #(.INIT(LUT)) _TECHMAP_REPLACE_ (.I0(A[0]), .I1(A[1]), .O(Y));
     end else
     if (WIDTH == 3) begin
-      LUT #(.INIT(LUT)) _TECHMAP_REPLACE_ (.A0(A[0]), .A1(A[1]), .A2(A[2]), .A3(1'b0), .O(Y));
+      LUT3 #(.INIT(LUT)) _TECHMAP_REPLACE_ (.I0(A[0]), .I1(A[1]), .I2(A[2]), .O(Y));
     end else
     if (WIDTH == 4) begin
-      LUT #(.INIT(LUT)) _TECHMAP_REPLACE_ (.A0(A[0]), .A1(A[1]), .A2(A[2]), .A3(A[3]), .O(Y));
+      LUT4 #(.INIT(LUT)) _TECHMAP_REPLACE_ (.I0(A[0]), .I1(A[1]), .I2(A[2]), .I3(A[3]), .O(Y));
     end else begin
       wire _TECHMAP_FAIL_ = 1;
     end

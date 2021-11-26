@@ -8,7 +8,7 @@
 
 TOP_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 REQUIREMENTS_FILE := requirements.txt
-ENVIRONMENT_FILE := environment.yml
+ENVIRONMENT_FILE := conda_lock.yml
 CMAKE_FLAGS ?= ""
 
 # Paths

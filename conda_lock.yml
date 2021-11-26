@@ -1,0 +1,26 @@
+# Copyright (C) 2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier:ISC
+
+name: fpga-interchange
+channels:
+    - defaults
+    - litex-hub
+dependencies:
+    - litex-hub::capnproto-java=0.1.5_0012_g44a8c1e=20201104_165332
+    - litex-hub::gcc-riscv64-elf-newlib=9.2.0=20201119_154229
+    - litex-hub::iverilog=0_8_5850_g540555fc=20210730_085634
+    - litex-hub::nextpnr-fpga_interchange
+    - litex-hub::prjoxide
+    - litex-hub::prjxray-db
+    - litex-hub::prjxray-tools
+    - litex-hub::vtr-optimized
+    - litex-hub::yosys
+    - swig
+    - pip
+    - pip:
+        - -r requirements.txt

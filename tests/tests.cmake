@@ -180,7 +180,6 @@ function(add_generic_test)
                     ${netlist}
             DEPENDS
                 ${arch}-${test_name}-json
-                chipdb-${device}-bin
                 ${device_target}
                 ${device_loc}
                 ${synth_json}

@@ -5,9 +5,15 @@ add_generic_test(
 )
 
 add_generic_test(
-    name lut
-    board_list testboard
-    sources lut_testarch.v
+    name lut_ff
+    board_list testboard testboard_noffmux
+    sources lut_ff.v
+)
+
+add_generic_test(
+    name lut_routethru
+    board_list testboard_noffmux
+    sources lut_routethru.v
 )
 
 add_xc7_validation_test(

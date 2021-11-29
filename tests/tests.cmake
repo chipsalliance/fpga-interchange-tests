@@ -239,12 +239,12 @@ function(add_generic_test)
                 COMMAND
                     ${VPR}
                     ${device_loc} ${netlist}
-                    --fpga_interchange_device
-                    --fpga_interchange_netlist
+                    --arch_format fpga-interchange
                     --circuit_format fpga-interchange
                     --echo_file on
                     --timing_analysis off
                     --clustering_pin_feasibility_filter off
+                    --constant_net_method route
                 DEPENDS
                     ${arch}-${test_name}-netlist
                     ${device_target}

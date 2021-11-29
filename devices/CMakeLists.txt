@@ -26,5 +26,6 @@ add_subdirectory(xc7vx980t)
 add_subdirectory(LIFCL-17)
 add_subdirectory(LIFCL-40)
 
-# Test architecture
+# Test architectures
 add_subdirectory(testarch)
+add_subdirectory(testarch-noffmux)

@@ -22,9 +22,9 @@ OB ob_2(.O(o2_wire), .P(o[2]));
 OB ob_3(.O(o3_wire), .P(o[3]));
 
 // "Free" flip-flops. In the testarch with no FFMUX they require LUT-thrus
-DFF ff_0(.D(i0_wire), .C(1'b1), .R(1'b0), .Q(o0_wire));
-DFF ff_1(.D(i1_wire), .C(1'b1), .R(1'b0), .Q(o1_wire));
-DFF ff_2(.D(i2_wire), .C(1'b1), .R(1'b0), .Q(o2_wire));
-DFF ff_3(.D(i3_wire), .C(1'b1), .R(1'b0), .Q(o3_wire));
+DFFR ff_0(.D(i0_wire), .C(1'b1), .R(1'b0), .Q(o0_wire));
+DFFR ff_1(.D(i1_wire), .C(1'b1), .R(1'b0), .Q(o1_wire));
+DFFR ff_2(.D(i2_wire), .C(1'b1), .R(1'b0), .Q(o2_wire));
+DFFR ff_3(.D(i3_wire), .C(1'b1), .R(1'b0), .Q(o3_wire));
 
 endmodule

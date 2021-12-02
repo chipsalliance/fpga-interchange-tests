@@ -98,13 +98,13 @@ function(add_generic_test)
         set(test_name "${name}-${board}")
 
         if(DEFINED generated_xdc)
-            set(xdc ${generated_xdc})
+            set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${generated_xdc})
         else()
             set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${prefix}${board}.xdc)
         endif()
         get_property(device_target TARGET device-${device} PROPERTY DEVICE_TARGET)
         get_property(device_loc TARGET device-${device} PROPERTY DEVICE_LOC)
-        set(chipdb_loc ${CMAKE_BINARY_DIR}/devices/${device}/${device}.bin)
+        get_property(chipdb_loc TARGET device-${device} PROPERTY CHIPDB_BIN_LOC)
 
         set(output_dir ${CMAKE_CURRENT_BINARY_DIR}/${board})
         add_custom_command(

@@ -250,13 +250,14 @@ function(generate_chipdb)
     get_target_property(BBASM programs BBASM)
 
     get_target_property(device_loc ${device_target} LOCATION)
-    set(chipdb_bba ${CMAKE_CURRENT_BINARY_DIR}/chipdb.bba)
+    set(chipdb_bba ${CMAKE_CURRENT_BINARY_DIR}/chipdb-${device}.bba)
     add_custom_command(
         OUTPUT ${chipdb_bba}
         COMMAND
             ${PYTHON3} -mfpga_interchange.nextpnr_emit
                 --schema_dir ${INTERCHANGE_SCHEMA_PATH}
                 --output_dir ${CMAKE_CURRENT_BINARY_DIR}
+                --suffix ${device}
                 --device_config ${device_config}
                 --device ${device_loc}
         DEPENDS

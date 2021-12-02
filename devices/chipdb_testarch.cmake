@@ -52,6 +52,18 @@ function(generate_testarch_device_db)
     add_custom_target(testarch-${device}-device DEPENDS ${out_file})
     set_property(TARGET testarch-${device}-device PROPERTY LOCATION ${out_file})
 
+    add_custom_target(testarch-${device}-device-json
+        COMMAND
+            ${PYTHON3} -mfpga_interchange.convert
+                --schema_dir ${INTERCHANGE_SCHEMA_PATH}
+                --schema device
+                --input_format capnp
+                --output_format json
+                ${out_file}
+                ${out_file}.json
+        DEPENDS ${out_file})
+
+
     if (DEFINED output_target)
         set(${output_target} testarch-${device}-device PARENT_SCOPE)
     endif()

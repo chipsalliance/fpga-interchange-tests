@@ -10,8 +10,6 @@ get_python_cpu_data(
     ram
 )
 
-set(retarget ${CMAKE_SOURCE_DIR}/tests/common/retarget_xc7.v)
-
 # TODO: add capability to build designs from https://github.com/litex-hub/linux-on-litex-vexriscv
 #add_litex_test(
 #    litex_board digilent_arty
@@ -36,7 +34,6 @@ add_generic_test(
     absolute_sources
         ${vexriscv}
         ${ram}
-    retarget ${retarget}
     failure_allowed
 )
 

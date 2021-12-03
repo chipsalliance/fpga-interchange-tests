@@ -98,7 +98,7 @@ function(add_generic_test)
         set(test_name "${name}-${board}")
 
         if(DEFINED generated_xdc)
-            set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${generated_xdc})
+            set(xdc ${generated_xdc})
         else()
             set(xdc ${CMAKE_CURRENT_SOURCE_DIR}/${prefix}${board}.xdc)
         endif()

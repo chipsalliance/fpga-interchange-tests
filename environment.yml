@@ -18,7 +18,7 @@ dependencies:
     - litex-hub::prjoxide=v0.0_398_g711770c=20210730_085634
     - litex-hub::prjxray-db=0.0_253_gcd41f08=20210923_204342
     - litex-hub::prjxray-tools=0.1_2932_gf7f06896=20210923_204342
-    - litex-hub::vtr-optimized=8.0.0_4694_g37d5576d5=20211005_122659
+    - litex-hub::vtr-optimized=8.0.0_5170_g81b5aa2a8=20220202_022309
     - litex-hub::yosys=0.9_5612_g7a7df9a3=20210927_142647_py37
     - swig
     - pip

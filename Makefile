@@ -9,7 +9,6 @@
 TOP_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 REQUIREMENTS_FILE := requirements.txt
 ENVIRONMENT_FILE := environment.yml
-CMAKE_FLAGS ?= ""
 
 # Paths
 RAPIDWRIGHT_PATH ?= $(TOP_DIR)/third_party/RapidWright
@@ -31,7 +30,7 @@ update:
 .PHONY: build
 build:
 	# Build test suite
-	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake ${CMAKE_FLAGS} ..
+	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake .. ${CMAKE_FLAGS}
 
 .PHONY: clean-build
 clean-build:

@@ -25,7 +25,7 @@ jobs:
         exclude_license: |
           - ./tests/designs/litex_linux/arty.v
 
-  Run-Tests:
+  Run-Nextpnr-Tests:
     runs-on: [self-hosted, Linux, X64]
     container: "ubuntu:20.04"
     strategy:
@@ -72,9 +72,57 @@ jobs:
           **/plot_*.svg
           build/report*.csv
 
+  Run-VPR-Tests:
+    runs-on: [self-hosted, Linux, X64]
+    container: "ubuntu:20.04"
+    strategy:
+      fail-fast: false
+      matrix:
+        device: ["xc7a35t", "LIFCL-40", "testarch"]
+    env:
+      LANG: "en_US.UTF-8"
+      DEBIAN_FRONTEND: "noninteractive"
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install
+      run: |
+        apt-get -qqy update
+        apt-get -qqy install build-essential git make \
+          cmake python3 wget unzip curl openjdk-11-jdk-headless capnproto
+        git submodule status > .submodules_status
+
+    - name: Create environment
+      run: make env
+
+    - name: Build CMake
+      run: |
+        make update
+        make build
+      env:
+        CMAKE_FLAGS: "-DPNR_TOOL=vpr"
+
+    - name: Run tests
+      run: |
+        .github/scripts/tests.sh ${{ matrix.device }}
+
+    - name: Prepare report
+      run: |
+        cd build
+        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allow-any-failure
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: fpga-interchange-tests-${{ matrix.device }}
+        path: |
+          **/plot_*.svg
+
   Prepare-Design-Status-Report:
     runs-on: ubuntu-18.04
-    needs: Run-Tests
+    needs: Run-Nextpnr-Tests
     steps:
 
     - uses: actions/checkout@v2

@@ -12,10 +12,6 @@ DEVICE=$1
 source env/conda/bin/activate fpga-interchange
 cd build
 
-# Build device database (this cannot fail)
-set -e
-make chipdb-${DEVICE}-bin
-
 # Run tests (allow failures)
 set +e
 for SUITE in tests validation-tests simulation-tests

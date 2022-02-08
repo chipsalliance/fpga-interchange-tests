@@ -7,16 +7,22 @@
 #
 # SPDX-License-Identifier: ISC
 
+source $(dirname "$0")/common.sh
+set -e
+enable_vivado 2017.2
+
 DEVICE=$1
 
 source env/conda/bin/activate fpga-interchange
 cd build
 
+make chipdb-${DEVICE}-bin
+
 # Run tests (allow failures)
 set +e
-for SUITE in tests validation-tests simulation-tests
+for SUITE in simulation-tests tests validation-tests $2
 do
-    make all-${DEVICE}-${SUITE} -j`nproc` -k --output-sync=target 2>&1 | tee all-${DEVICE}-${SUITE}.log
+    make all-${DEVICE}-${SUITE} -j$(nproc) -k --output-sync=target 2>&1 | tee all-${DEVICE}-${SUITE}.log
 done
 
 make list-allowed-failing-tests | tee allowed-failures.log

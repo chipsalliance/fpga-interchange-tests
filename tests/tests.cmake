@@ -245,6 +245,7 @@ function(add_generic_test)
                     --timing_analysis off
                     --clustering_pin_feasibility_filter off
                     --constant_net_method route
+                    --route_chan_width 20
                 DEPENDS
                     ${arch}-${test_name}-netlist
                     ${device_target}

@@ -76,6 +76,7 @@ add_board(
     speedgrade -2
     part xczu7ev-ffvc1156-2-e
     no_fasm
+    no_bitstream
 )
 
 add_board(

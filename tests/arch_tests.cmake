@@ -139,6 +139,23 @@ function(add_xc7_test)
       add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
       add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
       add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+
+      set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
+      add_custom_command(
+          OUTPUT ${dcp_fasm}
+          COMMAND
+              ${quiet_cmd}
+              ${BIT2FASM}
+                  --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                  --part ${part}
+                  --bitread ${BITREAD}
+                  --fasm_file ${dcp_fasm}
+                  ${dcp_bit}
+          DEPENDS
+              ${dcp_bit}
+              xc7-${test_name}-dcp-bit
+      )
+      add_custom_target(xc7-${test_name}-dcp-bit-fasm DEPENDS ${dcp_fasm})
     endif()
 
     # Bitstream generation target
@@ -177,28 +194,7 @@ function(add_xc7_test)
               xc7-${test_name}-bit
       )
       add_custom_target(xc7-${test_name}-bit-fasm DEPENDS ${bit_fasm})
-    endif()
 
-    if (NOT no_bitstream)
-      set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
-      add_custom_command(
-          OUTPUT ${dcp_fasm}
-          COMMAND
-              ${quiet_cmd}
-              ${BIT2FASM}
-                  --db-root ${PRJXRAY_DB_DIR}/${device_family}
-                  --part ${part}
-                  --bitread ${BITREAD}
-                  --fasm_file ${dcp_fasm}
-                  ${dcp_bit}
-          DEPENDS
-              ${dcp_bit}
-              xc7-${test_name}-dcp-bit
-      )
-      add_custom_target(xc7-${test_name}-dcp-bit-fasm DEPENDS ${dcp_fasm})
-    endif()
-
-    if (NOT no_fasm AND NOT no_bitstream)
       add_custom_target(xc7-${test_name}-dcp-diff-fasm
           COMMAND diff -u
               ${bit_fasm}
@@ -635,8 +631,6 @@ function(add_xc7_validation_test)
         )
 
         if(NOT ${disable_vivado_test})
-            add_dependencies(all-vendor-bit-tests xc7-${test_name}-dcp-diff-fasm)
-            add_dependencies(all-${device}-vendor-bit-tests xc7-${test_name}-dcp-diff-fasm)
             add_dependencies(all-vendor-bit-tests xc7-${test_name}-fasm2bels-diff-fasm)
             add_dependencies(all-${device}-vendor-bit-tests xc7-${test_name}-fasm2bels-diff-fasm)
         endif()

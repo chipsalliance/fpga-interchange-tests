@@ -13,4 +13,5 @@ add_generic_test(
 add_xc7_validation_test(
     name lut
     board_list arty35t
+    disable_vivado_test
 )

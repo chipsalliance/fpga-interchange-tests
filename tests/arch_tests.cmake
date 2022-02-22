@@ -139,6 +139,23 @@ function(add_xc7_test)
       add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
       add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
       add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+
+      set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
+      add_custom_command(
+          OUTPUT ${dcp_fasm}
+          COMMAND
+              ${quiet_cmd}
+              ${BIT2FASM}
+                  --db-root ${PRJXRAY_DB_DIR}/${device_family}
+                  --part ${part}
+                  --bitread ${BITREAD}
+                  --fasm_file ${dcp_fasm}
+                  ${dcp_bit}
+          DEPENDS
+              ${dcp_bit}
+              xc7-${test_name}-dcp-bit
+      )
+      add_custom_target(xc7-${test_name}-dcp-bit-fasm DEPENDS ${dcp_fasm})
     endif()
 
     # Bitstream generation target
@@ -177,28 +194,7 @@ function(add_xc7_test)
               xc7-${test_name}-bit
       )
       add_custom_target(xc7-${test_name}-bit-fasm DEPENDS ${bit_fasm})
-    endif()
 
-    if (NOT no_bitstream)
-      set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
-      add_custom_command(
-          OUTPUT ${dcp_fasm}
-          COMMAND
-              ${quiet_cmd}
-              ${BIT2FASM}
-                  --db-root ${PRJXRAY_DB_DIR}/${device_family}
-                  --part ${part}
-                  --bitread ${BITREAD}
-                  --fasm_file ${dcp_fasm}
-                  ${dcp_bit}
-          DEPENDS
-              ${dcp_bit}
-              xc7-${test_name}-dcp-bit
-      )
-      add_custom_target(xc7-${test_name}-dcp-bit-fasm DEPENDS ${dcp_fasm})
-    endif()
-
-    if (NOT no_fasm AND NOT no_bitstream)
       add_custom_target(xc7-${test_name}-dcp-diff-fasm
           COMMAND diff -u
               ${bit_fasm}
@@ -324,80 +320,83 @@ function(add_xcup_test)
     get_property(device_family TARGET board-${board} PROPERTY DEVICE_FAMILY)
     get_property(part TARGET board-${board} PROPERTY PART)
     get_property(arch TARGET board-${board} PROPERTY ARCH)
+    get_property(no_bitstream TARGET board-${board} PROPERTY NO_BITSTREAM)
 
     set(test_name "${name}-${board}")
     set(run_vivado ${CMAKE_SOURCE_DIR}/utils/run_vivado.sh)
 
-    # Bitstream generation target from DCP
-    set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
-    set(vivado_bit ${output_dir}/${name}.vivado.bit)
-    add_custom_command(
-        OUTPUT ${vivado_bit}
-        COMMAND ${CMAKE_COMMAND} -E env
-            VIVADO_SETTINGS=${VIVADO_SETTINGS}
-            OUTPUT_DIR=${output_dir}/${name}
-            NAME=${name}
-            PART=${part}
-            TOP=${top}
-            XDC=${xdc}
-            SOURCES="${sources}"
-            ARCH=${arch}
-            BIT_FILE=${vivado_bit}
-            ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${vivado_tcl} -notrace -nojournal
-        DEPENDS
-            ${run_vivado}
-            ${vivado_tcl}
-            ${sources}
-    )
+    if (NOT no_bitstream)
+        # Bitstream generation target from DCP
+        set(vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/vivado.tcl)
+        set(vivado_bit ${output_dir}/${name}.vivado.bit)
+        add_custom_command(
+            OUTPUT ${vivado_bit}
+            COMMAND ${CMAKE_COMMAND} -E env
+                VIVADO_SETTINGS=${VIVADO_SETTINGS}
+                OUTPUT_DIR=${output_dir}/${name}
+                NAME=${name}
+                PART=${part}
+                TOP=${top}
+                XDC=${xdc}
+                SOURCES="${sources}"
+                ARCH=${arch}
+                BIT_FILE=${vivado_bit}
+                ${quiet_cmd}
+                ${run_vivado} -mode batch -source ${vivado_tcl} -notrace -nojournal
+            DEPENDS
+                ${run_vivado}
+                ${vivado_tcl}
+                ${sources}
+        )
 
-    add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
-    add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
-    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+        add_custom_target(${arch}-${test_name}-vivado-bit DEPENDS ${vivado_bit})
+        add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
+        add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-vivado-bit)
 
-    # DCP generation target
-    set(dcp ${output_dir}/${name}.dcp)
-    add_custom_command(
-        OUTPUT ${dcp}
-        COMMAND ${CMAKE_COMMAND} -E env
-            RAPIDWRIGHT_PATH=${RAPIDWRIGHT_PATH}
-            ${INVOKE_RAPIDWRIGHT} ${JAVA_HEAP_SPACE}
-            com.xilinx.rapidwright.interchange.PhysicalNetlistToDcp
-            ${netlist} ${phys} ${xdc} ${dcp}
-        DEPENDS
-            ${INVOKE_RAPIDWRIGHT}
-            ${arch}-${test_name}-netlist
-            ${arch}-${test_name}-phys
-            ${netlist}
-            ${phys}
-            ${xdc}
-    )
+        # DCP generation target
+        set(dcp ${output_dir}/${name}.dcp)
+        add_custom_command(
+            OUTPUT ${dcp}
+            COMMAND ${CMAKE_COMMAND} -E env
+                RAPIDWRIGHT_PATH=${RAPIDWRIGHT_PATH}
+                ${INVOKE_RAPIDWRIGHT} ${JAVA_HEAP_SPACE}
+                com.xilinx.rapidwright.interchange.PhysicalNetlistToDcp
+                ${netlist} ${phys} ${xdc} ${dcp}
+            DEPENDS
+                ${INVOKE_RAPIDWRIGHT}
+                ${arch}-${test_name}-netlist
+                ${arch}-${test_name}-phys
+                ${netlist}
+                ${phys}
+                ${xdc}
+        )
 
-    add_custom_target(${arch}-${test_name}-dcp DEPENDS ${dcp})
+        add_custom_target(${arch}-${test_name}-dcp DEPENDS ${dcp})
 
-    # Bitstream generation target from DCP
-    set(dcp_vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/dcp_vivado.tcl)
-    set(dcp_bit ${output_dir}/${name}.dcp.bit)
-    add_custom_command(
-        OUTPUT ${dcp_bit}
-        COMMAND ${CMAKE_COMMAND} -E env
-            VIVADO_SETTINGS=${VIVADO_SETTINGS}
-            OUTPUT_DIR=${output_dir}
-            DCP_FILE=${dcp}
-            BIT_FILE=${dcp_bit}
-            ARCH=${arch}
-            ${quiet_cmd}
-            ${run_vivado} -mode batch -source ${dcp_vivado_tcl} -notrace -nojournal
-        DEPENDS
-            ${arch}-${test_name}-dcp
-            ${run_vivado}
-            ${dcp_vivado_tcl}
-            ${dcp}
-    )
+        # Bitstream generation target from DCP
+        set(dcp_vivado_tcl ${CMAKE_SOURCE_DIR}/tests/common/dcp_vivado.tcl)
+        set(dcp_bit ${output_dir}/${name}.dcp.bit)
+        add_custom_command(
+            OUTPUT ${dcp_bit}
+            COMMAND ${CMAKE_COMMAND} -E env
+                VIVADO_SETTINGS=${VIVADO_SETTINGS}
+                OUTPUT_DIR=${output_dir}
+                DCP_FILE=${dcp}
+                BIT_FILE=${dcp_bit}
+                ARCH=${arch}
+                ${quiet_cmd}
+                ${run_vivado} -mode batch -source ${dcp_vivado_tcl} -notrace -nojournal
+            DEPENDS
+                ${arch}-${test_name}-dcp
+                ${run_vivado}
+                ${dcp_vivado_tcl}
+                ${dcp}
+        )
 
-    add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
-    add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
-    add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+        add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
+        add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+        add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+    endif()
 
 endfunction()
 
@@ -596,7 +595,6 @@ function(add_xc7_validation_test)
                 ${run_vivado} -mode batch -source ${tcl} -notrace -nojournal
             DEPENDS
                 xc7-${test_name}-fasm2bels-dcp
-                ${dcp}
                 ${run_vivado}
                 ${tcl}
             WORKING_DIRECTORY
@@ -617,7 +615,6 @@ function(add_xc7_validation_test)
                     --fasm_file ${vivado_fasm}
                     ${vivado_bit}
             DEPENDS
-                ${vivado_bit}
                 xc7-${test_name}-fasm2bels-bit
         )
 
@@ -630,13 +627,9 @@ function(add_xc7_validation_test)
             DEPENDS
                 xc7-${test_name}-fasm2bels-bit-fasm
                 xc7-${test_name}-fasm2bels-fasm
-                ${fasm}
-                ${vivado_fasm}
         )
 
         if(NOT ${disable_vivado_test})
-            add_dependencies(all-vendor-bit-tests xc7-${test_name}-dcp-diff-fasm)
-            add_dependencies(all-${device}-vendor-bit-tests xc7-${test_name}-dcp-diff-fasm)
             add_dependencies(all-vendor-bit-tests xc7-${test_name}-fasm2bels-diff-fasm)
             add_dependencies(all-${device}-vendor-bit-tests xc7-${test_name}-fasm2bels-diff-fasm)
         endif()

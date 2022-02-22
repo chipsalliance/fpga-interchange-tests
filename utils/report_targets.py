@@ -118,6 +118,11 @@ def main():
         type=str,
         help="Log with allowed failures"
     )
+    parser.add_argument(
+        "--allow-any-failure",
+        action="store_true",
+        help="Allow any failure"
+    )
 
     args = parser.parse_args()
 
@@ -125,12 +130,13 @@ def main():
     failed_targets = set()
     allowed_failures = set()
 
-    with open(args.allowed_failures, "r") as fp:
-        data = fp.readlines()
-        for line in data:
-            if "allowed to fail" in line:
-                arch, design = line.split()[0].split("-")
-                allowed_failures.add((arch, design))
+    if args.allowed_failures:
+        with open(args.allowed_failures, "r") as fp:
+            data = fp.readlines()
+            for line in data:
+                if "allowed to fail" in line:
+                    arch, design = line.split()[0].split("-")
+                    allowed_failures.add((arch, design))
 
     # Read logs
     for log_name in args.log:
@@ -219,7 +225,7 @@ def main():
                         else:
                             assert False, (key2, stage, v1, v2)
 
-    if hard_failures:
+    if hard_failures and not args.allow_any_failure:
         print("Tests not allowed to fail:")
         for arch, design in hard_failures:
             print(f"\t{arch} {design}")

@@ -25,7 +25,7 @@ jobs:
         exclude_license: |
           - ./tests/designs/litex_linux/arty.v
 
-  Run-Tests:
+  Run-Nextpnr-Tests:
     runs-on: [self-hosted, Linux, X64]
     container: "ubuntu:20.04"
     strategy:
@@ -35,6 +35,63 @@ jobs:
     env:
       LANG: "en_US.UTF-8"
       DEBIAN_FRONTEND: "noninteractive"
+      GHA_EXTERNAL_DISK: "tools"
+      XILINX_LOCAL_USER_DATA: "no"
+      LC_ALL: "C"
+    steps:
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install
+      run: |
+        apt-get -qqy update
+        apt-get -qqy install build-essential git make locales libtinfo-dev \
+          cmake python3 wget unzip curl openjdk-11-jdk-headless capnproto
+        git submodule status > .submodules_status
+        dpkg-reconfigure locales
+        # Vivado is erroring out due to a missing library in CI.
+        # https://support.xilinx.com/s/article/76585?language=en_US
+        ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5
+
+    - name: Create environment
+      run: make env
+
+    - name: Build CMake
+      run: |
+        make update
+        make build
+
+    - name: Run tests
+      run: |
+        .github/scripts/tests.sh ${{ matrix.device }} vendor-bit-tests
+
+    - name: Prepare report
+      run: |
+        cd build
+        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allowed-failures allowed-failures.log
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: fpga-interchange-tests-${{ matrix.device }}
+        path: |
+          **/plot_*.svg
+          build/report*.csv
+
+  Run-VPR-Tests:
+    runs-on: [self-hosted, Linux, X64]
+    container: "ubuntu:20.04"
+    strategy:
+      fail-fast: false
+      matrix:
+        device: ["xc7a35t", "LIFCL-40", "testarch"]
+    env:
+      LANG: "en_US.UTF-8"
+      DEBIAN_FRONTEND: "noninteractive"
+      GHA_EXTERNAL_DISK: "tools"
+      XILINX_LOCAL_USER_DATA: "no"
+      LC_ALL: "C"
     steps:
 
     - uses: actions/checkout@v2
@@ -55,6 +112,8 @@ jobs:
       run: |
         make update
         make build
+      env:
+        CMAKE_FLAGS: "-DPNR_TOOL=vpr"
 
     - name: Run tests
       run: |
@@ -63,18 +122,17 @@ jobs:
     - name: Prepare report
       run: |
         cd build
-        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allowed-failures allowed-failures.log
+        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allow-any-failure
 
     - uses: actions/upload-artifact@v2
       with:
         name: fpga-interchange-tests-${{ matrix.device }}
         path: |
           **/plot_*.svg
-          build/report*.csv
 
   Prepare-Design-Status-Report:
     runs-on: ubuntu-18.04
-    needs: Run-Tests
+    needs: Run-Nextpnr-Tests
     steps:
 
     - uses: actions/checkout@v2

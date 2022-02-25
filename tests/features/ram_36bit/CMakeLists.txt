@@ -11,3 +11,11 @@ add_xc7_validation_test(
     testbench ram_36bit_tb.v
     disable_vivado_test
 )
+
+add_generic_test(
+    name ram_36bit
+    board_list zcu104
+    sources ram_36bit.v ram_36bit_zcu104.v
+    top top_zcu104
+    failure_allowed
+)

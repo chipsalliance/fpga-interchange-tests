@@ -1,7 +1,7 @@
 function(diff_io_test name)
     add_generic_test(
         name ${name}
-        board_list basys3
+        board_list basys3 zcu104
         constr_prefix ${name}
         sources ${name}.v
         testbench ${name}_tb.v

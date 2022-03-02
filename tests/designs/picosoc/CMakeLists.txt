@@ -15,6 +15,13 @@ add_generic_test(
 
 add_generic_test(
     name picosoc
+    board_list arty_s7_50
+    top top
+    absolute_sources ${picosoc_dir}/arty_s7_50.v ${picosoc_sources}
+)
+
+add_generic_test(
+    name picosoc
     board_list basys3
     top top
     absolute_sources ${picosoc_dir}/basys3.v ${picosoc_sources}

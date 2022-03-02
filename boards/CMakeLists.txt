@@ -17,6 +17,25 @@ add_board(
 )
 
 add_board(
+    name arty_s7_25
+    device_family spartan7
+    device xc7s25
+    arch xc7
+    package csga324
+    speedgrade -1
+    no_fasm
+)
+
+add_board(
+    name arty_s7_50
+    device_family spartan7
+    device xc7s50
+    arch xc7
+    package csga324
+    speedgrade -1
+)
+
+add_board(
     name nexys_video
     device_family artix7
     device xc7a200t

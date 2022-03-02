@@ -6,6 +6,10 @@ add_subdirectory(xc7a35t)
 add_subdirectory(xc7a100t)
 add_subdirectory(xc7a200t)
 
+# Spartan-7 devices
+add_subdirectory(xc7s25)
+add_subdirectory(xc7s50)
+
 # Zynq-7 devices
 add_subdirectory(xc7z010)
 

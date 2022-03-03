@@ -4,6 +4,7 @@ function(generate_testarch_device_db)
     #    device <common device>
     #    package <package>
     #    output_target <output device target>
+    #    [extra_args <extra args>]
     # )
     # ~~~
     #
@@ -17,13 +18,14 @@ function(generate_testarch_device_db)
     #             share the same xc7a35t device prefix
     #   - package: one among the parts available for a given package
     #   - output_target: variable name that will hold the output device target for the parent scope
+    #   - extra_args: a list of extra arguments to be passed to the test architecture generator
     #
     # Targets generated:
     #   - rapidwright-<device>-device
 
     set(options)
     set(oneValueArgs device package output_target)
-    set(multiValueArgs)
+    set(multiValueArgs extra_args)
 
     cmake_parse_arguments(
         create_testarch_device_db
@@ -36,6 +38,7 @@ function(generate_testarch_device_db)
     set(device ${create_testarch_device_db_device})
     set(package ${create_testarch_device_db_package})
     set(output_target ${create_testarch_device_db_output_target})
+    set(extra_args ${create_testarch_device_db_extra_args})
 
     get_target_property(PYTHON3 programs PYTHON3)
 
@@ -47,6 +50,7 @@ function(generate_testarch_device_db)
                 --schema-dir ${INTERCHANGE_SCHEMA_PATH}
                 --out-file ${out_file}
                 --package ${package}
+                ${extra_args}
     )
 
     add_custom_target(testarch-${device}-device DEPENDS ${out_file})

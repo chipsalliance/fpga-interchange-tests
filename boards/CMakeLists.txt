@@ -107,12 +107,23 @@ add_board(
     speedgrade -9
 )
 
-# Fake board to test the test architecture
+# Fake board to test test architecture(s)
 add_board(
     name testboard
     device_family test
     device testarch
     arch testarch
+    package test_package
+    speedgrade -1
+    no_fasm
+    no_bitstream
+)
+
+add_board(
+    name testboard_noffmux
+    device_family test
+    device testarch-noffmux
+    arch testarch-noffmux
     package test_package
     speedgrade -1
     no_fasm

@@ -104,7 +104,7 @@ function(add_generic_test)
         endif()
         get_property(device_target TARGET device-${device} PROPERTY DEVICE_TARGET)
         get_property(device_loc TARGET device-${device} PROPERTY DEVICE_LOC)
-        set(chipdb_loc ${CMAKE_BINARY_DIR}/devices/${device}/${device}.bin)
+        get_property(chipdb_loc TARGET device-${device} PROPERTY CHIPDB_BIN_LOC)
 
         set(output_dir ${CMAKE_CURRENT_BINARY_DIR}/${board})
         add_custom_command(
@@ -180,7 +180,6 @@ function(add_generic_test)
                     ${netlist}
             DEPENDS
                 ${arch}-${test_name}-json
-                chipdb-${device}-bin
                 ${device_target}
                 ${device_loc}
                 ${synth_json}

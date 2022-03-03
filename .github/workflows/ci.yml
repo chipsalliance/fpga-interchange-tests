@@ -38,6 +38,7 @@ jobs:
       GHA_EXTERNAL_DISK: "tools"
       XILINX_LOCAL_USER_DATA: "no"
       LC_ALL: "C"
+      INSTALL_DIR: ${{ github.workspace }}/install
     steps:
 
     - uses: actions/checkout@v2
@@ -62,10 +63,20 @@ jobs:
       run: |
         make update
         make build
+      env:
+        CMAKE_FLAGS: "-DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_DIR }} -DINSTALL_DEVICE=${{ matrix.device }}"
 
     - name: Run tests
       run: |
         .github/scripts/tests.sh ${{ matrix.device }} vendor-bit-tests
+
+    - name: Install device data
+      run: cd build && make install
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: fpga-interchange-tests-install-data
+        path: ${{ env.INSTALL_DIR }}
 
     - name: Prepare report
       run: |
@@ -74,7 +85,7 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: fpga-interchange-tests-${{ matrix.device }}
+        name: fpga-interchange-tests-report
         path: |
           **/plot_*.svg
           build/report*.csv
@@ -124,20 +135,16 @@ jobs:
         cd build
         python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allow-any-failure
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: fpga-interchange-tests-${{ matrix.device }}
-        path: |
-          **/plot_*.svg
-
   Prepare-Design-Status-Report:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs: Run-Nextpnr-Tests
     steps:
 
     - uses: actions/checkout@v2
 
     - uses: actions/download-artifact@v2
+      with:
+        name: fpga-interchange-tests-report
 
     - name: Result aggregation
       run: |
@@ -170,3 +177,28 @@ jobs:
         git push -u origin +HEAD:gh-pages
         rm -rf .git
 
+  Push-to-GCP:
+    runs-on: ubuntu-latest
+    needs: Run-Nextpnr-Tests
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: fpga-interchange-tests-install-data
+        path: install
+
+    - name: Prepare install package
+      run: |
+        sudo apt install pixz
+        # Copying techmap files
+        mkdir -p install/techmaps
+        cp tests/common/libs/*.v install/techmaps
+        # Packaging devices
+        .github/scripts/install.sh
+
+    - name: WIP Push to GCP
+      run: |
+        du -ah .
+        echo "Pushing to GCP..."

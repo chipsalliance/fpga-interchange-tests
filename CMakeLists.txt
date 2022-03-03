@@ -18,6 +18,8 @@ set(VIVADO_SETTINGS /opt/Xilinx/Vivado/${VIVADO_VERSION}/settings64.sh CACHE PAT
 
 set(PNR_TOOL "nextpnr" CACHE STRING "Place and Route tool to use")
 
+set(INSTALL_DEVICE "all" CACHE STRING "Set the device to be installed. Installs all devices by default")
+
 # FASM database directory
 find_program(PRJXRAY_CONFIG prjxray-config)
 if (NOT ${PRJXRAY_CONFIG} STREQUAL "PRJXRAY_CONFIG-NOTFOUND")

@@ -10,6 +10,9 @@ name: FPGA interchange CI tests
 
 on: [push, pull_request]
 
+env:
+  INSTALL_DIR: ${{ github.workspace }}/install
+
 jobs:
   Check-Repository:
     runs-on: ubuntu-latest
@@ -38,7 +41,6 @@ jobs:
       GHA_EXTERNAL_DISK: "tools"
       XILINX_LOCAL_USER_DATA: "no"
       LC_ALL: "C"
-      INSTALL_DIR: ${{ github.workspace }}/install
     steps:
 
     - uses: actions/checkout@v2
@@ -192,10 +194,6 @@ jobs:
     - name: Prepare install package
       run: |
         sudo apt install pixz
-        # Copying techmap files
-        mkdir -p install/techmaps
-        cp tests/common/libs/*.v install/techmaps
-        # Packaging devices
         .github/scripts/install.sh
 
     - name: WIP Push to GCP

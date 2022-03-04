@@ -10,6 +10,9 @@ name: FPGA interchange CI tests
 
 on: [push, pull_request]
 
+env:
+  INSTALL_DIR: ${{ github.workspace }}/install
+
 jobs:
   Check-Repository:
     runs-on: ubuntu-latest
@@ -31,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        device: ["xc7a35t", "xc7a100t", "xc7a200t", "xc7s50", "xc7z010", "xczu7ev", "xc7k480t", "xc7vx980t", "LIFCL-40", "testarch"]
+        device: ["xc7z010", "testarch"]
     env:
       LANG: "en_US.UTF-8"
       DEBIAN_FRONTEND: "noninteractive"
@@ -62,10 +65,20 @@ jobs:
       run: |
         make update
         make build
+      env:
+        CMAKE_FLAGS: "-DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_DIR }} -DINSTALL_DEVICE=${{ matrix.device }}"
 
     - name: Run tests
       run: |
         .github/scripts/tests.sh ${{ matrix.device }} vendor-bit-tests
+
+    - name: Install device data
+      run: cd build && make install
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: fpga-interchange-tests-install-data
+        path: ${{ env.INSTALL_DIR }}
 
     - name: Prepare report
       run: |
@@ -74,7 +87,7 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: fpga-interchange-tests-${{ matrix.device }}
+        name: fpga-interchange-tests-report
         path: |
           **/plot_*.svg
           build/report*.csv
@@ -124,20 +137,16 @@ jobs:
         cd build
         python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allow-any-failure
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: fpga-interchange-tests-${{ matrix.device }}
-        path: |
-          **/plot_*.svg
-
   Prepare-Design-Status-Report:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs: Run-Nextpnr-Tests
     steps:
 
     - uses: actions/checkout@v2
 
     - uses: actions/download-artifact@v2
+      with:
+        name: fpga-interchange-tests-report
 
     - name: Result aggregation
       run: |
@@ -170,3 +179,24 @@ jobs:
         git push -u origin +HEAD:gh-pages
         rm -rf .git
 
+  Push-to-GCP:
+    runs-on: ubuntu-latest
+    needs: Run-Nextpnr-Tests
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: fpga-interchange-tests-install-data
+        path: install
+
+    - name: Prepare install package
+      run: |
+        sudo apt install pixz
+        .github/scripts/install.sh
+
+    - name: WIP Push to GCP
+      run: |
+        du -ah .
+        echo "Pushing to GCP..."

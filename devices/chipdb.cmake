@@ -297,16 +297,18 @@ function(generate_chipdb)
     add_custom_target(all-${device}-vendor-bit-tests)
     add_custom_target(all-${device}-simulation-tests)
 
-    install(FILES ${device_loc} DESTINATION devices/${device})
-    install(FILES ${chipdb_bin} DESTINATION devices/${device})
+    if (${INSTALL_DEVICE} STREQUAL "all" OR ${INSTALL_DEVICE} STREQUAL ${device})
+        install(FILES ${device_loc} DESTINATION devices/${device})
+        install(FILES ${chipdb_bin} DESTINATION devices/${device})
 
-    add_custom_target(
-        install_${device}_device
-        ALL
-        DEPENDS
-            ${device_target}
-            chipdb-${device}-bin
-    )
+        add_custom_target(
+            install_${device}_device
+            ALL
+            DEPENDS
+                ${device_target}
+                chipdb-${device}-bin
+        )
+    endif()
 
     add_dependencies(all-device-data chipdb-${device}-bin)
 

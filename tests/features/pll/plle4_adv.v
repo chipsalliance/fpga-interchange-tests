@@ -15,7 +15,7 @@ module top (
     IBUFDS ibuf_ds (.I(clk_p), .IB(clk_n), .O(clk));
 
     wire locked;
-    wire clk0, clk1;
+    wire clk0d, clk1d, clk0, clk1;
     wire clkfb;
 
     PLLE4_ADV #(
@@ -35,8 +35,8 @@ module top (
         .CLKIN         (clk),
         .RST           (rst),
         .LOCKED        (locked),
-        .CLKOUT0       (clk0),
-        .CLKOUT1       (clk1),
+        .CLKOUT0       (clk0d),
+        .CLKOUT1       (clk1d),
         .CLKOUTPHYEN   (1'b0),
         .PWRDWN        (1'b0),
         .DADDR         (7'b0),
@@ -44,6 +44,9 @@ module top (
         .CLKFBIN       (clkfb),
         .CLKFBOUT      (clkfb)
     );
+    
+    BUFGCE b0 (.CE(1'b1), .I(clk0d), .O(clk0));
+    BUFGCE b1 (.CE(1'b1), .I(clk1d), .O(clk1));
 
     wire rst0, rst1;
     sig_fifo1 fifo_rst0(clk, clk0, rst, rst0);

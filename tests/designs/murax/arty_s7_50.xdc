@@ -1,4 +1,4 @@
-## arty35t
+## Arty S7-50
 
 # Clock
 set_property LOC R2 [get_ports {io_mainClk}]

@@ -62,6 +62,25 @@ add_board(
     speedgrade -1
 )
 
+add_board(
+    name xc7k70t_board
+    device_family kintex7
+    device xc7k70t
+    arch xc7
+    package fbg484
+    speedgrade -1
+)
+
+add_board(
+    name xc7k160t_board
+    device_family kintex7
+    device xc7k160t
+    arch xc7
+    package ffg676
+    speedgrade -1
+    no_fasm
+)
+
 # Fake board, just to test the chip support
 add_board(
     name xc7k480t_board

@@ -31,3 +31,11 @@ add_generic_test(
     sources lifcl40evn_toplevel.v
     absolute_sources ${murax}
 )
+
+add_generic_test(
+    name murax
+    board_list xc7k70t_board
+    top toplevel
+    sources xc7k70t_board_toplevel.v
+    absolute_sources ${murax}
+)

@@ -112,12 +112,12 @@ def main():
             device_files[device]["report"] = fname
 
         # Performance graph
-        fname = os.path.join(pathname, "plot_Run_Tests_{}_.svg".format(device))
+        fname = os.path.join(pathname, "plot_Run_Nextpnr_Tests_{}_.svg".format(device))
         if os.path.isfile(fname):
             device_files[device]["plot"] = fname
 
         else:
-            fname = os.path.join(pathname, "plot_Run_Tests_{}_.svg".format(
+            fname = os.path.join(pathname, "plot_Run_Nextpnr_Tests_{}_.svg".format(
                 device.replace("-", "_")))
             if os.path.isfile(fname):
                 device_files[device]["plot"] = fname

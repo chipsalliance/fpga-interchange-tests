@@ -21,10 +21,9 @@ include third_party/make-env/conda.mk
 
 .PHONY: update
 update:
-	git submodule init
-	git submodule update --init --recursive
 	pushd ${RAPIDWRIGHT_PATH} && \
-		make update_jars && \
+		./gradlew updateJars --no-watch-fs && \
+		make compile && \
 		popd
 
 .PHONY: build

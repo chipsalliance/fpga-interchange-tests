@@ -17,6 +17,8 @@ add_subdirectory(xc7z010)
 add_subdirectory(xczu7ev)
 
 # Kintex-7 devices
+add_subdirectory(xc7k70t)
+add_subdirectory(xc7k160t)
 add_subdirectory(xc7k480t)
 
 # Viterx-7 devices

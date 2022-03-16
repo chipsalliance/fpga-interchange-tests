@@ -16,5 +16,4 @@ add_xc7_validation_test(
     name counter
     board_list basys3
     testbench counter_tb.v
-    disable_vivado_test
 )

@@ -18,16 +18,16 @@ add_generic_test(
 )
 
 add_generic_test(
-    name plle3_adv
+    name plle4_adv
     board_list zcu104
-    sources util.v plle3_adv.v
+    sources util.v plle4_adv.v
     failure_allowed
 )
 
 add_generic_test(
-    name plle3_base
+    name plle4_base
     board_list zcu104
-    sources util.v plle3_base.v
+    sources util.v plle4_base.v
     failure_allowed
 )
 

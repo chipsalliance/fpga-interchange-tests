@@ -14,7 +14,7 @@ dependencies:
     - litex-hub::capnproto-java=0.1.5_0012_g44a8c1e=20201104_165332
     - litex-hub::gcc-riscv64-elf-newlib=9.2.0=20201119_154229
     - litex-hub::iverilog=0_8_5850_g540555fc=20210730_085634
-    - litex-hub::nextpnr-fpga_interchange=0.2_33_g81e97086=20220302_164843_py37
+    - litex-hub::nextpnr-fpga_interchange=0.2_79_g8e9d0a6e=20220317_162926_py37
     - litex-hub::prjoxide=v0.0_398_g711770c=20210730_085634
     - litex-hub::prjxray-db=0.0_257_g0a0adde=20220202_022309
     - litex-hub::prjxray-tools=0.1_2942_g5349556b=20220202_022309

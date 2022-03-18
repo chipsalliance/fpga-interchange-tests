@@ -49,7 +49,6 @@ jobs:
         apt-get -qqy update
         apt-get -qqy install build-essential git make locales libtinfo-dev \
           cmake python3 wget unzip curl openjdk-11-jdk-headless capnproto
-        git submodule status > .submodules_status
         dpkg-reconfigure locales
         # Vivado is erroring out due to a missing library in CI.
         # https://support.xilinx.com/s/article/76585?language=en_US
@@ -60,8 +59,8 @@ jobs:
 
     - name: Build CMake
       run: |
-        make update
         make build
+        make update
 
     - name: Run tests
       run: |
@@ -101,17 +100,20 @@ jobs:
     - name: Install
       run: |
         apt-get -qqy update
-        apt-get -qqy install build-essential git make \
+        apt-get -qqy install build-essential git make locales libtinfo-dev \
           cmake python3 wget unzip curl openjdk-11-jdk-headless capnproto
-        git submodule status > .submodules_status
+        dpkg-reconfigure locales
+        # Vivado is erroring out due to a missing library in CI.
+        # https://support.xilinx.com/s/article/76585?language=en_US
+        ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5
 
     - name: Create environment
       run: make env
 
     - name: Build CMake
       run: |
-        make update
         make build
+        make update
       env:
         CMAKE_FLAGS: "-DPNR_TOOL=vpr"
 

@@ -9,5 +9,4 @@ add_xc7_validation_test(
     name wire
     board_list arty35t
     testbench wire_tb.v
-    disable_vivado_test
 )

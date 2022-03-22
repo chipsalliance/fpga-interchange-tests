@@ -23,11 +23,3 @@ add_generic_test(
     sources util.v plle4_adv.v
     failure_allowed
 )
-
-add_generic_test(
-    name plle4_base
-    board_list zcu104
-    sources util.v plle4_base.v
-    failure_allowed
-)
-

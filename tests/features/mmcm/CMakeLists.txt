@@ -21,3 +21,9 @@ add_generic_test(
     board_list basys3
     sources mmcm_buf_basys3.v mmcme2_test.v
 )
+
+add_generic_test(
+    name mmcme4
+    board_list zcu104
+    sources mmcme4_adv.v
+)

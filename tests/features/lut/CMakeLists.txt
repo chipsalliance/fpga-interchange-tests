@@ -1,6 +1,6 @@
 add_generic_test(
     name lut
-    board_list arty35t
+    board_list arty35t zcu104
     sources lut.v
 )
 

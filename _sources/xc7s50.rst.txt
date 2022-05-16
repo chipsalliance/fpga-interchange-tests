@@ -1,0 +1,15 @@
+
+xc7s50
+##########
+
+Designs support status
+
+.. csv-table::
+    :file: xc7s50.csv
+    :header-rows: 1
+
+CI performance graph
+
+.. image:: xc7s50-perf.svg
+    :width: 400
+

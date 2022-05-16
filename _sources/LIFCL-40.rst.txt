@@ -1,0 +1,15 @@
+
+LIFCL-40
+##########
+
+Designs support status
+
+.. csv-table::
+    :file: LIFCL-40.csv
+    :header-rows: 1
+
+CI performance graph
+
+.. image:: LIFCL-40-perf.svg
+    :width: 400
+

@@ -1,0 +1,15 @@
+
+xczu7ev
+##########
+
+Designs support status
+
+.. csv-table::
+    :file: xczu7ev.csv
+    :header-rows: 1
+
+CI performance graph
+
+.. image:: xczu7ev-perf.svg
+    :width: 400
+

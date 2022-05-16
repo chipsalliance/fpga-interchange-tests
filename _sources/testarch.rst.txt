@@ -1,0 +1,15 @@
+
+testarch
+##########
+
+Designs support status
+
+.. csv-table::
+    :file: testarch.csv
+    :header-rows: 1
+
+CI performance graph
+
+.. image:: testarch-perf.svg
+    :width: 400
+

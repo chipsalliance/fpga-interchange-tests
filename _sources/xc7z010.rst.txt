@@ -1,0 +1,15 @@
+
+xc7z010
+##########
+
+Designs support status
+
+.. csv-table::
+    :file: xc7z010.csv
+    :header-rows: 1
+
+CI performance graph
+
+.. image:: xc7z010-perf.svg
+    :width: 400
+

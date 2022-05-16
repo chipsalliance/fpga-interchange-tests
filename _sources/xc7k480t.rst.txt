@@ -1,0 +1,15 @@
+
+xc7k480t
+##########
+
+Designs support status
+
+.. csv-table::
+    :file: xc7k480t.csv
+    :header-rows: 1
+
+CI performance graph
+
+.. image:: xc7k480t-perf.svg
+    :width: 400
+

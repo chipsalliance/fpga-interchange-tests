@@ -1,0 +1,15 @@
+
+xc7a100t
+##########
+
+Designs support status
+
+.. csv-table::
+    :file: xc7a100t.csv
+    :header-rows: 1
+
+CI performance graph
+
+.. image:: xc7a100t-perf.svg
+    :width: 400
+

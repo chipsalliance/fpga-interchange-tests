@@ -1,0 +1,15 @@
+
+xc7vx980t
+##########
+
+Designs support status
+
+.. csv-table::
+    :file: xc7vx980t.csv
+    :header-rows: 1
+
+CI performance graph
+
+.. image:: xc7vx980t-perf.svg
+    :width: 400
+

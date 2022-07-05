@@ -28,6 +28,7 @@ jobs:
       with:
         exclude_license: |
           - ./tests/designs/litex_linux/arty.v
+          - ./conda_lock.yml
 
   Run-Nextpnr-Tests:
     runs-on: [self-hosted, Linux, X64]

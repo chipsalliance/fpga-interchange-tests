@@ -1,27 +1,101 @@
-# Copyright (C) 2022 F4PGA Authors.
-#
-# Use of this source code is governed by a ISC-style
-# license that can be found in the LICENSE file or at
-# https://opensource.org/licenses/ISC
-#
-# SPDX-License-Identifier:ISC
-
 name: fpga-interchange
 channels:
-    - defaults
-    - litex-hub
+  - litex-hub
+  - defaults
 dependencies:
-    - litex-hub::capnproto-java=0.1.5_0012_g44a8c1e=20201104_165332
-    - litex-hub::gcc-riscv64-elf-newlib=9.2.0=20201119_154229
-    - litex-hub::iverilog=0_8_5850_g540555fc=20210730_085634
-    - litex-hub::nextpnr-fpga_interchange
-    - litex-hub::prjoxide=v0.0_398_g711770c=20210730_085634
-    - litex-hub::prjxray-db
-    - litex-hub::prjxray-tools
-    - litex-hub::vtr-optimized
-    - litex-hub::yosys
-    - swig
-    - packaging=21.3
-    - pip=21.1.3
-    - pip:
-        - -r requirements.txt
+  - _libgcc_mutex=0.1=main
+  - _openmp_mutex=5.1=1_gnu
+  - binutils-riscv64-elf=2.34=20220614_111216
+  - bzip2=1.0.8=h7b6447c_0
+  - ca-certificates=2022.4.26=h06a4308_0
+  - capnproto=0.9.1=h4ff587b_0
+  - capnproto-java=0.1.5_0012_g44a8c1e=20201104_165332
+  - certifi=2022.6.15=py37h06a4308_0
+  - cloog=0.18.0=0
+  - fontconfig=2.13.1=h6c09931_0
+  - freetype=2.11.0=h70c0345_0
+  - gcc-riscv64-elf-newlib=9.2.0=20201119_154229
+  - gcc-riscv64-elf-nostdc=9.2.0=20210923_213204
+  - gmp=6.2.1=h295c915_3
+  - icu=58.2=he6710b0_3
+  - isl=0.21=20210924_145025
+  - iverilog=0_8_5850_g540555fc=20210730_085634
+  - ld_impl_linux-64=2.38=h1181459_1
+  - libboost=1.73.0=h28710b8_12
+  - libffi=3.3=he6710b0_2
+  - libgcc-ng=11.2.0=h1234567_1
+  - libgomp=11.2.0=h1234567_1
+  - libpng=1.6.37=hbc83047_0
+  - libstdcxx-ng=11.2.0=h1234567_1
+  - libuuid=1.0.3=h7f8727e_2
+  - libxml2=2.9.14=h74e7548_0
+  - lz4-c=1.9.3=h295c915_1
+  - mpc=1.1.0=h10f8cd9_1
+  - mpfr=4.0.2=hb69a4c5_1
+  - ncurses=6.3=h5eee18b_3
+  - nextpnr-fpga_interchange=0.3_21_g41936fef=20220512_085338_py37
+  - openssl=1.1.1p=h5eee18b_0
+  - packaging=21.3=pyhd3eb1b0_0
+  - pcre=8.45=h295c915_0
+  - pip=21.1.3=py37h06a4308_0
+  - prjoxide=v0.0_398_g711770c=20210730_085634
+  - prjxray-db=0.0_257_g0a0adde=20220512_085338
+  - prjxray-tools=0.1_2986_g5937733d=20220512_085338
+  - py-boost=1.73.0=py37h51133e4_12
+  - pyparsing=3.0.4=pyhd3eb1b0_0
+  - python=3.7.13=h12debd9_0
+  - readline=8.1.2=h7f8727e_1
+  - setuptools=61.2.0=py37h06a4308_0
+  - sqlite=3.38.5=hc218d9a_0
+  - swig=4.0.2=h295c915_4
+  - tbb=2020.3=hfd86e86_0
+  - tk=8.6.12=h1ccaba5_0
+  - vtr-optimized=8.0.0_5383_gc012f19d3=20220512_085338
+  - wheel=0.37.1=pyhd3eb1b0_0
+  - xz=5.2.5=h7f8727e_1
+  - yosys=0.17_7_g990c9b8e1=20220512_085338_py37
+  - zlib=1.2.12=h7f8727e_2
+  - zstd=1.5.2=ha4553b6_0
+  - pip:
+    - Arpeggio==2.0.0
+    - charset-normalizer==2.1.0
+    - colorama==0.4.5
+    - fasm==0.0.2.post88
+    - fasm2bels @ git+https://github.com/SymbiFlow/f4pga-xc-fasm2bels.git@2e3395e05b8d0f84b7bbcb32df081ac07391d799
+    - future==0.18.2
+    - idna==3.3
+    - intervaltree==3.1.0
+    - lxml==4.9.1
+    - ninja==1.10.2.3
+    - numpy==1.21.6
+    - parameterized==0.8.1
+    - prjxray @ git+https://github.com/f4pga/prjxray.git@ae546d6b7648bf4df9cf63f0b25b2028b5623c43
+    - progressbar2==4.0.0
+    - psutil==5.9.1
+    - pycapnp==1.1.0
+    - pyjson5==1.6.1
+    - pyserial==3.5
+    - python-sat==0.1.7.dev18
+    - python-utils==3.3.3
+    - pythondata-cpu-vexriscv @ git+https://github.com/litex-hub/pythondata-cpu-vexriscv@78279395c7d97480c53526aeb9a4ab367b8f8e73
+    - pythondata-cpu-vexriscv-smp @ git+https://github.com/litex-hub/pythondata-cpu-vexriscv_smp@4306ae2eb5464bc37d14eff9a3c051d7b0c17d0d
+    - PyYAML==6.0
+    - rapidyaml==0.2.2
+    - requests==2.28.1
+    - rr-graph==0.0.1.post22
+    - simplejson==3.17.6
+    - six==1.16.0
+    - sortedcontainers==2.4.0
+    - textX==3.0.0
+    - urllib3==1.26.9
+    - xc-fasm @ git+https://github.com/chipsalliance/f4pga-xc-fasm.git@25dc605c9c0896204f0c3425b52a332034cf5e5c
+    - -e third_party/python-fpga-interchange
+    - -e third_party/litex
+    - -e third_party/litex-boards
+    - -e third_party/litedram
+    - -e third_party/liteeth
+    - -e third_party/liteiclink
+    - -e third_party/pythondata-software-compiler_rt
+    - -e third_party/migen
+prefix: /usr/share/miniconda/envs/fpga-interchange
+

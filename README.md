@@ -13,7 +13,7 @@ make env
 Enter the environment by running:
 
 ```
-make enter
+source env/conda/bin/activate fpga-interchange
 ```
 
 To update the RapidWright data run:

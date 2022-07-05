@@ -1,11 +1,12 @@
-psutil
-ninja
-git+https://github.com/litghost/rapidyaml.git@fixup_python_packaging#egg=rapidyaml
 fasm
-git+https://github.com/SymbiFlow/prjxray.git
-git+https://github.com/SymbiFlow/symbiflow-xc-fasm.git
-git+https://github.com/capnproto/pycapnp.git
-git+https://github.com/SymbiFlow/symbiflow-xc-fasm2bels.git
+ninja
+psutil
+pycapnp==v1.1.0
+rapidyaml==0.2.2
+
+git+https://github.com/f4pga/prjxray.git
+git+https://github.com/chipsalliance/f4pga-xc-fasm.git
+git+https://github.com/SymbiFlow/f4pga-xc-fasm2bels.git
 -e third_party/python-fpga-interchange
 
 # Litex

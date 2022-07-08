@@ -54,6 +54,7 @@ jobs:
         yum -y update
         yum -y install epel-release
         yum -y groupinstall 'Development Tools'
+        yum -y install which
         yum -y install git
         yum -y install make
         yum -y install python3
@@ -64,7 +65,7 @@ jobs:
         yum -y install capnproto-devel
         yum -y install cmake3
         ln -s /usr/bin/cmake3 /usr/bin/cmake
-        java
+        java --version
 
     - name: Create environment
       run: make env

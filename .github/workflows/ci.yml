@@ -52,6 +52,7 @@ jobs:
     - name: Install
       run: |
         yum -y update
+        yum makecache
         yum -y groupinstall 'Development Tools'
         yum -y install git
         yum -y install make

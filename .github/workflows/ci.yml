@@ -62,6 +62,8 @@ jobs:
         yum -y install unzip
         yum -y install curl
         yum -y install java-11-openjdk-headless
+        yum -y install java-11-openjdk
+        yum -y install java-11-openjdk-devel
         yum -y install capnproto-devel
         yum -y install cmake3
         ln -s /usr/bin/cmake3 /usr/bin/cmake

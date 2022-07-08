@@ -64,6 +64,7 @@ jobs:
         yum -y install capnproto-devel
         yum -y install cmake3
         ln -s /usr/bin/cmake3 /usr/bin/cmake
+        java
 
     - name: Create environment
       run: make env

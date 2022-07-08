@@ -54,7 +54,10 @@ jobs:
         yum -y update
         # Install cmake 3.*
         yum -y install build-essential git make locales libtinfo-dev \
-          cmake3 python3 wget unzip curl openjdk-11-jdk-headless capnproto
+          python3 wget unzip curl openjdk-11-jdk-headless capnproto
+        yum -y install epel-release cmake3
+        ln -s /usr/bin/cmake3 /usr/bin/cmake
+        cmake
         # dpkg-reconfigure locales
         # Vivado is erroring out due to a missing library in CI.
         # https://support.xilinx.com/s/article/76585?language=en_US

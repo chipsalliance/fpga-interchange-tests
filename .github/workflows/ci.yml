@@ -55,7 +55,6 @@ jobs:
         yum -y groupinstall 'Development Tools'
         yum -y install git
         yum -y install make
-        yum -y install libtinfo-dev
         yum -y install python3
         yum -y install wget
         yum -y install unzip

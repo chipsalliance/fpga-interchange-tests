@@ -52,7 +52,7 @@ jobs:
     - name: Install
       run: |
         yum -y update
-        yum -y install build-essential
+        yum groupinstall 'Development Tools'
         yum -y install git
         yum -y install make
         yum -y install locales

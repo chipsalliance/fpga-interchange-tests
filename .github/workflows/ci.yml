@@ -34,7 +34,7 @@ jobs:
     runs-on: [self-hosted, Linux, X64]
     container: "centos:7"
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         device: ["xc7a35t", "xc7a100t", "xc7a200t", "xc7s50", "xc7z010", "xczu7ev", "xc7k70t", "xc7k160t", "xc7k480t", "xc7vx980t", "LIFCL-40", "testarch"]
     env:
@@ -52,17 +52,20 @@ jobs:
     - name: Install
       run: |
         yum -y update
-        # Install cmake 3.*
-        yum -y install build-essential git make locales libtinfo-dev \
-          python3 wget unzip curl openjdk-11-jdk-headless capnproto
+        yum -y install build-essential
+        yum -y install git
+        yum -y install make
+        yum -y install locales
+        yum -y install libtinfo-dev
+        yum -y install python3
+        yum -y install wget
+        yum -y install unzip
+        yum -y install curl
+        yum -y install openjdk-11-jdk-headless
+        yum -y install capnproto
         yum -y install epel-release
         yum -y install cmake3
         ln -s /usr/bin/cmake3 /usr/bin/cmake
-        cmake
-        # dpkg-reconfigure locales
-        # Vivado is erroring out due to a missing library in CI.
-        # https://support.xilinx.com/s/article/76585?language=en_US
-        # ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5
 
     - name: Create environment
       run: make env

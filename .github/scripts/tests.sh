@@ -18,11 +18,16 @@ cd build
 
 make chipdb-${DEVICE}-bin
 
+OUTPUT_SYNC=""
+if [ "$2" == "sync" ]; then
+    OUTPUT_SYNC="--output-sync=target"
+fi
+
 # Run tests (allow failures)
 set +e
-for SUITE in simulation-tests tests validation-tests $2
+for SUITE in simulation-tests tests validation-tests $3
 do
-    make all-${DEVICE}-${SUITE} -j$(nproc) -k --output-sync=target 2>&1 | tee all-${DEVICE}-${SUITE}.log
+    make all-${DEVICE}-${SUITE} -j$(nproc) -k ${OUTPUT_SYNC} 2>&1 | tee all-${DEVICE}-${SUITE}.log
 done
 
 make list-allowed-failing-tests | tee allowed-failures.log

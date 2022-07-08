@@ -79,7 +79,7 @@ jobs:
 
     - name: Run tests
       run: |
-        .github/scripts/tests.sh ${{ matrix.device }} sync vendor-bit-tests
+        .github/scripts/tests.sh ${{ matrix.device }} no-sync vendor-bit-tests
 
     - name: Prepare report
       run: |

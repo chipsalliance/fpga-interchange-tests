@@ -52,7 +52,7 @@ jobs:
     - name: Install
       run: |
         yum -y update
-        yum makecache
+        yum -y install epel-release
         yum -y groupinstall 'Development Tools'
         yum -y install git
         yum -y install make
@@ -60,9 +60,8 @@ jobs:
         yum -y install wget
         yum -y install unzip
         yum -y install curl
-        yum -y install java-11-openjdk java-11-openjdk-devel
+        yum -y install java-11-openjdk-headless
         yum -y install capnproto-devel
-        yum -y install epel-release
         yum -y install cmake3
         ln -s /usr/bin/cmake3 /usr/bin/cmake
 

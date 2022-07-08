@@ -59,7 +59,7 @@ jobs:
         yum -y install wget
         yum -y install unzip
         yum -y install curl
-        yum -y install openjdk-11-jdk-headless
+        yum -y install java-11-openjdk java-11-openjdk-devel
         yum -y install capnproto
         yum -y install epel-release
         yum -y install cmake3

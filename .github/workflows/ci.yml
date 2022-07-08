@@ -32,7 +32,7 @@ jobs:
 
   Run-Nextpnr-Tests:
     runs-on: [self-hosted, Linux, X64]
-    container: "ubuntu:20.04"
+    container: "centos:7"
     strategy:
       fail-fast: false
       matrix:
@@ -51,13 +51,14 @@ jobs:
 
     - name: Install
       run: |
-        apt-get -qqy update
-        apt-get -qqy install build-essential git make locales libtinfo-dev \
-          cmake python3 wget unzip curl openjdk-11-jdk-headless capnproto
-        dpkg-reconfigure locales
+        yum -y update
+        # Install cmake 3.*
+        yum -y install build-essential git make locales libtinfo-dev \
+          cmake3 python3 wget unzip curl openjdk-11-jdk-headless capnproto
+        # dpkg-reconfigure locales
         # Vivado is erroring out due to a missing library in CI.
         # https://support.xilinx.com/s/article/76585?language=en_US
-        ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5
+        # ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5
 
     - name: Create environment
       run: make env

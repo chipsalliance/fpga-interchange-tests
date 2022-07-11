@@ -54,19 +54,22 @@ jobs:
         yum -y update
         yum -y install epel-release
         yum -y groupinstall 'Development Tools'
-        yum -y install which
-        yum -y install git
-        yum -y install make
-        yum -y install python3
-        yum -y install wget
-        yum -y install unzip
-        yum -y install curl
-        yum -y install java-11-openjdk-headless
-        yum -y install java-11-openjdk
-        yum -y install java-11-openjdk-devel
-        yum -y install capnproto-devel
+        yum -y install which git python3 wget unzip curl \
+          java-11-openjdk-headless java-11-openjdk java-11-openjdk-devel capnproto-devel
+        # Cmake install
         yum -y install cmake3
         ln -s /usr/bin/cmake3 /usr/bin/cmake
+        # Upgrade make version
+        wget http://ftp.gnu.org/gnu/make/make-4.2.1.tar.gz
+        tar -xvf make-4.2.1.tar.gz
+        pushd make-4.2.1
+        ./configure
+        make
+        make install
+        popd
+        # Check versions
+        make --version
+        cmake --version
         java --version
 
     - name: Create environment
@@ -79,7 +82,7 @@ jobs:
 
     - name: Run tests
       run: |
-        .github/scripts/tests.sh ${{ matrix.device }} no-sync vendor-bit-tests
+        .github/scripts/tests.sh ${{ matrix.device }} vendor-bit-tests
 
     - name: Prepare report
       run: |

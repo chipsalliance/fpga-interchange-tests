@@ -1,5 +1,5 @@
 get_python_cpu_data(
-    VexRiscvLitexSmpCluster_Cc1_Iw32Is4096Iy1_Dw32Ds4096Dy1_Ldw128_Ood.v
+    VexRiscvLitexSmpCluster_Cc1_Iw32Is4096Iy1_Dw32Ds4096Dy1_ITs4DTs4_Ldw128_Ood.v
     pythondata_cpu_vexriscv_smp
     vexriscv
 )

@@ -16520,7 +16520,7 @@ BUFG BUFG_6(
 	.O(clkout_buf1)
 );
 
-VexRiscvLitexSmpCluster_Cc1_Iw32Is4096Iy1_Dw32Ds4096Dy1_Ldw128_Ood VexRiscvLitexSmpCluster_Cc1_Iw32Is4096Iy1_Dw32Ds4096Dy1_Ldw128_Ood(
+VexRiscvLitexSmpCluster_Cc1_Iw32Is4096Iy1_Dw32Ds4096Dy1_ITs4DTs4_Ldw128_Ood VexRiscvLitexSmpCluster_Cc1_Iw32Is4096Iy1_Dw32Ds4096Dy1_ITs4DTs4_Ldw128_Ood(
 	.clintWishbone_ADR(main_soclinux_clintbus_adr),
 	.clintWishbone_CYC(main_soclinux_clintbus_cyc),
 	.clintWishbone_DAT_MOSI(main_soclinux_clintbus_dat_w),

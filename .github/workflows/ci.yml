@@ -114,7 +114,7 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: fpga-interchange-tests-${{ matrix.device }}
+        name: fpga-interchange-tests_${{ matrix.device }}_${{ matrix.tool }}_${{ matrix.os }}
         path: |
           **/plot_*.svg
           build/report*.csv

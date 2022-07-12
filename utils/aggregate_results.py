@@ -95,15 +95,18 @@ def main():
     device_files = dict()
     for name in os.listdir(args.inp):
 
-        if not name.startswith("fpga-interchange-tests-"):
+        if not name.startswith("fpga-interchange-tests_"):
+            continue
+
+        _, device, tool, os_name = name.split("_")
+
+        if os_name == "centos" or tool == "vpr":
             continue
 
         pathname = os.path.join(args.inp, name)
         if not os.path.isdir(pathname):
             continue
 
-        # Get the device name
-        device = name.replace("fpga-interchange-tests-", "")
         device_files[device] = dict()
 
         # Test status report
@@ -125,7 +128,7 @@ def main():
     # Generate content
     for device, files in device_files.items():
 
-        assert "report" in files, files
+        assert "report" in files, (device, files)
 
         # Load CSV report
         with open(files["report"], "r") as fp:

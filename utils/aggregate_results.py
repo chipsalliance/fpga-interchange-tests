@@ -125,7 +125,7 @@ def main():
     # Generate content
     for device, files in device_files.items():
 
-        assert "report" in files, files
+        assert "report" in files, (device, files)
 
         # Load CSV report
         with open(files["report"], "r") as fp:

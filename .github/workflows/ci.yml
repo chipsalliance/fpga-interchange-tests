@@ -30,34 +30,55 @@ jobs:
           - ./tests/designs/litex_linux/arty.v
           - ./conda_lock.yml
 
-  Run-Nextpnr-Tests:
+  Matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate.outputs.matrix }}
+
+    steps:
+
+      - name: Setup repository
+        uses: actions/checkout@v3
+
+      - name: Generate examples matrix
+        id: generate
+        run: ./.github/scripts/generate_job_matrix.py '${{ github.repository }}'
+
+
+  Run-Tests:
+    needs: Matrix
+
     runs-on: [self-hosted, Linux, X64]
-    container: "ubuntu:20.04"
+
     strategy:
       fail-fast: false
       matrix:
-        device: ["xc7a35t", "xc7a100t", "xc7a200t", "xc7s50", "xc7z010", "xczu7ev", "xc7k70t", "xc7k160t", "xc7k480t", "xc7vx980t", "LIFCL-40", "testarch"]
+        include: ${{ fromJson(needs.Matrix.outputs.matrix)  }}
+
+    container: ${{ matrix.os }}:${{ matrix.os-version }}
+
     env:
-      LANG: "en_US.UTF-8"
-      DEBIAN_FRONTEND: "noninteractive"
-      GHA_EXTERNAL_DISK: "tools"
-      XILINX_LOCAL_USER_DATA: "no"
-      LC_ALL: "C"
+      LANG: en_US.UTF-8
+      DEBIAN_FRONTEND: noninteractive
+      GHA_EXTERNAL_DISK: tools
+      XILINX_LOCAL_USER_DATA: no
+      LC_ALL: C
+      CMAKE_FLAGS: -DPNR_TOOL=${{ matrix.tool }}
     steps:
 
     - uses: actions/checkout@v2
       with:
         submodules: recursive
 
-    - name: Install
+    - name: Install centos
+      if: ${{matrix.os == 'centos'}}
       run: |
-        apt-get -qqy update
-        apt-get -qqy install build-essential git make locales libtinfo-dev \
-          cmake python3 wget unzip curl openjdk-11-jdk-headless capnproto
-        dpkg-reconfigure locales
-        # Vivado is erroring out due to a missing library in CI.
-        # https://support.xilinx.com/s/article/76585?language=en_US
-        ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5
+        .github/scripts/centos-setup.sh
+
+    - name: Install
+      if: ${{ matrix.os == 'ubuntu' }}
+      run: |
+        .github/scripts/ubuntu-setup.sh
 
     - name: Create environment
       run: make env
@@ -67,67 +88,27 @@ jobs:
         make build
         make update
 
-    - name: Run tests
+    - name: Run nextpnr tests
+      if: ${{ matrix.tool == 'nextpnr'  }}
       run: |
         .github/scripts/tests.sh ${{ matrix.device }} vendor-bit-tests
 
-    - name: Prepare report
-      run: |
-        cd build
-        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allowed-failures allowed-failures.log
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: fpga-interchange-tests-${{ matrix.device }}
-        path: |
-          **/plot_*.svg
-          build/report*.csv
-
-  Run-VPR-Tests:
-    runs-on: [self-hosted, Linux, X64]
-    container: "ubuntu:20.04"
-    strategy:
-      fail-fast: false
-      matrix:
-        device: ["xc7a35t", "LIFCL-40", "testarch"]
-    env:
-      LANG: "en_US.UTF-8"
-      DEBIAN_FRONTEND: "noninteractive"
-      GHA_EXTERNAL_DISK: "tools"
-      XILINX_LOCAL_USER_DATA: "no"
-      LC_ALL: "C"
-    steps:
-
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-
-    - name: Install
-      run: |
-        apt-get -qqy update
-        apt-get -qqy install build-essential git make locales libtinfo-dev \
-          cmake python3 wget unzip curl openjdk-11-jdk-headless capnproto
-        dpkg-reconfigure locales
-        # Vivado is erroring out due to a missing library in CI.
-        # https://support.xilinx.com/s/article/76585?language=en_US
-        ln -s /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/libtinfo.so.5
-
-    - name: Create environment
-      run: make env
-
-    - name: Build CMake
-      run: |
-        make build
-        make update
-      env:
-        CMAKE_FLAGS: "-DPNR_TOOL=vpr"
-
-    - name: Run tests
+    - name: Run VPR tests
+      if: ${{ matrix.tool == 'vpr'  }}
       run: |
         .github/scripts/tests.sh ${{ matrix.device }}
 
-    - name: Prepare report
+    - name: Prepare nextpnr report
+      if: ${{ matrix.tool == 'nextpnr'  }}
       run: |
+        source env/conda/bin/activate fpga-interchange
+        cd build
+        python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allowed-failures allowed-failures.log
+
+    - name: Prepare VPR report
+      if: ${{ matrix.tool == 'vpr'  }}
+      run: |
+        source env/conda/bin/activate fpga-interchange
         cd build
         python3 ../utils/report_targets.py --log `find . -name "all-*-tests.log"` --csv report.csv --allow-any-failure
 
@@ -136,10 +117,11 @@ jobs:
         name: fpga-interchange-tests-${{ matrix.device }}
         path: |
           **/plot_*.svg
+          build/report*.csv
 
   Prepare-Design-Status-Report:
     runs-on: ubuntu-18.04
-    needs: Run-Nextpnr-Tests
+    needs: Run-Tests
     steps:
 
     - uses: actions/checkout@v2

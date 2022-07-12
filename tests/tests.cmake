@@ -193,6 +193,7 @@ function(add_generic_test)
         add_custom_command(
             OUTPUT ${netlist_yaml}
             COMMAND
+                ${quiet_cmd}
                 ${PYTHON3} -mfpga_interchange.convert
                     --schema_dir ${INTERCHANGE_SCHEMA_PATH}
                     --schema logical
@@ -214,6 +215,7 @@ function(add_generic_test)
             add_custom_command(
                 OUTPUT ${phys}
                 COMMAND
+                    ${quiet_cmd}
                     ${NEXTPNR_FPGA_INTERCHANGE}
                         --chipdb ${chipdb_loc}
                         --xdc ${xdc}
@@ -237,6 +239,7 @@ function(add_generic_test)
             add_custom_command(
                 OUTPUT ${phys}
                 COMMAND
+                    ${quiet_cmd}
                     ${VPR}
                     ${device_loc} ${netlist}
                     --arch_format fpga-interchange
@@ -262,6 +265,7 @@ function(add_generic_test)
         add_custom_command(
             OUTPUT ${phys_yaml}
             COMMAND
+                ${quiet_cmd}
                 ${PYTHON3} -mfpga_interchange.convert
                     --schema_dir ${INTERCHANGE_SCHEMA_PATH}
                     --schema physical

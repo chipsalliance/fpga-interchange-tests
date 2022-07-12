@@ -241,7 +241,7 @@ def main():
         # Data
         keys = sorted(designs.keys(), key=lambda x: x[1])
         for key in keys:
-            line = "{},{},{}".format(key[1], key[0], key[2])
+            line = f"{key[1]},{key[0]},{key[2]}"
             for stage in all_stages:
                 status = designs[key][stage]
                 if status is True:

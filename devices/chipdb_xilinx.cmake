@@ -159,6 +159,8 @@ function(generate_xc7_device_db)
     if(DEFINED device_target)
         set(${device_target} timing-${device}-device PARENT_SCOPE)
     endif()
+    
+    add_custom_target(all-${device}-dcp-bit)
 endfunction()
 
 function(generate_xcup_device_db)

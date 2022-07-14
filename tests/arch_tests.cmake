@@ -139,6 +139,7 @@ function(add_xc7_test)
       add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
       add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
       add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+      add_dependencies(all-${device}-dcp-bit ${arch}-${test_name}-dcp-bit)
 
       set(dcp_fasm ${output_dir}/${name}.dcp.bit.fasm)
       add_custom_command(
@@ -396,6 +397,7 @@ function(add_xcup_test)
         add_custom_target(${arch}-${test_name}-dcp-bit DEPENDS ${dcp_bit})
         add_dependencies(all-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
         add_dependencies(all-${device}-vendor-bit-tests ${arch}-${test_name}-dcp-bit)
+        add_dependencies(all-${device}-dcp-bit ${arch}-${test_name}-dcp-bit)
     endif()
 
 endfunction()

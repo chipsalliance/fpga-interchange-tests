@@ -7,6 +7,7 @@
 #
 # SPDX-License-Identifier: ISC
 
+set -e
 apt-get -qqy update
 apt-get -qqy install build-essential git make locales libtinfo-dev \
   cmake python3 wget unzip curl openjdk-11-jdk-headless capnproto

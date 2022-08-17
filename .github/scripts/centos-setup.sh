@@ -7,6 +7,7 @@
 #
 # SPDX-License-Identifier: ISC
 
+set -e
 yum -y update
 yum -y install epel-release
 yum -y groupinstall 'Development Tools'
@@ -25,7 +26,7 @@ pushd make-4.2.1
 make
 make install
 popd
-ln -s /usr/local/bin/make /usr/bin/make
+ln -sf /usr/local/bin/make /usr/bin/make
 
 # Check versions
 make --version

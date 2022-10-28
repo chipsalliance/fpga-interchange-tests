@@ -28,8 +28,12 @@ jobs:
         submodules:  'recursive'
         ssh-key: ${{ secrets.SSH_DEPLOY_KEY }}
 
+    - name: Install prerequisites
+      run: |
+        python3 -m pip install setuptools
+
     - name: Update Conda Lock
-      uses: SymbiFlow/actions/update_conda_lock@c6142a4ec7859653352757eb8f7c4630f63f96e3
+      uses: f4pga/actions/update_conda_lock@8ed9d1c014e69f692474a96210a3344588f23f84
       with:
         conda_lock_file:  'conda_lock.yml'
         environment_file: 'environment.yml'

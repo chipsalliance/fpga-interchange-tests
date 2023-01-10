@@ -28,6 +28,9 @@ make install
 popd
 ln -sf /usr/local/bin/make /usr/bin/make
 
+# Copy java.capnp needed by NISP
+cp ./third_party/nextpnr-fpga-interchange-site-preprocessor/third_party/capnproto-java/compiler/src/main/schema/capnp/java.capnp /usr/include/capnp/java.capnp
+
 # Check versions
 make --version
 cmake --version

@@ -36,6 +36,8 @@ jobs:
     steps:
 
     - uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Install prerequisites
       run: |
@@ -47,6 +49,10 @@ jobs:
         apt update -qqy
         apt install -qqy gnupg2 google-cloud-cli
 
+    - name: Install Rust
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
     - name: Save timestamp
       id: timestamp
       run: |
@@ -54,6 +60,7 @@ jobs:
 
     - name: Generate interchange data
       run: |
+        source "$HOME/.cargo/env"
         .github/scripts/pack-interchange-data.sh \
           interchange_tarballs \
           links \

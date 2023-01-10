@@ -80,11 +80,17 @@ jobs:
       run: |
         .github/scripts/ubuntu-setup.sh
 
+    - name: Install Rust
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
     - name: Create environment
-      run: make env
+      run: |
+        make env
 
     - name: Build CMake
       run: |
+        source "$HOME/.cargo/env"
         make build
         make update
 

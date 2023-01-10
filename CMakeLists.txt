@@ -53,6 +53,16 @@ set_program(vvp)
 set_program(xcfasm)
 set_program(yosys)
 
+if(DEFINED ENV{"NISP"})
+    set(NISP_PATH $ENV{"NISP"})
+else()
+    get_filename_component(NISP_PATH "third_party/nextpnr-fpga-interchange-site-preprocessor/nisp" ABSOLUTE)
+endif()
+
+set_target_properties(
+    programs PROPERTIES NISP ${NISP_PATH}
+)
+
 include(boards/boards.cmake)
 include(devices/chipdb.cmake)
 

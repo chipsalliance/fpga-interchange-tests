@@ -12,6 +12,7 @@ ENVIRONMENT_FILE := conda_lock.yml
 
 # Paths
 RAPIDWRIGHT_PATH ?= $(TOP_DIR)/third_party/RapidWright
+NISP_PATH = third_party/nextpnr-fpga-interchange-site-preprocessor
 
 third_party/make-env/conda.mk:
 	git submodule init
@@ -26,11 +27,23 @@ update:
 		make compile && \
 		popd
 
+${NISP_PATH}/nisp:
+	@$(IN_CONDA_ENV) cd ${NISP_PATH} && (FPGA_INTERCHANGE_SCHEMA_DIR=third_party/fpga-interchange-schema cargo build --release)
+	@ln -s `realpath ${NISP_PATH}/target/release/nisp` ${NISP_PATH}/nisp
+
+.PHONY: nisp
+nisp: ${NISP_PATH}/nisp
+
+.PHONY: clean-nisp
+clean-nisp:
+	@rm -rf ${NISP_PATH}/target
+	@unlink ${NISP_PATH}/nisp || true
+
 .PHONY: build
-build:
+build: ${NISP_PATH}/nisp
 	# Build test suite
 	@$(IN_CONDA_ENV) mkdir -p build && cd build && cmake .. ${CMAKE_FLAGS}
 
 .PHONY: clean-build
-clean-build:
+clean-build: clean-nisp
 	rm -rf build/*

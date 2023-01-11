@@ -37,6 +37,7 @@ LINK_PREFIX=$3
 INSTALL_DIR="$(pwd)/install"
 
 # Prepare environment
+source "$HOME/.cargo/env"
 make env
 source env/conda/bin/activate fpga-interchange
 

@@ -60,7 +60,6 @@ jobs:
 
     - name: Generate interchange data
       run: |
-        source "$HOME/.cargo/env"
         .github/scripts/pack-interchange-data.sh \
           interchange_tarballs \
           links \

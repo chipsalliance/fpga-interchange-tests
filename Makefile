@@ -37,7 +37,7 @@ nisp: ${NISP_PATH}/nisp
 .PHONY: clean-nisp
 clean-nisp:
 	@rm -rf ${NISP_PATH}/target
-	@unlink ${NISP_PATH}/nisp || true
+	-@unlink ${NISP_PATH}/nisp
 
 .PHONY: build
 build: ${NISP_PATH}/nisp

@@ -248,6 +248,7 @@ function(generate_chipdb)
 
     get_target_property(PYTHON3 programs PYTHON3)
     get_target_property(BBASM programs BBASM)
+    get_target_property(NISP programs NISP)
 
     get_target_property(device_loc ${device_target} LOCATION)
     set(chipdb_bba ${CMAKE_CURRENT_BINARY_DIR}/chipdb.bba)
@@ -280,6 +281,22 @@ function(generate_chipdb)
 
     add_custom_target(chipdb-${device}-bin DEPENDS ${chipdb_bin})
 
+    # TODO: Currently we invoke NISP to generate JSON data and we keep the
+    # JSON file. Ultimately this data should be imported to the BBA file.
+    set(nisp_json ${CMAKE_CURRENT_BINARY_DIR}/${device}_site_routability.json)
+    add_custom_command(
+        OUTPUT ${nisp_json}
+        COMMAND
+            ${NISP} ${device_loc} ${chipdb_bba} preprocess --json :all --threads 1 --no-formula-opt -c
+        DEPENDS
+            chipdb-${device}-bba
+            ${device_target}
+            ${device_loc}
+            ${NISP}
+    )
+
+    add_custom_target(chipdb-${device}-json DEPENDS ${nisp_json})
+
     # Setting device target properties
     add_custom_target(device-${device})
     set_target_properties(
@@ -299,6 +316,7 @@ function(generate_chipdb)
 
     install(FILES ${device_loc} DESTINATION devices/${device})
     install(FILES ${chipdb_bin} DESTINATION devices/${device})
+    install(FILES ${nisp_json}  DESTINATION devices/${device})
 
     add_custom_target(
         install_${device}_device
@@ -306,9 +324,11 @@ function(generate_chipdb)
         DEPENDS
             ${device_target}
             chipdb-${device}-bin
+            chipdb-${device}-json
     )
 
     add_dependencies(all-device-data chipdb-${device}-bin)
+    add_dependencies(all-device-data chipdb-${device}-json)
 
 endfunction()
 

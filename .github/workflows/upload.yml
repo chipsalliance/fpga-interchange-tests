@@ -25,7 +25,7 @@ on:
 jobs:
 
   Upload-Interchange-Data:
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
     container: ubuntu:focal
 
     env:

@@ -48,7 +48,7 @@ jobs:
   Run-Tests:
     needs: Matrix
 
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
 
     strategy:
       fail-fast: false

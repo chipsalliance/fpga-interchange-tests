@@ -54,6 +54,7 @@ dependencies:
   - wheel=0.37.1=pyhd3eb1b0_0
   - xz=5.2.5=h7f8727e_1
   - yosys=0.17_7_g990c9b8e1=20220512_085338_py37
+  - symbiflow-yosys-plugins=1.0.0_7_855_gd64a754=20220330_123635
   - zlib=1.2.12=h7f8727e_2
   - zstd=1.5.2=ha4553b6_0
   - pip:

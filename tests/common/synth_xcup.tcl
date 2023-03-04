@@ -1,7 +1,18 @@
 yosys -import
 
+set use_uhdm $::env(USE_UHDM)
+
+if { $use_uhdm } {
+    plugin -i systemverilog
+    yosys -import
+}
+
 foreach src $::env(SOURCES) {
-    read_verilog $src
+    if { $use_uhdm } {
+        read_systemverilog $src
+    } else {
+        read_verilog $src
+    }
 }
 
 synth_xilinx -flatten -noclkbuf -nolutram -nowidelut -nosrl -nocarry -nodsp -arch xcup

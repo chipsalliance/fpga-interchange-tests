@@ -36,7 +36,7 @@ function(add_generic_test)
     #   - <arch>-<name>-<board>-phys     : physical interchange netlist
     #   - <arch>-<name>-<board>-fasm     : fasm file
 
-    set(options failure_allowed)
+    set(options failure_allowed uhdm)
     set(oneValueArgs name tcl top testbench constr_prefix generated_xdc)
     set(multiValueArgs board_list sources absolute_sources built_sources)
 
@@ -55,6 +55,7 @@ function(add_generic_test)
     set(constr_prefix ${add_generic_test_constr_prefix})
     set(generated_xdc ${add_generic_test_generated_xdc})
     set(failure_allowed ${add_generic_test_failure_allowed})
+    set(uhdm ${add_generic_test_uhdm})
 
     set(sources)
     foreach(source ${add_generic_test_sources})
@@ -123,6 +124,13 @@ function(add_generic_test)
         set(synth_json ${output_dir}/${name}.json)
         set(synth_log ${output_dir}/${name}.synth.log)
         set(synth_verilog ${output_dir}/${name}.synth.v)
+
+        if(uhdm)
+            set(use_uhdm TRUE)
+        else()
+            set(use_uhdm FALSE)
+        endif()
+
         add_custom_command(
             OUTPUT ${synth_json}
             COMMAND ${CMAKE_COMMAND} -E env
@@ -130,6 +138,7 @@ function(add_generic_test)
                 OUT_JSON=${synth_json}
                 OUT_VERILOG=${synth_verilog}
                 LIB_DIR=${lib_dir}
+                USE_UHDM=${use_uhdm}
                 ${quiet_cmd}
                 ${YOSYS} -c ${synth_tcl} -l ${synth_log}
             DEPENDS

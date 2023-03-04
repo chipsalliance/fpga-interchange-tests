@@ -20,6 +20,7 @@ dependencies:
     - litex-hub::prjxray-tools
     - litex-hub::vtr-optimized
     - litex-hub::yosys
+    - litex-hub::symbiflow-yosys-plugins=1.0.0_7_855_gd64a754=20220330_123635
     - swig
     - packaging=21.3
     - pip=21.1.3
